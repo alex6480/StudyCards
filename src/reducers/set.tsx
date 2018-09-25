@@ -24,7 +24,7 @@ const cards = (state:  { [id: number] : FlashCard; } = initialState.cards, actio
 const name = (state: string = initialState.name, action: fromActions.Actions): string => {
     switch (action.type) {
         case fromActions.UPDATE_SET_NAME:
-            return action.payload;
+            return action.payload.name;
         default:
             return state;
     }
@@ -42,6 +42,12 @@ export default (state: FlashCardSet = initialState, action: fromActions.Actions)
     // Generate a new id if none has been supplied
     var setId = state.id == initialState.id ? utils.guid() : state.id;
     switch (action.type) {
+        case fromActions.UPDATE_SET_NAME:
+            return {
+                cards: state.cards,
+                name: action.payload.set.id == state.id ? name(state.name, action) : state.name,
+                id: setId
+            }
         case fromActions.ADD_NEW_CARD:
             if (action.payload.setId == state.id) {
                 var newCard = card(undefined, action);

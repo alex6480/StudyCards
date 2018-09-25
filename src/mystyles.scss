@@ -74,3 +74,20 @@ $modal-content-width: 900px;
 .card-content.content {
     margin-bottom: 0;
 }
+
+.editable-text {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    margin: -0.2rem 0;
+
+    &:first-child {
+        margin-left: -0.5rem;
+    }
+
+    &:hover, &:focus {
+        border: 1px solid white;
+        background-color: rgba(white, $alpha: 0.1);
+    }
+}

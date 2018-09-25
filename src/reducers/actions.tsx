@@ -31,7 +31,7 @@ export const ADD_NEW_SET = "add new set";
 
 export const Actions = {
     addNewCard: (setId: string) => createAction(ADD_NEW_CARD, { setId: setId }),
-    updateSetName: (name: string) => createAction(UPDATE_SET_NAME, name),
+    updateSetName: (set: FlashCardSet, newName: string) => createAction(UPDATE_SET_NAME, { set: set, name: newName }),
     deleteCard: (card: FlashCard) => createAction(DELETE_CARD, card),
     updateCardFace: (cardId: string, face: FlashCardFace) => createAction(UPDATE_CARD_FACE, {
         cardId: cardId,

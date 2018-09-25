@@ -6,12 +6,14 @@ import SetExporter from "../SetExporter";
 import { AppState } from "../../reducers";
 import FlashCard from "../../lib/flashcard/flashcard";
 import { FlashCardFace } from "../../lib/flashcard/FlashCardFace";
+import EditableText from "../rich-text-editor/EditableText";
 
 interface SetPageProps {
     set: FlashCardSet;
     addNewCard: (setId: string) => void;
     deleteCard: (card: FlashCard) => void;
     updateCardFace: (cardId: string, face: FlashCardFace) => void;
+    updateSetName: (set: FlashCardSet, newName: string) => void;
     goToDashboard: () => void;
 }
 
@@ -60,7 +62,9 @@ export default class SetPage extends React.Component<SetPageProps, SetPageState>
             <section className="hero is-primary">
                 <div className="hero-body">
                     <div className="container">
-                        <h1 className="title is-1">{this.props.set.name} ({ Object.keys(this.props.set.cards).length })</h1>
+                        <h1 className="title is-1">
+                            <EditableText value={this.props.set.name} onChange={this.updateSetName.bind(this)}/>
+                            ({ Object.keys(this.props.set.cards).length })</h1>
                         <nav className="breadcrumb subtitle is-6" aria-label="breadcrumbs">
                             <ul>
                                 <li><a href="#" onClick={this.props.goToDashboard}>My Sets</a></li>
@@ -94,5 +98,9 @@ export default class SetPage extends React.Component<SetPageProps, SetPageState>
 
     private goToSection (newPage: SetPageSection) {
         this.setState({section: newPage});
+    }
+
+    private updateSetName (newName: string) {
+        this.props.updateSetName(this.props.set, newName);
     }
 }
