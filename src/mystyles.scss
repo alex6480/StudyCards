@@ -1,0 +1,76 @@
+@charset "utf-8";
+
+// Import a Google Font
+@import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+
+// Set your brand colors
+$beige-lighter: #EFF0EB;
+
+// Update Bulma's global variables
+$family-sans-serif: "Nunito", sans-serif;
+$widescreen-enabled: true;
+$fullhd-enabled: false;
+
+// Update some of Bulma's component variables
+$body-background-color: $beige-lighter;
+$input-shadow: none;
+
+// Have wider modals
+$modal-content-width: 900px;
+
+// Import only what you need from Bulma
+@import "../node_modules/bulma/sass/utilities/_all.sass";
+@import "../node_modules/bulma/sass/base/_all.sass";
+@import "../node_modules/bulma/sass/grid/_all.sass";
+@import "../node_modules/bulma/sass/elements/button.sass";
+@import "../node_modules/bulma/sass/elements/container.sass";
+@import "../node_modules/bulma/sass/elements/box.sass";
+@import "../node_modules/bulma/sass/elements/form.sass";
+@import "../node_modules/bulma/sass/elements/icon.sass";
+@import "../node_modules/bulma/sass/elements/title.sass";
+@import "../node_modules/bulma/sass/elements/notification.sass";
+@import "../node_modules/bulma/sass/elements/content.sass";
+@import "../node_modules/bulma/sass/layout/hero.sass";
+@import "../node_modules/bulma/sass/layout/section.sass";
+@import "../node_modules/bulma/sass/components/breadcrumb.sass";
+@import "../node_modules/bulma/sass/components/level.sass";
+@import "../node_modules/bulma/sass/components/modal.sass";
+@import "../node_modules/bulma/sass/components/dropdown.sass";
+@import "../node_modules/bulma/sass/components/card.sass";
+@import "../node_modules/bulma/sass/components/navbar.sass";
+@import "../node_modules/bulma/sass/components/tabs.sass";
+
+// These should be moved to appropriate locations
+// Used by the RichFieldEditor
+.listed-flashcard {
+    .flashcard-face {
+        & .flashcard-face-toolbar {
+            display: flex;
+            padding: 0.5rem;
+
+            & > .field {
+                margin: 0;
+                &:not(:first-child) {
+                    margin-left: 0.5rem;
+                }
+            }
+        }
+    }
+}
+
+.reveal-editor-field {
+    cursor: pointer;
+    color: #AAA;
+    &:before {
+        content: "[";
+        color: black;
+    }
+    &:after {
+        content: "]";
+        color: black;
+    }
+}
+
+.card-content.content {
+    margin-bottom: 0;
+}
