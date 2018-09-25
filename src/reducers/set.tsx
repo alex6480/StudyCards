@@ -30,14 +30,6 @@ const name = (state: string = initialState.name, action: fromActions.Actions): s
     }
 }
 
-// Reducer for the card currently being edited
-function cardBeingEdited (state: FlashCard | null = null, action: fromActions.Actions): FlashCard | null {
-    switch (action.type) {
-        default:
-            return null;
-    }
-}
-
 export default (state: FlashCardSet = initialState, action: fromActions.Actions): FlashCardSet => {
     // Generate a new id if none has been supplied
     var setId = state.id == initialState.id ? utils.guid() : state.id;
