@@ -1,35 +1,45 @@
 import * as React from 'react';
 
 interface EditableTextProps {
-    value?: string;
+    value: string;
     onChange?: (newValue: string) => void;
+    maxLength?: number;
 }
 
-export default class EditableText extends React.Component<EditableTextProps> {
-    private contentSpan: HTMLSpanElement | null = null;
+interface EditableTextState {
+    updateSelection?: UpdateSelection;
+}
 
-    constructor (props: {}) {
+enum UpdateSelection {
+    None,
+    Start,
+    End
+}
+
+export default class EditableText extends React.Component<EditableTextProps, EditableTextState> {
+    private contentSpan: HTMLSpanElement | null = null;
+    private caretPosition?: number = undefined;
+
+    constructor (props: EditableTextProps) {
         super(props);
+
+        this.state = {
+            updateSelection: undefined
+        };
     }
 
-    private handleInput () {
+    private handleChange (e: React.ChangeEvent<HTMLInputElement>) {
         if (this.props.onChange != undefined && this.contentSpan != null) {
-            let text = this.contentSpan.textContent;
-            if (text != null) {
-                this.props.onChange(text);
+            let text = e.target.value;
+            if (text != null && this.props.maxLength != undefined) {
+                this.props.onChange(text.substr(0, Math.min(text.length, this.props.maxLength)));
             }
         }
     }
 
     render () {
-        return <div className="editable-text"
-                    suppressContentEditableWarning={true}
-                    contentEditable={true}
-                    onInput={this.handleInput.bind(this)}
-                    ref={s => this.contentSpan = s}>{this.props.value}</div>
-    }
-
-    shouldComponentUpdate (nextProps: EditableTextProps, nextState: {}){
-        return this.contentSpan != undefined && nextProps.value !== this.contentSpan.textContent;
+        return <input className="editable-text"
+                    onChange={this.handleChange.bind(this)}
+                    ref={s => this.contentSpan = s} value={this.props.value} />
     }
 }

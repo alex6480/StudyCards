@@ -82,6 +82,14 @@ $modal-content-width: 900px;
     border-radius: 3px;
     margin: -0.2rem 0;
 
+    color: inherit;
+    font: inherit;
+    background: transparent;
+
+    &:empty:before {
+        content: "\00a0";
+    }
+
     &:first-child {
         margin-left: -0.5rem;
     }

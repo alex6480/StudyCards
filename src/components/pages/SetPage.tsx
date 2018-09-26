@@ -63,8 +63,11 @@ export default class SetPage extends React.Component<SetPageProps, SetPageState>
                 <div className="hero-body">
                     <div className="container">
                         <h1 className="title is-1">
-                            <EditableText value={this.props.set.name} onChange={this.updateSetName.bind(this)}/>
-                            ({ Object.keys(this.props.set.cards).length })</h1>
+                            <span className="icon icon-small">
+                                <i className="fas fa-pen"></i>
+                            </span>&nbsp;
+                            <EditableText maxLength={30} value={this.props.set.name} onChange={this.updateSetName.bind(this)}/>
+                        </h1>
                         <nav className="breadcrumb subtitle is-6" aria-label="breadcrumbs">
                             <ul>
                                 <li><a href="#" onClick={this.props.goToDashboard}>My Sets</a></li>
