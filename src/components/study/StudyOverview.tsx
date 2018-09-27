@@ -25,7 +25,7 @@ export default class StudyOverview extends React.Component<StudyOverviewProps> {
         let knownCardIds = Study.getKnownCardIds(this.props.set.cards, this.props.studyData);
         let newCardsInStudy = Math.min(newCardIds.length, this.props.maxNewCards);
         let knownCardsInStudy = Math.min(knownCardIds.length, this.props.maxTotalCards - newCardsInStudy);
-
+        
         return <div className="columns">
             <div className="column">
                 <h1 className="title is-3">Study {this.props.set.name} now</h1>
@@ -35,7 +35,7 @@ export default class StudyOverview extends React.Component<StudyOverviewProps> {
                     This study section will include {newCardsInStudy} new
                     card{newCardsInStudy == 1 ? "" : "s"} and {knownCardsInStudy} known card{knownCardsInStudy == 1 ? "" : "s"}.
                 </p>
-                <a href="#" className="button is-primary" onClick={this.handleStartClick.bind(this)}>Study Now</a>
+                <a href="#" className="button is-large is-primary" onClick={this.handleStartClick.bind(this)}>Study Now</a>
             </div>
 
             <div className="column">
