@@ -16,6 +16,7 @@ interface SetPageProps {
     deleteCard: (card: FlashCard) => void;
     updateCardFace: (cardId: string, face: FlashCardFace) => void;
     updateSetName: (set: FlashCardSet, newName: string) => void;
+    resetStudySessionData: () => void;
     goToDashboard: () => void;
 }
 
@@ -53,6 +54,7 @@ export default class SetPage extends React.Component<SetPageProps, SetPageState>
                 break;
             case SetPageSection.Study:
                 page = <StudySection set={this.props.set}
+                        resetSessionStudyData={this.props.resetStudySessionData}
                         studyData={{
                             setId: this.props.set.id,
                             cardData: {}

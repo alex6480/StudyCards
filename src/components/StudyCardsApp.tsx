@@ -20,6 +20,7 @@ interface StudyCardsAppDispatchProps {
     deleteCard: (card: FlashCard) => void;
     updateCardFace: (cardId: string, face: FlashCardFace) => void;
     updateSetName: (set: FlashCardSet, newName: string) => void;
+    resetStudySessionData: () => void
 }
 
 interface StudyCardsAppProps extends StudyCardsAppStateProps, StudyCardsAppDispatchProps {}
@@ -74,7 +75,8 @@ class StudyCardsApp extends React.Component<StudyCardsAppProps, StudyCardsAppSta
                         deleteCard={this.props.deleteCard}
                         updateCardFace={this.props.updateCardFace}
                         goToDashboard={this.goToDashboard.bind(this)}
-                        updateSetName={this.props.updateSetName} />
+                        updateSetName={this.props.updateSetName}
+                        resetStudySessionData={this.props.resetStudySessionData} />
         }
     }
 }
@@ -91,7 +93,8 @@ function mapDispatchToProps (dispatch: Dispatch): StudyCardsAppDispatchProps {
         addNewCard: (setId: string) => dispatch(Actions.addNewCard(setId)),
         deleteCard: (card: FlashCard) => dispatch(Actions.deleteCard(card)),
         updateCardFace: (cardId: string, face: FlashCardFace) => dispatch(Actions.updateCardFace(cardId, face)),        
-        updateSetName: (set: FlashCardSet, newName: string) => dispatch(Actions.updateSetName(set, newName)),        
+        updateSetName: (set: FlashCardSet, newName: string) => dispatch(Actions.updateSetName(set, newName)),
+        resetStudySessionData: () => dispatch(Actions.resetSessionStudyData()),      
     }
 }
 

@@ -28,6 +28,7 @@ export const UPDATE_SET_NAME = "update set name";
 export const DELETE_CARD = "delete card";
 export const UPDATE_CARD_FACE = "update card face";
 export const ADD_NEW_SET = "add new set";
+export const RESET_SESSION_STUDY_DATA = "reset session study data";
 
 export const Actions = {
     addNewCard: (setId: string) => createAction(ADD_NEW_CARD, { setId: setId }),
@@ -37,7 +38,12 @@ export const Actions = {
         cardId: cardId,
         face: face
     }),
-    addSet: (set?: FlashCardSet) => createAction(ADD_NEW_SET, { set: set })
+    addSet: (set?: FlashCardSet) => createAction(ADD_NEW_SET, { set: set }),
+    
+    /**
+     * Resets the parts of the studydata that are temporary for a single study session
+     */
+    resetSessionStudyData: () => createAction(RESET_SESSION_STUDY_DATA),
 }
 
 export type Actions = ActionsUnion<typeof Actions>;

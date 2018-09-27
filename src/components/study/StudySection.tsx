@@ -8,6 +8,7 @@ import * as Study from "../../lib/study";
 interface StudySectionProps {
     set: FlashCardSet;
     studyData: SetStudyData;
+    resetSessionStudyData: () => void;
 }
 
 interface StudySectionState {
@@ -31,6 +32,8 @@ export default class StudySection extends React.Component<StudySectionProps, Stu
             studyDeck: deck,
             currentCardId: currentCardId
         });
+        // Make sure no temporary data is left from previous study session
+        this.props.resetSessionStudyData();
     }
 
     render () {
