@@ -93,7 +93,7 @@ export default class SetPage extends React.Component<SetPageProps, SetPageState>
                             </span>&nbsp;
                             Back
                         </a> 
-                        <a className="navbar-item" onClick={() => this.goToSection(SetPageSection.Study)}>Study</a> 
+                        <a className="navbar-item" onClick={() => this.goToSection(SetPageSection.Study)}>Study</a>
                         <a className="navbar-item" onClick={() => this.goToSection(SetPageSection.Edit)}>Edit Cards</a>
                         <a className="navbar-item" onClick={() => this.goToSection(SetPageSection.Properties)}>Set Properties</a>
                         <a className="navbar-item" onClick={() => this.goToSection(SetPageSection.Export)}>Export</a>
