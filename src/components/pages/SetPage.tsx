@@ -7,6 +7,8 @@ import { AppState } from "../../reducers";
 import FlashCard from "../../lib/flashcard/flashcard";
 import { FlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import EditableText from "../rich-text-editor/EditableText";
+import StudySection from "../study/StudySection";
+import { SetStudyData } from "../../lib/flashcard/StudyData";
 
 interface SetPageProps {
     set: FlashCardSet;
@@ -50,6 +52,12 @@ export default class SetPage extends React.Component<SetPageProps, SetPageState>
                 page = <SetExporter set={this.props.set}/>
                 break;
             case SetPageSection.Study:
+                page = <StudySection set={this.props.set}
+                        studyData={{
+                            setId: this.props.set.id,
+                            cardData: {}
+                        }}/>
+                break
             default:
                 page = <SetCardEditor set={this.props.set}
                             addNewCard={this.props.addNewCard}
