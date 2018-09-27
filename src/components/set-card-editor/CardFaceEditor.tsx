@@ -1,76 +1,37 @@
-import * as React from 'react';
-import { FlashCardFace } from '../../lib/flashcard/flashcardface';
-import DropDown from '../rich-text-editor/DropDown';
-import { ToolbarButton, ToolbarButtonInline, ToolbarButtonBlock } from '../rich-text-editor/ToolbarButton';
-import { InlineStyle, BlockStyle } from '../rich-text-editor/styles';
-import { Editor, EditorState, CompositeDecorator, RichUtils } from 'draft-js';
-import { Dispatch } from 'redux';
-import { Actions } from '../../reducers/actions';
-import { connect } from 'react-redux';
-import { RevealDecorator, RevealEntity } from '../rich-text-editor/RevealEntity';
-import { AppState } from '../../reducers';
+import { CompositeDecorator, Editor, EditorState, RichUtils } from "draft-js";
+import * as React from "react";
+import { IFlashCardFace } from "../../lib/flashcard/flashcardface";
+import DropDown from "../rich-text-editor/DropDown";
+import { RevealDecorator, RevealEntity } from "../rich-text-editor/RevealEntity";
+import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
+import { ToolbarButton, ToolbarButtonBlock, ToolbarButtonInline } from "../rich-text-editor/ToolbarButton";
 
-interface CardFaceEditorState {
-    editorState: EditorState
+interface ICardFaceEditorState {
+    editorState: EditorState;
 }
 
-export interface CardFaceEditorProps {
-    face: FlashCardFace,
-    cardId: string,
-    updateCardFace: (cardId: string, face: FlashCardFace) => void
+export interface ICardFaceEditorProps {
+    face: IFlashCardFace;
+    cardId: string;
+    updateCardFace: (cardId: string, face: IFlashCardFace) => void;
 }
 
-export default class CardFaceEditor extends React.Component<CardFaceEditorProps, CardFaceEditorState> {
+export default class CardFaceEditor extends React.Component<ICardFaceEditorProps, ICardFaceEditorState> {
     private editor: Editor | null = null;
-    
-    constructor (props: CardFaceEditorProps) {
+
+    constructor(props: ICardFaceEditorProps) {
         super(props);
 
-        let editorState = props.face.richTextContent != null
+        const editorState = props.face.richTextContent != null
             ? EditorState.createWithContent(props.face.richTextContent, new CompositeDecorator([
-                RevealDecorator
+                RevealDecorator,
             ]))
             : EditorState.createEmpty();
 
-        this.state = {
-            editorState: editorState
-        };
+        this.state = { editorState };
     }
 
-    private preventDefault (func: (e?: React.MouseEvent) => any) {
-        return (e: React.MouseEvent) => {
-            e.preventDefault;
-            func(e);
-        }
-    }
-
-    private toggleReveal () {
-        new RevealEntity().toggle(this.state.editorState, (newEditorState: EditorState) => {
-            this.onChange(newEditorState);
-        });
-    }
-
-    private toggleInlineStyle (style: InlineStyle) {
-        if (this.editor != null) {
-            this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, style));
-        }
-    }
-
-    private toggleBlockStyle (style: BlockStyle) {
-        if (this.editor != null) {
-            this.onChange(RichUtils.toggleBlockType(this.state.editorState, style));
-        }
-    }
-
-    private onChange (editorState: EditorState) {
-        this.setState({ editorState: editorState });
-        this.props.updateCardFace(this.props.cardId, { 
-            ...this.props.face,
-            richTextContent: editorState.getCurrentContent()
-        });
-    }
-
-    render() {
+    public render() {
         return <div className="card flashcard-face">
             <header className="card-header">
                 <div className="flashcard-face-toolbar">
@@ -100,45 +61,88 @@ export default class CardFaceEditor extends React.Component<CardFaceEditorProps,
                         </p>
                     </div>
                     <div className="field has-addons">
-                        <ToolbarButtonInline icon="bold" type={InlineStyle.BOLD} editorState={this.state.editorState} toggleStyle={this.toggleInlineStyle.bind(this)} />
-                        <ToolbarButtonInline icon="italic" type={InlineStyle.ITALIC} editorState={this.state.editorState} toggleStyle={this.toggleInlineStyle.bind(this)} />
-                        <ToolbarButtonInline icon="underline" type={InlineStyle.UNDERLINE} editorState={this.state.editorState} toggleStyle={this.toggleInlineStyle.bind(this)} />
-                        <ToolbarButtonInline icon="strikethrough" type={InlineStyle.STRIKETHROUGH} editorState={this.state.editorState} toggleStyle={this.toggleInlineStyle.bind(this)} />
+                        <ToolbarButtonInline icon="bold" type={InlineStyle.BOLD}
+                            editorState={this.state.editorState} toggleStyle={this.toggleInlineStyle.bind(this)} />
+                        <ToolbarButtonInline icon="italic" type={InlineStyle.ITALIC}
+                            editorState={this.state.editorState} toggleStyle={this.toggleInlineStyle.bind(this)} />
+                        <ToolbarButtonInline icon="underline" type={InlineStyle.UNDERLINE}
+                            editorState={this.state.editorState} toggleStyle={this.toggleInlineStyle.bind(this)} />
+                        <ToolbarButtonInline icon="strikethrough" type={InlineStyle.STRIKETHROUGH}
+                            editorState={this.state.editorState} toggleStyle={this.toggleInlineStyle.bind(this)} />
                     </div>
                     <div className="field">
                         <DropDown>
-                        { /*<a href="#" className="dropdown-item" onClick={this.toggleBlockStyle(BlockStyle.HEADER_ONE)}>
+                        {/*<a href="#" className="dropdown-item"
+                            onClick={this.toggleBlockStyle(BlockStyle.HEADER_ONE)}>
                             Title
                         </a>
-                        <a className="dropdown-item" onClick={this.toggleBlockStyle(BlockStyle.HEADER_TWO)}>
+                        <a className="dropdown-item"
+                            onClick={this.toggleBlockStyle(BlockStyle.HEADER_TWO)}>
                             Subtitle
                         </a>
-                        <a href="#" className="dropdown-item is-active" onClick={this.toggleBlockStyle(BlockStyle.PARAGRAPH)}>
+                        <a href="#" className="dropdown-item is-active"
+                            onClick={this.toggleBlockStyle(BlockStyle.PARAGRAPH)}>
                             Body
-                        </a>*/ }
+                        </a>*/}
                         </DropDown>
                     </div>
                     <div className="field has-addons">
-                        <ToolbarButtonBlock icon="list-ul" type={BlockStyle.UNORDERED_LIST_ITEM} editorState={this.state.editorState} toggleStyle={this.toggleBlockStyle.bind(this)}/>
-                        <ToolbarButtonBlock icon="list-ol" type={BlockStyle.ORDERED_LIST_ITEM} editorState={this.state.editorState} toggleStyle={this.toggleBlockStyle.bind(this)}/>
+                        <ToolbarButtonBlock icon="list-ul" type={BlockStyle.UNORDERED_LIST_ITEM}
+                            editorState={this.state.editorState} toggleStyle={this.toggleBlockStyle.bind(this)}/>
+                        <ToolbarButtonBlock icon="list-ol" type={BlockStyle.ORDERED_LIST_ITEM}
+                            editorState={this.state.editorState} toggleStyle={this.toggleBlockStyle.bind(this)}/>
                     </div>
                     <div className="field">
-                        <ToolbarButton icon="low-vision" editorState={this.state.editorState} onClick={this.toggleReveal.bind(this)} />
+                        <ToolbarButton icon="low-vision" editorState={this.state.editorState}
+                            onClick={this.toggleReveal.bind(this)} />
                     </div>
                 </div>
             </header>
-            
-            <div className="card-content content" onClick={e => {e.preventDefault(); this.editor && this.editor.focus()}}>
+
+            <div className="card-content content" onClick={this.focusEditor.bind(this)}>
                 <Editor
                     editorState={this.state.editorState}
                     onChange={this.onChange.bind(this)}
                     ref={editor => this.editor = editor}
                 />
             </div>
-            
+
             <footer className="card-footer">
                 <p>This is a list of tags</p>
             </footer>
-        </div>
+        </div>;
+    }
+
+    private focusEditor(e: React.MouseEvent) {
+        e.preventDefault();
+        if (this.editor) {
+            this.editor.focus();
+        }
+    }
+
+    private toggleReveal() {
+        new RevealEntity().toggle(this.state.editorState, (newEditorState: EditorState) => {
+            this.onChange(newEditorState);
+        });
+    }
+
+    private toggleInlineStyle(style: InlineStyle) {
+        if (this.editor != null) {
+            this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, style));
+        }
+    }
+
+    private toggleBlockStyle(style: BlockStyle) {
+        if (this.editor != null) {
+            this.onChange(RichUtils.toggleBlockType(this.state.editorState, style));
+        }
+    }
+
+    private onChange(editorState: EditorState) {
+        this.setState({ editorState });
+        this.props.updateCardFace(this.props.cardId, {
+            ...this.props.face,
+            richTextContent: editorState.getCurrentContent(),
+        });
     }
 }

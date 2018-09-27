@@ -1,6 +1,6 @@
 /// <reference types="node" />
 
-declare module 'react-rte' {
+declare module "react-rte" {
     interface RichTextEditorProps {
         value: EditorValue,
         onChange: (value:EditorValue) => void

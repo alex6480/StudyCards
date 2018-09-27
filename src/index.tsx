@@ -1,19 +1,17 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-
-import SetPage from "./components/pages/SetPage"
-import { createStore } from "redux";
-import reducer from "./reducers";
 import { Provider } from "react-redux";
+import { createStore } from "redux";
 import StudyCardsApp from "./components/StudyCardsApp";
+import reducer from "./reducers";
 
-require("./mystyles.scss");
+import "./mystyles.scss";
 
-var store = createStore(reducer);
+const store = createStore(reducer);
 
 ReactDOM.render(
     <Provider store={store}>
         <StudyCardsApp />
     </Provider>,
-    document.getElementById("app")
+    document.getElementById("app"),
 );

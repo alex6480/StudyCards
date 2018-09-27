@@ -1,48 +1,42 @@
-import { combineReducers } from 'redux';
-import card, * as fromCard from './card';
-import set, * as fromSet from './set';
-import FlashCardSet from '../lib/flashcard/FlashCardSet';
-import FlashCard from '../lib/flashcard/flashcard';
-import * as fromActions from './actions';
-import * as utils from '../lib/utils';
-import { SetStudyData } from '../lib/flashcard/StudyData';
-import setStudyData from './studyData';
+import IFlashCardSet from "../lib/flashcard/FlashCardSet";
+import { ISetStudyData } from "../lib/flashcard/StudyData";
+import * as utils from "../lib/utils";
+import * as fromActions from "./actions";
+import set, * as fromSet from "./set";
+import setStudyData from "./studyData";
 
-export type AppState = {
-    sets: { [id: string]: FlashCardSet },
-    studyData: { [id: string]: SetStudyData }
-};
-
-const initialState: AppState = {
-    sets: { },
-    studyData: { }
+export interface IAppState {
+    sets: { [id: string]: IFlashCardSet };
+    studyData: { [id: string]: ISetStudyData };
 }
 
-let reducer = (state: AppState = initialState, action: fromActions.Actions): AppState => {
+const initialState: IAppState = {
+    sets: { },
+    studyData: { },
+};
+
+export default function studyCardsStore(state: IAppState = initialState, action: fromActions.Actions): IAppState {
     switch (action.type) {
         case fromActions.ADD_NEW_SET:
-            let newSet = action.payload.set != undefined ? action.payload.set : set(undefined, action);
-            let newStudyData: SetStudyData = {
+            const newSet = action.payload.set !== undefined ? action.payload.set : set(undefined, action);
+            const newStudyData: ISetStudyData = {
                 setId: newSet.id,
-                cardData: {}
+                cardData: {},
             };
             return {
                 sets: {
                     [newSet.id]: newSet,
-                    ...state.sets
+                    ...state.sets,
                 },
                 studyData: {
                     [newSet.id]: newStudyData,
-                    ...state.studyData
-                }
-            }
+                    ...state.studyData,
+                },
+            };
         default:
             return {
                 sets: utils.objectMapString(state.sets, (k, v) => set(v, action)),
-                studyData: utils.objectMapString(state.studyData, (k, v) => setStudyData(v, action))
+                studyData: utils.objectMapString(state.studyData, (k, v) => setStudyData(v, action)),
             };
     }
 }
-
-const studyCardsStore = reducer;
-export default studyCardsStore;

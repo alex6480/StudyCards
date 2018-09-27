@@ -1,30 +1,32 @@
-import * as React  from 'react';
-import { EntityType, EditorEntity, MutabilityType, DraftDecorator } from './entity';
-import { ContentBlock, ContentState, Entity } from 'draft-js';
+import { ContentBlock, ContentState } from "draft-js";
+import * as React from "react";
+import { EditorEntity, EntityType, IDraftDecorator, MutabilityType } from "./entity";
 
 export class RevealEntity extends EditorEntity<{}> {
-    constructor () {
+    constructor() {
         super(EntityType.Reveal, MutabilityType.Mutable, {});
     }
 }
 
 export class Reveal extends React.Component {
-    render () {
+    public render() {
         return <span className="reveal-editor-field">
             {this.props.children}
-        </span>
+        </span>;
     }
 }
 
-let revealStrategy = function (block: ContentBlock, callback: (start: number, end: number) => void, contentState: ContentState) {
+function revealStrategy(block: ContentBlock,
+                        callback: (start: number, end: number) => void,
+                        contentState: ContentState) {
     block.findEntityRanges((value) => {
         const entityKey = value.getEntity();
-        return entityKey != null && contentState.getEntity(entityKey).getType() == EntityType.Reveal
+        return entityKey != null && contentState.getEntity(entityKey).getType() === EntityType.Reveal;
     }, callback);
 }
 
-let RevealDecorator: DraftDecorator = {
+const RevealDecorator: IDraftDecorator = {
     strategy: revealStrategy,
     component: Reveal,
-}
-export { RevealDecorator}
+};
+export { RevealDecorator };

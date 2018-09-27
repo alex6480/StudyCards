@@ -1,26 +1,43 @@
+import { EditorState } from "draft-js";
 import * as React from "react";
-import { EditorState, DraftBlockType } from "draft-js";
 import { BlockStyle, InlineStyle } from "./styles";
 
-interface ToolbarButtonProps {
+interface IToolbarButtonProps {
     onClick?: (e: React.MouseEvent) => void;
-    editorState: EditorState,
+    editorState: EditorState;
     icon: string;
 }
 
-interface ToolbarButtonState {
+interface IToolbarButtonState {
     isActive: boolean;
 }
 
-export class ToolbarButton<P extends ToolbarButtonProps> extends React.Component<P, ToolbarButtonState> {
+export class ToolbarButton<P extends IToolbarButtonProps> extends React.Component<P, IToolbarButtonState> {
     private mouseUpHandler: (e: MouseEvent) => void = this.handleMouseUp.bind(this);
-    
-    constructor (props: P) {
+
+    constructor(props: P) {
         super(props);
 
         this.state = {
             isActive: false,
         };
+    }
+
+    public render() {
+        return <p className="control">
+            <a className={"button " + (this.state.isActive ? "is-active" : "")}
+                onMouseDown={this.handleMouseDown.bind(this)} onClick={this.onClick.bind(this)}>
+                <span className="icon">
+                    <i className={"fas fa-" + this.props.icon}></i>
+                </span>
+            </a>
+        </p>;
+    }
+
+    protected onClick(e: React.MouseEvent) {
+        if (this.props.onClick) {
+            this.props.onClick(e);
+        }
     }
 
     private handleMouseDown(e: MouseEvent) {
@@ -33,23 +50,7 @@ export class ToolbarButton<P extends ToolbarButtonProps> extends React.Component
 
     private handleMouseUp() {
         document.removeEventListener("mouseup", this.mouseUpHandler);
-        this.setState({ isActive: false })
-    }
-
-    protected onClick (e: React.MouseEvent) {
-        if (this.props.onClick) {
-            this.props.onClick(e);
-        }
-    }
-
-    render() {
-        return <p className="control">
-            <a className={"button " + (this.state.isActive ? "is-active" : "")} onMouseDown={this.handleMouseDown.bind(this)} onClick={this.onClick.bind(this)}>
-                <span className="icon">
-                    <i className={"fas fa-" + this.props.icon}></i>
-                </span>
-            </a>
-        </p>
+        this.setState({ isActive: false });
     }
 }
 
@@ -60,22 +61,17 @@ export class ToolbarButton<P extends ToolbarButtonProps> extends React.Component
 
 
 
-interface ToolbarButtonInlineProps extends ToolbarButtonProps {
-    type: InlineStyle
-    toggleStyle: (style: InlineStyle) => void
+interface IToolbarButtonInlineProps extends IToolbarButtonProps {
+    type: InlineStyle;
+    toggleStyle: (style: InlineStyle) => void;
 }
 
-export class ToolbarButtonInline extends ToolbarButton<ToolbarButtonInlineProps> {
-    public componentWillReceiveProps(newProps: ToolbarButtonInlineProps) {
+export class ToolbarButtonInline extends ToolbarButton<IToolbarButtonInlineProps> {
+    public componentWillReceiveProps(newProps: IToolbarButtonInlineProps) {
         this.setState({ isActive: this.isActive(newProps) });
     }
 
-    private isActive (props: ToolbarButtonInlineProps) {
-        let currentStyle = props.editorState.getCurrentInlineStyle();
-        return currentStyle.has(this.props.type);
-    }
-
-    protected onClick (e: React.MouseEvent) {
+    protected onClick(e: React.MouseEvent) {
         if (this.props.onClick) {
             this.props.onClick(e);
         } else {
@@ -83,6 +79,11 @@ export class ToolbarButtonInline extends ToolbarButton<ToolbarButtonInlineProps>
             this.setState({ isActive: ! this.state.isActive });
         }
     }
+
+    private isActive(props: IToolbarButtonInlineProps) {
+        const currentStyle = props.editorState.getCurrentInlineStyle();
+        return currentStyle.has(this.props.type);
+    }
 }
 
 
@@ -95,33 +96,33 @@ export class ToolbarButtonInline extends ToolbarButton<ToolbarButtonInlineProps>
 
 
 
-interface ToolbarButtonBlockProps extends ToolbarButtonProps {
-    type: BlockStyle
-    toggleStyle: (style: BlockStyle) => void
+interface IToolbarButtonBlockProps extends IToolbarButtonProps {
+    type: BlockStyle;
+    toggleStyle: (style: BlockStyle) => void;
 }
 
-export class ToolbarButtonBlock extends ToolbarButton<ToolbarButtonBlockProps> {
-    public componentWillReceiveProps(newProps: ToolbarButtonProps) {
+export class ToolbarButtonBlock extends ToolbarButton<IToolbarButtonBlockProps> {
+    public componentWillReceiveProps(newProps: IToolbarButtonProps) {
         this.setState({ isActive: this.isActive(newProps) });
     }
 
-    private isActive (props: ToolbarButtonProps) {
-        let selection = props.editorState.getSelection();
-        let content = props.editorState.getCurrentContent();
-        let selectionStartBlockKey = selection.getStartKey();
+    protected onClick(e: React.MouseEvent) {
+        if (this.props.onClick) {
+            this.props.onClick(e);
+        } else {
+            this.props.toggleStyle(this.props.type);
+            this.setState({ isActive: ! this.state.isActive });
+        }
+    }
+
+    private isActive(props: IToolbarButtonProps) {
+        const selection = props.editorState.getSelection();
+        const content = props.editorState.getCurrentContent();
+        const selectionStartBlockKey = selection.getStartKey();
         if (selectionStartBlockKey == null) {
             return false;
         }
-        let block = content.getBlockForKey(selectionStartBlockKey);
-        return block.getType() == this.props.type;
-    }
-    
-    protected onClick (e: React.MouseEvent) {
-        if (this.props.onClick) {
-            this.props.onClick(e);
-        } else {
-            this.props.toggleStyle(this.props.type);
-            this.setState({ isActive: ! this.state.isActive });
-        }
+        const block = content.getBlockForKey(selectionStartBlockKey);
+        return block.getType() === this.props.type;
     }
 }

@@ -1,71 +1,31 @@
-import * as React from 'react';
-import FlashCardSet, { ExportFlashCardSet } from '../../lib/flashcard/FlashCardSet';
-import * as utils from '../../lib/utils';
-import { ParseError } from '../../lib/flashcard/parsers/SetParser';
-import { SetParser } from '../../lib/flashcard/parsers/SetParserV1';
+import * as React from "react";
+import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
+import { ParseError } from "../../lib/flashcard/parsers/SetParser";
+import { SetParser } from "../../lib/flashcard/parsers/SetParserV1";
 
-interface SetFilePickerProps {
-    onChange?: (set: FlashCardSet | null) => void
+interface ISetFilePickerProps {
+    onChange?: (set: IFlashCardSet | null) => void;
 }
 
-interface SetFilePickerState {
-    set: FlashCardSet | null,
-    filename: string
+interface ISetFilePickerState {
+    set: IFlashCardSet | null;
+    filename: string;
 }
 
-export default class SetFilePicker extends React.Component<SetFilePickerProps, SetFilePickerState> {
-    constructor (props: SetFilePickerProps) {
+export default class SetFilePicker extends React.Component<ISetFilePickerProps, ISetFilePickerState> {
+    constructor(props: ISetFilePickerProps) {
         super(props);
         this.state = {
             set: null,
-            filename: ""
+            filename: "",
         };
     }
 
-    private handleFileChange (e: React.ChangeEvent<HTMLInputElement>) {
-        let files = e.target.files;
-        if (files != null && files.length > 0) {
-            let reader = new FileReader();
-            let file = files[0];
-            let self = this;
-
-            reader.onload = (function(){
-                var text = reader.result as string;
-                self.parseSet(text, result => {
-                    self.setState({
-                        filename: file.name + " (" + file.size + ")",
-                        set: result
-                    });
-                    if (self.props.onChange) {
-                        self.props.onChange(result);
-                    }
-                }, errors => {
-                    console.log(errors);
-                });
-            });
-            reader.readAsText(files[0]);
-        } else {
-            this.setState({
-                filename: ""
-            })
-        }
-    }
-
-    private parseSet (data: string, onSuccess: (result: FlashCardSet) => void, onError: (errors: ParseError[]) => void): void {
-        let set = JSON.parse(data) as ExportFlashCardSet;
-        // Verify the integrity of the set
-        switch (set.exportVersion) {
-            case "1":
-                new SetParser().parse(set, onSuccess, onError);
-            default:
-                onError(["Unknown set format"]);
-        }
-    }
-    
-    render () {
+    public render() {
         return <div className="file has-name">
             <label className="file-label">
-                <input className="file-input" type="file" name="flashcardset" onChange={this.handleFileChange.bind(this)} />
+                <input className="file-input" type="file" name="flashcardset"
+                    onChange={this.handleFileChange.bind(this)} />
                 <span className="file-cta">
                     <span className="file-icon">
                         <i className="fas fa-upload"></i>
@@ -78,6 +38,47 @@ export default class SetFilePicker extends React.Component<SetFilePickerProps, S
                     { this.state.filename }
                 </span> }
             </label>
-        </div>
+        </div>;
+    }
+
+    private handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const files = e.target.files;
+        if (files != null && files.length > 0) {
+            const reader = new FileReader();
+            const file = files[0];
+            const self = this;
+
+            reader.onload = (() => {
+                const text = reader.result as string;
+                self.parseSet(text, result => {
+                    self.setState({
+                        filename: file.name + " (" + file.size + ")",
+                        set: result,
+                    });
+                    if (self.props.onChange) {
+                        self.props.onChange(result);
+                    }
+                }, errors => {
+                    throw new Error(errors.join(","));
+                });
+            });
+            reader.readAsText(files[0]);
+        } else {
+            this.setState({
+                filename: "",
+            });
+        }
+    }
+
+    private parseSet(data: string, onSuccess: (result: IFlashCardSet) => void,
+                     onError: (errors: ParseError[]) => void): void {
+        const set = JSON.parse(data) as ExportFlashCardSet;
+        // Verify the integrity of the set
+        switch (set.exportVersion) {
+            case "1":
+                new SetParser().parse(set, onSuccess, onError);
+            default:
+                onError(["Unknown set format"]);
+        }
     }
 }

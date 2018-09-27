@@ -1,18 +1,18 @@
-import * as React from 'react';
+import * as React from "react";
 
-interface AddNewSetTileProps {
+interface IAddNewSetTileProps {
     goToImport: () => void;
     addSet: () => void;
 }
 
-export default class AddNewSetTile extends React.Component<AddNewSetTileProps> {
-    constructor (props: AddNewSetTileProps) {
+export default class AddNewSetTile extends React.Component<IAddNewSetTileProps> {
+    constructor(props: IAddNewSetTileProps) {
         super(props);
         // Set initial state
-        this.state = { }
+        this.state = { };
     }
 
-    render () {
+    public render() {
         return <div className="column is-2">
             <div className="tile is-vertical">
                 <a className="tile button is-primary is-child" onClick={this.props.addSet.bind(this)}>
@@ -22,6 +22,6 @@ export default class AddNewSetTile extends React.Component<AddNewSetTileProps> {
                     Import
                 </a>
             </div>
-        </div>
+        </div>;
     }
 }

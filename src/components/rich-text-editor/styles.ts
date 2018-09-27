@@ -3,7 +3,7 @@ export enum InlineStyle {
     ITALIC = "ITALIC",
     UNDERLINE = "UNDERLINE",
     STRIKETHROUGH = "STRIKETHROUGH",
-    REVEAL = "REVEAL"
+    REVEAL = "REVEAL",
 }
 
 export enum BlockStyle {

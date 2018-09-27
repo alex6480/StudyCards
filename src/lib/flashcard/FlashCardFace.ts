@@ -8,7 +8,7 @@ export enum FlashCardFaceType {
     RichText,
 }
 
-export interface FlashCardFace {
+export interface IFlashCardFace {
     id: FlashCardFaceId;
     setId: string;
     cardId: string;
@@ -21,12 +21,12 @@ export class ExportFlashCardFace {
     public readonly type: FlashCardFaceType;
     public readonly richTextContent: string |null;
 
-    constructor (face: FlashCardFace) {
+    constructor(face: IFlashCardFace) {
         this.id = face.id;
         this.type = face.type;
 
-        let rawContent = face.richTextContent != null ? convertToRaw(face.richTextContent) : null;
-        this.richTextContent = JSON.stringify(rawContent); 
-        //this.richTextContent = draftToMarkdown(rawContent, {}) 
+        const rawContent = face.richTextContent != null ? convertToRaw(face.richTextContent) : null;
+        this.richTextContent = JSON.stringify(rawContent);
+        // this.richTextContent = draftToMarkdown(rawContent, {})
     }
 }

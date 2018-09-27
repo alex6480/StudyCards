@@ -1,36 +1,38 @@
-import { SetStudyData, CardStudyData } from "../lib/flashcard/StudyData";
-import * as fromActions from "./actions";
+import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 import * as Utils from "../lib/utils";
+import * as fromActions from "./actions";
 
-const initialSetStudyDataState: SetStudyData = {
+const initialSetStudyDataState: ISetStudyData = {
     setId: "",
-    cardData: {}
-}
+    cardData: {},
+};
 
-const initialCardStudyDataState: CardStudyData = {
+const initialCardStudyDataState: ICardStudyData = {
     cardId: "",
-    dueDate: new Date()
-}
+    dueDate: new Date(),
+};
 
-export default (state: SetStudyData = initialSetStudyDataState, action: fromActions.Actions): SetStudyData => {
+export default function studyData(state: ISetStudyData = initialSetStudyDataState,
+                                  action: fromActions.Actions): ISetStudyData {
     switch (action.type) {
         case fromActions.RESET_SESSION_STUDY_DATA:
             return {
                 cardData: Utils.objectMapString(state.cardData, (cardId, cardData) => cardStudyData(cardData, action)),
-                ...state
-            }
+                ...state,
+            };
         default:
             return state;
     }
 }
 
-function cardStudyData (state: CardStudyData = initialCardStudyDataState, action: fromActions.Actions): CardStudyData {
+function cardStudyData(state: ICardStudyData = initialCardStudyDataState,
+                       action: fromActions.Actions): ICardStudyData {
     switch (action.type) {
         case fromActions.RESET_SESSION_STUDY_DATA:
             return {
                 reshuffleTime: undefined,
-                ...state
-            }
+                ...state,
+            };
         default:
             return state;
     }

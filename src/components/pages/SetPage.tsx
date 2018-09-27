@@ -1,70 +1,67 @@
 import * as React from "react";
-import { connect } from 'react-redux'
-import FlashCardSet from "../../lib/flashcard/FlashCardSet";
+import IFlashCard from "../../lib/flashcard/flashcard";
+import { IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
+import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
+import EditableText from "../rich-text-editor/EditableText";
 import SetCardEditor from "../set-card-editor/SetCardEditor";
 import SetExporter from "../SetExporter";
-import { AppState } from "../../reducers";
-import FlashCard from "../../lib/flashcard/flashcard";
-import { FlashCardFace } from "../../lib/flashcard/FlashCardFace";
-import EditableText from "../rich-text-editor/EditableText";
 import StudySection from "../study/StudySection";
-import { SetStudyData } from "../../lib/flashcard/StudyData";
 
-interface SetPageProps {
-    set: FlashCardSet;
+interface ISetPageProps {
+    set: IFlashCardSet;
     addNewCard: (setId: string) => void;
-    deleteCard: (card: FlashCard) => void;
-    updateCardFace: (cardId: string, face: FlashCardFace) => void;
-    updateSetName: (set: FlashCardSet, newName: string) => void;
+    deleteCard: (card: IFlashCard) => void;
+    updateCardFace: (cardId: string, face: IFlashCardFace) => void;
+    updateSetName: (set: IFlashCardSet, newName: string) => void;
     resetStudySessionData: () => void;
     goToDashboard: () => void;
 }
 
-interface SetPageState {
-    section: SetPageSection
+interface ISetPageState {
+    section: ISetPageSection;
 }
 
-enum SetPageSection {
+enum ISetPageSection {
     Study,
     Edit,
     Export,
     Properties,
 }
 
-export default class SetPage extends React.Component<SetPageProps, SetPageState> {
-    constructor (props: SetPageProps) {
+export default class SetPage extends React.Component<ISetPageProps, ISetPageState> {
+    constructor(props: ISetPageProps) {
         super(props);
         // Set initial state
         this.state = {
-            section: SetPageSection.Study
-        }
+            section: ISetPageSection.Study,
+        };
     }
 
-    render () {
-        var page:React.ReactElement<any>;
+    public render() {
+        let page: React.ReactElement<any>;
         switch (this.state.section) {
-            case SetPageSection.Edit:
+            case ISetPageSection.Edit:
                 page = <SetCardEditor set={this.props.set}
                             addNewCard={this.props.addNewCard}
                             deleteCard={this.props.deleteCard}
-                            updateCardFace={this.props.updateCardFace} />
+                            updateCardFace={this.props.updateCardFace} />;
                 break;
-            case SetPageSection.Export:
-                page = <SetExporter set={this.props.set}/>
+            case ISetPageSection.Export:
+                page = <SetExporter set={this.props.set}/>;
                 break;
-            case SetPageSection.Study:
+            case ISetPageSection.Study:
                 page = <StudySection set={this.props.set}
                         resetSessionStudyData={this.props.resetStudySessionData}
                         studyData={{
                             setId: this.props.set.id,
-                            cardData: {}
-                        }}/>
-                break
+                            cardData: {},
+                        }}/>;
+                break;
             default:
                 page = <SetCardEditor set={this.props.set}
                             addNewCard={this.props.addNewCard}
                             deleteCard={this.props.deleteCard}
-                            updateCardFace={this.props.updateCardFace} />
+                            updateCardFace={this.props.updateCardFace} />;
                 break;
         }
 
@@ -73,7 +70,9 @@ export default class SetPage extends React.Component<SetPageProps, SetPageState>
                 <div className="hero-body">
                     <div className="container">
                         <h1 className="title is-1">
-                            <EditableText maxLength={30} value={this.props.set.name} onChange={this.updateSetName.bind(this)}/>
+                            <EditableText maxLength={30}
+                                value={this.props.set.name}
+                                onChange={this.updateSetName.bind(this)}/>
                         </h1>
                         <nav className="breadcrumb subtitle is-6" aria-label="breadcrumbs">
                             <ul>
@@ -92,11 +91,12 @@ export default class SetPage extends React.Component<SetPageProps, SetPageState>
                                 <i className="fas fa-arrow-left"></i>
                             </span>&nbsp;
                             Back
-                        </a> 
-                        <a className="navbar-item" onClick={() => this.goToSection(SetPageSection.Study)}>Study</a>
-                        <a className="navbar-item" onClick={() => this.goToSection(SetPageSection.Edit)}>Edit Cards</a>
-                        <a className="navbar-item" onClick={() => this.goToSection(SetPageSection.Properties)}>Set Properties</a>
-                        <a className="navbar-item" onClick={() => this.goToSection(SetPageSection.Export)}>Export</a>
+                        </a>
+                        <a className="navbar-item" onClick={() => this.goToSection(ISetPageSection.Study)}>Study</a>
+                        <a className="navbar-item" onClick={() => this.goToSection(ISetPageSection.Edit)}>Edit Cards</a>
+                        <a className="navbar-item"
+                            onClick={() => this.goToSection(ISetPageSection.Properties)}>Set Properties</a>
+                        <a className="navbar-item" onClick={() => this.goToSection(ISetPageSection.Export)}>Export</a>
                     </div>
                 </div>
             </nav>
@@ -106,11 +106,11 @@ export default class SetPage extends React.Component<SetPageProps, SetPageState>
         </div>;
     }
 
-    private goToSection (newPage: SetPageSection) {
+    private goToSection(newPage: ISetPageSection) {
         this.setState({section: newPage});
     }
 
-    private updateSetName (newName: string) {
+    private updateSetName(newName: string) {
         this.props.updateSetName(this.props.set, newName);
     }
 }

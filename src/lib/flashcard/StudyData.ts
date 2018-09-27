@@ -1,6 +1,6 @@
-import FlashCard from "./flashcard";
+import IFlashCard from "./flashcard";
 
-export interface CardStudyData {
+export interface ICardStudyData {
     cardId: string;
     dueDate: Date;
 
@@ -11,8 +11,8 @@ export interface CardStudyData {
     reshuffleTime?: Date;
 }
 
-export interface SetStudyData {
+export interface ISetStudyData {
     setId: string;
     lastStudied?: Date;
-    cardData: { [cardId: string]: CardStudyData }
+    cardData: { [cardId: string]: ICardStudyData };
 }

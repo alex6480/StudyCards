@@ -1,10 +1,10 @@
-import * as fromActions from './actions';
-import FlashCard from '../lib/flashcard/flashcard';
-import { EditorState, ContentState } from 'draft-js';
-import * as utils from '../lib/utils';
-import { FlashCardFaceType } from '../lib/flashcard/FlashCardFace';
+import { ContentState } from "draft-js";
+import IFlashCard from "../lib/flashcard/flashcard";
+import { FlashCardFaceType } from "../lib/flashcard/FlashCardFace";
+import * as Utils from "../lib/utils";
+import * as fromActions from "./actions";
 
-export const initialState: FlashCard = {
+export const initialState: IFlashCard = {
     id: "",
     setId: "",
     faces: {
@@ -13,34 +13,34 @@ export const initialState: FlashCard = {
             cardId: "",
             setId: "",
             type: FlashCardFaceType.RichText,
-            richTextContent: ContentState.createFromText("")
+            richTextContent: ContentState.createFromText(""),
         },
         back: {
             id: "back",
             cardId: "",
             setId: "",
             type: FlashCardFaceType.RichText,
-            richTextContent: ContentState.createFromText("")
-        }
-    }
+            richTextContent: ContentState.createFromText(""),
+        },
+    },
 };
 
-export default (state: FlashCard = initialState, action: fromActions.Actions): FlashCard => {
+export default function card(state: IFlashCard = initialState, action: fromActions.Actions): IFlashCard {
     switch (action.type) {
         case fromActions.ADD_NEW_CARD:
-            if (state.id == initialState.id) {
+            if (state.id === initialState.id) {
                 return { ...state,
-                    id: utils.guid(),
+                    id: Utils.guid(),
                     setId: action.payload.setId };
             }
             break;
         case fromActions.UPDATE_CARD_FACE:
-            if (action.payload.cardId == state.id) {
+            if (action.payload.cardId === state.id) {
                 return { ...state,
                     faces: {...state.faces,
-                        [action.payload.face.id]: action.payload.face
-                    }
-                }
+                        [action.payload.face.id]: action.payload.face,
+                    },
+                };
             }
             break;
         default:

@@ -1,26 +1,26 @@
-import { ExportFlashCardFace, FlashCardFace } from "./FlashCardFace";
+import { ExportFlashCardFace, IFlashCardFace } from "./FlashCardFace";
 
-export default interface FlashCard {
+export default interface IFlashCard {
     id: string;
     setId: string;
     faces: {
-        front: FlashCardFace,
-        back: FlashCardFace
-    }
+        front: IFlashCardFace,
+        back: IFlashCardFace,
+    };
 }
 
 export class ExportFlashCard {
     public readonly id: string;
     public readonly faces: {
         front: ExportFlashCardFace,
-        back: ExportFlashCardFace
-    }
+        back: ExportFlashCardFace,
+    };
 
-    constructor (flashcard: FlashCard) {
+    constructor(flashcard: IFlashCard) {
         this.id = flashcard.id;
         this.faces = {
             front: new ExportFlashCardFace(flashcard.faces.front),
             back: new ExportFlashCardFace(flashcard.faces.back),
-        }
+        };
     }
 }

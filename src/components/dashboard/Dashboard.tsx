@@ -1,27 +1,23 @@
-import * as React from 'react';
-import FlashCardSet from '../../lib/flashcard/FlashCardSet';
-import AddNewSetTile from './AddNewSetTile';
-import SetTile from './SetTile';
+import * as React from "react";
+import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
+import AddNewSetTile from "./AddNewSetTile";
+import SetTile from "./SetTile";
 
-interface DashboardProps {
-    sets: { [id: string]: FlashCardSet },
+interface IDashboardProps {
+    sets: { [id: string]: IFlashCardSet };
     goToImport: () => void;
-    goToSet: (set: FlashCardSet) => void;
+    goToSet: (set: IFlashCardSet) => void;
     addSet: () => void;
 }
 
-export default class Dashboard extends React.Component<DashboardProps> {
-    constructor (props: DashboardProps) {
+export default class Dashboard extends React.Component<IDashboardProps> {
+    constructor(props: IDashboardProps) {
         super(props);
         // Set initial state
-        this.state = { }
+        this.state = { };
     }
 
-    private handleAddSet () {
-        this.props.addSet();
-    }
-
-    render () {
+    public render() {
         return <div>
             <section className="hero is-primary">
                 <div className="hero-body">
@@ -43,13 +39,17 @@ export default class Dashboard extends React.Component<DashboardProps> {
                     </div>
                 </div>
             </section>
-        </div>
+        </div>;
     }
 
-    private getSetTiles (sets: { [id: string]: FlashCardSet }) {
-        var result: React.ReactElement<SetTile>[] = [];
-        for (var setId in sets) {
-            result.push(<SetTile key={setId} set={sets[setId]} goToSet={this.props.goToSet}/>)
+    private handleAddSet() {
+        this.props.addSet();
+    }
+
+    private getSetTiles(sets: { [id: string]: IFlashCardSet }) {
+        const result: React.ReactElement<SetTile>[] = [];
+        for (const setId of Object.keys(sets)) {
+            result.push(<SetTile key={setId} set={sets[setId]} goToSet={this.props.goToSet}/>);
         }
 
         return result;
