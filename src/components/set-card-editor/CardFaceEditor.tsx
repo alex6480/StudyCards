@@ -1,6 +1,6 @@
 import { CompositeDecorator, Editor, EditorState, RichUtils } from "draft-js";
 import * as React from "react";
-import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/flashcardface";
+import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import DropDown from "../rich-text-editor/DropDown";
 import { RevealDecorator, RevealEntity } from "../rich-text-editor/RevealEntity";
 import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
