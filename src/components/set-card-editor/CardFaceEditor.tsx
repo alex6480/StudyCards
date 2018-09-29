@@ -112,6 +112,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
                     editorState={this.state.editorState}
                     onChange={this.onChange.bind(this)}
                     ref={editor => this.editor = editor}
+                    onBlur={this.onBlur.bind(this)}
                 />
             </div>
 
@@ -148,10 +149,13 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
 
     private onChange(editorState: EditorState) {
         this.setState({ editorState });
+    }
+
+    private onBlur() {
         if (this.props.face.type === FlashCardFaceType.RichText) {
             this.props.updateCardFace(this.props.cardId, {
                 ...this.props.face,
-                richTextContent: editorState.getCurrentContent(),
+                richTextContent: this.state.editorState.getCurrentContent(),
             });
         }
     }
