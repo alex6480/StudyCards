@@ -1,4 +1,5 @@
-import { ExportFlashCardFace, IFlashCardFace } from "./FlashCardFace";
+import { ExportFlashCardFace, ExportImageFlashCardFace, ExportNoFlashCardFace, ExportRichTextFlashCardFace,
+    FlashCardFaceType, IFlashCardFace } from "./FlashCardFace";
 
 export default interface IFlashCard {
     id: string;
@@ -10,6 +11,17 @@ export default interface IFlashCard {
 }
 
 export class ExportFlashCard {
+    private static getExportFace(face: IFlashCardFace): ExportFlashCardFace {
+        switch (face.type) {
+            case FlashCardFaceType.RichText:
+                return new ExportRichTextFlashCardFace(face);
+            case FlashCardFaceType.None:
+                return new ExportNoFlashCardFace(face);
+            case FlashCardFaceType.Image:
+                return new ExportImageFlashCardFace(face);
+        }
+    }
+
     public readonly id: string;
     public readonly faces: {
         front: ExportFlashCardFace,
@@ -19,8 +31,8 @@ export class ExportFlashCard {
     constructor(flashcard: IFlashCard) {
         this.id = flashcard.id;
         this.faces = {
-            front: new ExportFlashCardFace(flashcard.faces.front),
-            back: new ExportFlashCardFace(flashcard.faces.back),
+            front: ExportFlashCard.getExportFace(flashcard.faces.front),
+            back: ExportFlashCard.getExportFace(flashcard.faces.back),
         };
     }
 }

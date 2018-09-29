@@ -1,12 +1,15 @@
 import { CompositeDecorator, Editor, EditorState, RichUtils } from "draft-js";
 import * as React from "react";
-import { IFlashCardFace } from "../../lib/flashcard/flashcardface";
+import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/flashcardface";
 import DropDown from "../rich-text-editor/DropDown";
 import { RevealDecorator, RevealEntity } from "../rich-text-editor/RevealEntity";
 import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
 import { ToolbarButton, ToolbarButtonBlock, ToolbarButtonInline } from "../rich-text-editor/ToolbarButton";
 
-interface ICardFaceEditorState {
+type ICardFaceEditorState = IRichTextCardFaceEditorState;
+
+interface IRichTextCardFaceEditorState {
+    faceType: FlashCardFaceType.RichText;
     editorState: EditorState;
 }
 
@@ -22,13 +25,18 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
     constructor(props: ICardFaceEditorProps) {
         super(props);
 
-        const editorState = props.face.richTextContent != null
+        if (props.face.type === FlashCardFaceType.RichText) {
+            const editorState = props.face.richTextContent != null
             ? EditorState.createWithContent(props.face.richTextContent, new CompositeDecorator([
                 RevealDecorator,
             ]))
             : EditorState.createEmpty();
 
-        this.state = { editorState };
+            this.state = {
+                faceType: props.face.type,
+                editorState,
+            };
+        }
     }
 
     public render() {
@@ -140,9 +148,11 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
 
     private onChange(editorState: EditorState) {
         this.setState({ editorState });
-        this.props.updateCardFace(this.props.cardId, {
-            ...this.props.face,
-            richTextContent: editorState.getCurrentContent(),
-        });
+        if (this.props.face.type === FlashCardFaceType.RichText) {
+            this.props.updateCardFace(this.props.cardId, {
+                ...this.props.face,
+                richTextContent: editorState.getCurrentContent(),
+            });
+        }
     }
 }

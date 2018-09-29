@@ -1,7 +1,8 @@
-import { convertFromRaw, RawDraftContentState } from "draft-js";
+import { ContentState, convertFromRaw, RawDraftContentState } from "draft-js";
 import * as Utils from "../../utils";
 import IFlashCard, { ExportFlashCard } from "../flashcard";
-import { ExportFlashCardFace, FlashCardFaceId, FlashCardFaceType, IFlashCardFace } from "../FlashCardFace";
+import { ExportFlashCardFace, ExportImageFlashCardFace, ExportRichTextFlashCardFace,
+    FlashCardFaceId, FlashCardFaceType, IFlashCardFace } from "../FlashCardFace";
 import IFlashCardSet, { ExportFlashCardSet } from "../FlashCardSet";
 import { ISetParser, ParseError } from "./SetParser";
 
@@ -120,13 +121,25 @@ export class SetParser implements ISetParser {
 
     private CardFace(face: ExportFlashCardFace, faceId: FlashCardFaceId,
                      cardId: string, setId: string, onError: onErrorHandler): IFlashCardFace {
-        return {
-            id: faceId,
-            cardId,
-            setId,
-            type: this.CardFaceType(face, onError),
-            richTextContent: this.RichTextContent(face, onError),
-        };
+        const cardFaceType = this.CardFaceType(face, onError);
+        switch (cardFaceType) {
+            case FlashCardFaceType.RichText:
+                return {
+                    id: faceId,
+                    cardId,
+                    setId,
+                    type: cardFaceType,
+                    richTextContent: this.RichTextContent(face as ExportRichTextFlashCardFace, onError),
+                };
+            default:
+                onError("Unknown face type");
+                return {
+                    id: faceId,
+                    cardId,
+                    setId,
+                    type: FlashCardFaceType.None,
+                };
+        }
     }
 
     private CardFaceType(face: ExportFlashCardFace, onError: onErrorHandler) {
@@ -143,17 +156,13 @@ export class SetParser implements ISetParser {
         }
     }
 
-    private RichTextContent(face: ExportFlashCardFace, onError: onErrorHandler) {
-        if (face.richTextContent == null) {
-            return null;
-        }
-
+    private RichTextContent(face: ExportRichTextFlashCardFace, onError: onErrorHandler) {
         const raw = JSON.parse(face.richTextContent) as RawDraftContentState;
         try {
             return convertFromRaw(raw);
         } catch (e) {
             onError("Unable to parse richTextContent for a face");
-            return null;
+            return ContentState.createFromText("");
         }
     }
 }
