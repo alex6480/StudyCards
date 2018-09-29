@@ -37,7 +37,7 @@ export function getNewCardIds(cards: {[id: string]: IFlashCard} | string[], stud
 function selectNewCardsForStudy(newCards: string[] | {[id: string]: IFlashCard},
                                 studyData: ISetStudyData, limit?: number): string[] {
     // Make sure newCardIds is actually an array of strings, even if an object was passed
-    if (typeof newCards === "object") {
+    if (! Array.isArray(newCards)) {
         newCards = Object.keys(newCards);
     }
 
@@ -69,7 +69,7 @@ function selectKnownCardsForStudy(knownCards: string[] | {[id: string]: IFlashCa
     let cardScoresDue: {score: number, id: string}[] = [];
     let cardScoresNotDue: {score: number, id: string}[] = [];
 
-    if (typeof knownCards === "object") {
+    if (! Array.isArray(knownCards)) {
         knownCards = Object.keys(knownCards);
     }
 
