@@ -3,8 +3,8 @@ import IFlashCard from "../../lib/flashcard/flashcard";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../../lib/flashcard/StudyData";
 import * as Study from "../../lib/study";
-import StudyOverview from "./StudyOverview";
 import PresentedCard from "./PresentedCard";
+import StudyOverview from "./StudyOverview";
 
 interface IStudySectionProps {
     set: IFlashCardSet;
@@ -37,7 +37,7 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
                     startStudy={this.startStudy.bind(this)}/>
             </div>;
         } else {
-            let card = this.props.set.cards[this.state.currentCardId];
+            const card = this.props.set.cards[this.state.currentCardId];
             return <PresentedCard showBack={false} card={card}/>;
         }
     }

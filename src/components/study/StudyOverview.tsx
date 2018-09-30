@@ -44,7 +44,6 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
     }
 
     private handleStartClick() {
-        debugger;
         const deck = Study.selectStudyDeck(this.props.studyData,
             this.props.maxNewCards,
             this.props.maxTotalCards,
