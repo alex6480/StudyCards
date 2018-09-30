@@ -1,6 +1,7 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
+import SetContainer from "../containers/SetContainer";
 import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
@@ -8,7 +9,6 @@ import { ICardStudyData } from "../lib/flashcard/StudyData";
 import { IAppState } from "../reducers";
 import { Actions } from "../reducers/actions";
 import Dashboard from "./dashboard/Dashboard";
-import SetPage from "./pages/SetPage";
 import SetImporter from "./set-importer/ImportPage";
 
 interface IStudyCardsAppStateProps {
@@ -53,14 +53,8 @@ class StudyCardsApp extends React.Component<IStudyCardsAppProps, IStudyCardsAppS
                         goToImport={this.goToImport.bind(this)}
                         goToSet={this.goToSet.bind(this)}/>;
         } else {
-            return <SetPage set={this.props.sets[this.state.currentSetId] as IFlashCardSet}
-                        addNewCard={this.props.addNewCard}
-                        deleteCard={this.props.deleteCard}
-                        updateCardFace={this.props.updateCardFace}
-                        goToDashboard={this.goToDashboard.bind(this)}
-                        updateSetName={this.props.updateSetName}
-                        resetStudySessionData={this.props.resetStudySessionData}
-                        updateCardStudyData={this.props.updateCardStudyData} />;
+            return <SetContainer set={this.props.sets[this.state.currentSetId] as IFlashCardSet}
+                        goToDashboard={this.goToDashboard.bind(this)} />;
         }
     }
 

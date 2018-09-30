@@ -1,57 +1,66 @@
 import * as React from "react";
-import IFlashCard from "../../lib/flashcard/flashcard";
-import { IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
-import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
-import { ICardStudyData } from "../../lib/flashcard/StudyData";
-import EditableText from "../rich-text-editor/EditableText";
-import SetCardEditor from "../set-card-editor/SetCardEditor";
-import SetExporter from "../SetExporter";
-import StudySection from "../study/StudySection";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
+import EditableText from "../components/rich-text-editor/EditableText";
+import SetCardEditor from "../components/set-card-editor/SetCardEditor";
+import SetExporter from "../components/SetExporter";
+import StudySection from "../components/study/StudySection";
+import IFlashCard from "../lib/flashcard/flashcard";
+import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
+import IFlashCardSet from "../lib/flashcard/FlashCardSet";
+import { ICardStudyData } from "../lib/flashcard/StudyData";
+import { IAppState } from "../reducers";
+import { Actions } from "../reducers/actions";
 
-interface ISetPageProps {
+interface ISetContainerOwnProps {
     set: IFlashCardSet;
+    goToDashboard: () => void;
+}
+
+interface ISetContainerDispatchProps {
     addNewCard: (setId: string) => void;
     deleteCard: (card: IFlashCard) => void;
     updateCardFace: (cardId: string, face: IFlashCardFace) => void;
     updateSetName: (set: IFlashCardSet, newName: string) => void;
     resetStudySessionData: () => void;
-    goToDashboard: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
 }
 
-interface ISetPageState {
-    section: ISetPageSection;
+interface ISetContainerProps extends ISetContainerOwnProps, ISetContainerDispatchProps { }
+
+interface ISetContainerState {
+    section: ISetContainer;
 }
 
-enum ISetPageSection {
+enum ISetContainer {
     Study,
     Edit,
     Export,
     Properties,
 }
 
-export default class SetPage extends React.Component<ISetPageProps, ISetPageState> {
-    constructor(props: ISetPageProps) {
+class SetContainer extends React.Component<ISetContainerProps, ISetContainerState> {
+    constructor(props: ISetContainerProps) {
         super(props);
         // Set initial state
         this.state = {
-            section: ISetPageSection.Study,
+            section: ISetContainer.Study,
         };
     }
 
     public render() {
         let page: React.ReactElement<any>;
         switch (this.state.section) {
-            case ISetPageSection.Edit:
+            case ISetContainer.Edit:
                 page = <SetCardEditor set={this.props.set}
                             addNewCard={this.props.addNewCard}
                             deleteCard={this.props.deleteCard}
                             updateCardFace={this.props.updateCardFace} />;
                 break;
-            case ISetPageSection.Export:
+            case ISetContainer.Export:
                 page = <SetExporter set={this.props.set}/>;
                 break;
-            case ISetPageSection.Study:
+            case ISetContainer.Study:
                 page = <StudySection set={this.props.set}
                         resetSessionStudyData={this.props.resetStudySessionData}
                         updateCardStudyData={this.props.updateCardStudyData}
@@ -95,11 +104,11 @@ export default class SetPage extends React.Component<ISetPageProps, ISetPageStat
                             </span>&nbsp;
                             Back
                         </a>
-                        <a className="navbar-item" onClick={() => this.goToSection(ISetPageSection.Study)}>Study</a>
-                        <a className="navbar-item" onClick={() => this.goToSection(ISetPageSection.Edit)}>Edit Cards</a>
+                        <a className="navbar-item" onClick={() => this.goToSection(ISetContainer.Study)}>Study</a>
+                        <a className="navbar-item" onClick={() => this.goToSection(ISetContainer.Edit)}>Edit Cards</a>
                         <a className="navbar-item"
-                            onClick={() => this.goToSection(ISetPageSection.Properties)}>Set Properties</a>
-                        <a className="navbar-item" onClick={() => this.goToSection(ISetPageSection.Export)}>Export</a>
+                            onClick={() => this.goToSection(ISetContainer.Properties)}>Set Properties</a>
+                        <a className="navbar-item" onClick={() => this.goToSection(ISetContainer.Export)}>Export</a>
                     </div>
                 </div>
             </nav>
@@ -109,7 +118,7 @@ export default class SetPage extends React.Component<ISetPageProps, ISetPageStat
         </div>;
     }
 
-    private goToSection(newPage: ISetPageSection) {
+    private goToSection(newPage: ISetContainer) {
         this.setState({section: newPage});
     }
 
@@ -117,3 +126,20 @@ export default class SetPage extends React.Component<ISetPageProps, ISetPageStat
         this.props.updateSetName(this.props.set, newName);
     }
 }
+
+function mapStateToProps(state: IAppState): {} {
+    return {};
+}
+
+function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
+    return {
+        addNewCard: (setId: string) => dispatch(Actions.addNewCard(setId)),
+        deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
+        updateCardFace: (cardId: string, face: IFlashCardFace) => dispatch(Actions.updateCardFace(cardId, face)),
+        updateSetName: (set: IFlashCardSet, newName: string) => dispatch(Actions.updateSetName(set, newName)),
+        resetStudySessionData: () => dispatch(Actions.resetSessionStudyData()),
+        updateCardStudyData: (studyData: ICardStudyData) => dispatch(Actions.updateCardStudyData(studyData)),
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SetContainer);
