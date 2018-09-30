@@ -30,8 +30,8 @@ During the study session
     1. Cards with a redraw time before the current time are randomly selected.
     2. If no cards have a readraw time before the current time, a random card is selected without a redraw time.
     3. If all cards have a redraw time in the future, the user is shown a card using the algorithm used to make the deck. A random card is selected but cards due early are prefered
-2. The user is asked to evaluate the card and can answer the following, based on how well they remembered it.
-    1. POORLY: The user does not feel comfortable with the card and would like to study it again this session. The card is give a due date a random short interval in the future.
+2. The user is asked to evaluate the card and can answer the following, based on how well their memory of the card was.
+    1. POOR: The user does not feel comfortable with the card and would like to study it again this session. The card is give a due date a random short interval in the future.
     The understanding level of the card is reset to 0.
     2. DECENT: The user feels reasonably comfortable with the card.
     The card is given a reshuffle time slightly longer than if poorly was selected. After selecting this option, the GOOD option will be available the next time this ard is shown.
