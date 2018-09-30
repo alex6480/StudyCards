@@ -2,6 +2,7 @@ import * as React from "react";
 import IFlashCard from "../../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
+import { ICardStudyData } from "../../lib/flashcard/StudyData";
 import EditableText from "../rich-text-editor/EditableText";
 import SetCardEditor from "../set-card-editor/SetCardEditor";
 import SetExporter from "../SetExporter";
@@ -15,6 +16,7 @@ interface ISetPageProps {
     updateSetName: (set: IFlashCardSet, newName: string) => void;
     resetStudySessionData: () => void;
     goToDashboard: () => void;
+    updateCardStudyData: (studyData: ICardStudyData) => void;
 }
 
 interface ISetPageState {
@@ -52,6 +54,7 @@ export default class SetPage extends React.Component<ISetPageProps, ISetPageStat
             case ISetPageSection.Study:
                 page = <StudySection set={this.props.set}
                         resetSessionStudyData={this.props.resetStudySessionData}
+                        updateCardStudyData={this.props.updateCardStudyData}
                         studyData={{
                             setId: this.props.set.id,
                             cardData: {},

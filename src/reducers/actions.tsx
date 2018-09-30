@@ -1,6 +1,7 @@
 import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
+import { ICardStudyData } from "../lib/flashcard/StudyData";
 
 /*
     Boilerplate stuff used to get typesafety within Redux
@@ -31,6 +32,7 @@ export const DELETE_CARD = "delete card";
 export const UPDATE_CARD_FACE = "update card face";
 export const ADD_NEW_SET = "add new set";
 export const RESET_SESSION_STUDY_DATA = "reset session study data";
+export const UPDATE_CARD_STUDY_DATA = "update card study data";
 
 export const Actions = {
     addNewCard: (setId: string) => createAction(ADD_NEW_CARD, { setId }),
@@ -38,6 +40,7 @@ export const Actions = {
     deleteCard: (card: IFlashCard) => createAction(DELETE_CARD, card),
     updateCardFace: (cardId: string, face: IFlashCardFace) => createAction(UPDATE_CARD_FACE, { cardId, face }),
     addSet: (set?: IFlashCardSet) => createAction(ADD_NEW_SET, { set }),
+    updateCardStudyData: (studyData: ICardStudyData) => createAction(UPDATE_CARD_STUDY_DATA, studyData),
 
     /**
      * Resets the parts of the studydata that are temporary for a single study session

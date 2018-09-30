@@ -4,6 +4,7 @@ import { Dispatch } from "redux";
 import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
+import { ICardStudyData } from "../lib/flashcard/StudyData";
 import { IAppState } from "../reducers";
 import { Actions } from "../reducers/actions";
 import Dashboard from "./dashboard/Dashboard";
@@ -20,6 +21,7 @@ interface IStudyCardsAppDispatchProps {
     deleteCard: (card: IFlashCard) => void;
     updateCardFace: (cardId: string, face: IFlashCardFace) => void;
     updateSetName: (set: IFlashCardSet, newName: string) => void;
+    updateCardStudyData: (studyData: ICardStudyData) => void;
     resetStudySessionData: () => void;
 }
 
@@ -57,7 +59,8 @@ class StudyCardsApp extends React.Component<IStudyCardsAppProps, IStudyCardsAppS
                         updateCardFace={this.props.updateCardFace}
                         goToDashboard={this.goToDashboard.bind(this)}
                         updateSetName={this.props.updateSetName}
-                        resetStudySessionData={this.props.resetStudySessionData} />;
+                        resetStudySessionData={this.props.resetStudySessionData}
+                        updateCardStudyData={this.props.updateCardStudyData} />;
         }
     }
 
@@ -97,6 +100,7 @@ function mapDispatchToProps(dispatch: Dispatch): IStudyCardsAppDispatchProps {
         updateCardFace: (cardId: string, face: IFlashCardFace) => dispatch(Actions.updateCardFace(cardId, face)),
         updateSetName: (set: IFlashCardSet, newName: string) => dispatch(Actions.updateSetName(set, newName)),
         resetStudySessionData: () => dispatch(Actions.resetSessionStudyData()),
+        updateCardStudyData: (studyData: ICardStudyData) => dispatch(Actions.updateCardStudyData(studyData)),
     };
 }
 

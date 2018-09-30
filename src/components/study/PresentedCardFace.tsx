@@ -15,14 +15,12 @@ export default class PresentedCardFace extends React.Component<IPresentedCardFac
     public render() {
         switch (this.props.face.type) {
             case FlashCardFaceType.RichText:
-                return <div className="card-content content">
-                    <Editor
+                return <Editor
                         editorState={EditorState.createWithContent(this.props.face.richTextContent)}
                         onChange={() => { /* Do nothing */ }}
                         readOnly={true}
                         ref={editor => this.editor = editor}
-                    />
-                </div>;
+                    />;
             case FlashCardFaceType.None:
                 return <div></div>;
         }

@@ -1,6 +1,16 @@
-import { ISetStudyData } from "../lib/flashcard/StudyData";
+import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 import IFlashCard from "./flashcard/flashcard";
 import * as Utils from "./utils";
+
+/**
+ * A score indicating how well the user remembered the presented card
+ */
+export enum CardEvaluation {
+    Poor,
+    Decent,
+    Good,
+    VeryGood,
+}
 
 export function selectStudyDeck(studyData: ISetStudyData, maxNewCards: number,
                                 maxTotalCards: number, cardIds: string[]): string[];
@@ -106,4 +116,93 @@ function selectKnownCardsForStudy(knownCards: string[] | {[id: string]: IFlashCa
     }
 
     return result;
+}
+
+/**
+ * Returns an updated studyData for the card based on the given evaluation
+ * @param studyData The study data to update
+ * @param evaluation The evaluation of the card
+ */
+export function updateCardStudyData(cardId: string,
+                                    studyData: ICardStudyData,
+                                    evaluation: CardEvaluation): ICardStudyData {
+    switch (evaluation) {
+        case CardEvaluation.VeryGood:
+        case CardEvaluation.Good:
+            return {
+                cardId,
+                redrawTime: getDueTimeIncrease(studyData, evaluation),
+                ...studyData,
+            };
+        case CardEvaluation.Decent:
+        case CardEvaluation.Poor:
+            return {
+                cardId,
+                redrawTime: getDueTimeIncrease(studyData, evaluation),
+                ...studyData,
+            };
+    }
+}
+
+/**
+ * Returns the time when this card will be presented again. Either in the same study session or in a future one
+ */
+export function getDueTimeIncrease(studyData: ICardStudyData, evaluation: CardEvaluation) {
+    const due: Date = new Date();
+    switch (evaluation) {
+        case CardEvaluation.VeryGood:
+            due.setDate(due.getDate() + 4);
+            return due;
+        case CardEvaluation.Good:
+            due.setDate(due.getDate() + 2);
+            return due;
+        case CardEvaluation.Decent:
+            due.setMinutes(due.getMinutes() + 10);
+            return due;
+        case CardEvaluation.Poor:
+            due.setDate(due.getMinutes() + 3);
+            return due;
+    }
+}
+
+/**
+ * Draws a card during a study session.
+ * 1. It picks a random card from the cards with a redraw time earlier than now
+ * 2. If no cards with a redraw time earlier than now, it picks a random card without a redraw time
+ * 3. If no cards have no redraw time, it picks a card with a redraw time in the future. Cards with an earlier
+ * redraw time are more likely to be drawn.
+ * @param deck The ids of the cards that can be drawn
+ * @param StudyData Study data for the cards in the deck
+ */
+export function drawCard(deck: string[], studyData: ISetStudyData): string {
+    if (deck.length === 0) {
+        throw new Error("Deck cannot be empty");
+    }
+
+    // 1. Try to return a card with a redraw time earlier than now
+    const dueCards = deck.filter(id => {
+        const card = studyData.cardData[id];
+        return card !== undefined && card.redrawTime !== null && card.redrawTime <= new Date();
+    });
+    if (dueCards.length > 0) { return dueCards[Math.floor(Math.random() * dueCards.length)]; }
+
+    // 2. Try to return a card with no redraw time
+    const cardWithoutRedraw = deck.filter(id =>
+        studyData.cardData[id] === undefined || studyData.cardData[id].redrawTime === undefined);
+    if (cardWithoutRedraw.length > 0) {
+        return cardWithoutRedraw[Math.floor(Math.random() * cardWithoutRedraw.length)];
+    }
+    if (cardWithoutRedraw.length > 0) {
+        return cardWithoutRedraw[Math.floor(Math.random() * cardWithoutRedraw.length)];
+    }
+
+    // 3. Return a card with a future redraw time
+    const futureCards = deck.map(id => {
+        const card = studyData.cardData[id];
+        return {
+            card,
+            score: (card.redrawTime as Date).getTime(),
+        };
+    });
+    return futureCards.sort((a, b) => a.score - b.score)[0].card.cardId;
 }

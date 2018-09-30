@@ -5,10 +5,10 @@ export interface ICardStudyData {
     dueDate: Date;
 
     /**
-     * The time when this card should be prioritized to be reshuffled back into the study deck during a study session
+     * The time when this card should be prioritized to be redrawn from the study deck during a study session
      * This is temporary and will be reset at the beginning of every study session
      */
-    reshuffleTime?: Date;
+    redrawTime: Date | null;
 }
 
 export interface ISetStudyData {
