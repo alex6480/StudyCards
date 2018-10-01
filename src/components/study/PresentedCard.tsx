@@ -7,7 +7,7 @@ import PresentedCardFace from "./PresentedCardFace";
 interface IPresentedCardProps {
     card: IFlashCard;
     studyData: ICardStudyData;
-    updateStudyData: (data: ICardStudyData) => void;
+    updateStudyData: (data: ICardStudyData, nextCard: boolean) => void;
     nextCard: () => void;
 }
 
@@ -69,8 +69,7 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
     private evaluateCard(evaluation: Study.CardEvaluation) {
         return (() => {
             const newData = Study.updateCardStudyData(this.props.card.id, this.props.studyData, evaluation);
-            this.props.updateStudyData(newData);
-            this.props.nextCard();
+            this.props.updateStudyData(newData, true);
         }).bind(this);
     }
 }

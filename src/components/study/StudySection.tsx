@@ -35,7 +35,7 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
                     studyData={this.props.studyData}
                     maxNewCards={this.StudyMaxNewCards}
                     maxTotalCards={this.StudyMaxTotalCards}
-                    startStudy={this.startStudy.bind(this)}/>
+                    startStudy={this.startStudy.bind(this)} />
             </div>;
         } else {
             const card = this.props.set.cards[this.state.currentCardId];
@@ -43,7 +43,7 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
                         studyData={this.props.studyData.cardData[this.state.currentCardId]}
                         card={card}
                         updateStudyData={this.updateCardStudyData.bind(this)}
-                        nextCard={this.nextCard.bind(this)}/>;
+                        nextCard={this.nextCard.bind(this)} />;
         }
     }
 
@@ -57,22 +57,45 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
         this.props.resetSessionStudyData();
     }
 
-    private updateCardStudyData(studyData: ICardStudyData) {
-        if (this.props.studyData.cardData[studyData.cardId] !== undefined
-            && this.props.studyData.cardData[studyData.cardId].dueDate !== studyData.dueDate
-            && this.state.studyDeck !== undefined) {
+    private updateCardStudyData(studyData: ICardStudyData, nextCard: boolean) {
+        let newDeck: string[] | undefined = this.state.studyDeck;
+        if (this.state.studyDeck !== undefined && studyData.removeFromDeck) {
             // Remove the card from the deck, if it the due date has been increased
-            this.setState({ studyDeck: this.state.studyDeck.filter(d => d !== studyData.cardId) });
+            newDeck = this.state.studyDeck.filter(d => d !== studyData.cardId);
+
+            if (newDeck.length > 0) {
+                this.setState({ studyDeck: newDeck });
+            } else {
+                // Stop the study session if the deck is empty
+                this.setState({
+                    studyDeck: undefined,
+                    currentCardId: undefined,
+                });
+            }
         }
         this.props.updateCardStudyData(studyData);
+
+        if (nextCard) {
+            this.nextCard(studyData, newDeck);
+        }
     }
 
-    private nextCard() {
-        if (this.state.studyDeck === undefined) {
+    private nextCard(updatedCardStudyData?: ICardStudyData, deck: string[] | undefined = this.state.studyDeck) {
+        if (deck === undefined) {
             throw new Error("Cannot show the next card, when no deck is active");
         }
+        let studyData = this.props.studyData;
+        if (updatedCardStudyData !== undefined) {
+            studyData = {
+                ...studyData,
+                cardData: {
+                    ...studyData.cardData,
+                    [updatedCardStudyData.cardId]: updatedCardStudyData,
+                },
+            };
+        }
         this.setState({
-            currentCardId: Study.drawCard(this.state.studyDeck, this.props.studyData),
+            currentCardId: Study.drawCard(deck, studyData),
         });
     }
 }

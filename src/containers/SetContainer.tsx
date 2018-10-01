@@ -8,13 +8,17 @@ import StudySection from "../components/study/StudySection";
 import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
-import { ICardStudyData } from "../lib/flashcard/StudyData";
+import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 import { IAppState } from "../reducers";
 import { Actions } from "../reducers/actions";
 
 interface ISetContainerOwnProps {
     set: IFlashCardSet;
     goToDashboard: () => void;
+}
+
+interface ISetContainerStateProps extends ISetContainerOwnProps {
+    studyData: ISetStudyData;
 }
 
 interface ISetContainerDispatchProps {
@@ -26,7 +30,7 @@ interface ISetContainerDispatchProps {
     updateCardStudyData: (studyData: ICardStudyData) => void;
 }
 
-interface ISetContainerProps extends ISetContainerOwnProps, ISetContainerDispatchProps { }
+interface ISetContainerProps extends ISetContainerStateProps, ISetContainerDispatchProps { }
 
 interface ISetContainerState {
     section: ISetContainer;
@@ -64,10 +68,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                 page = <StudySection set={this.props.set}
                         resetSessionStudyData={this.props.resetStudySessionData}
                         updateCardStudyData={this.props.updateCardStudyData}
-                        studyData={{
-                            setId: this.props.set.id,
-                            cardData: {},
-                        }}/>;
+                        studyData={this.props.studyData} />;
                 break;
             default:
                 page = <SetCardEditor set={this.props.set}
@@ -127,8 +128,14 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
     }
 }
 
-function mapStateToProps(state: IAppState): {} {
-    return {};
+function mapStateToProps(state: IAppState, ownProps: ISetContainerOwnProps): ISetContainerStateProps {
+    if (state.studyData[ownProps.set.id] === undefined) {
+        throw new Error("Studydata object does not exist for set " + ownProps.set.id);
+    }
+    return {
+        ...ownProps,
+        studyData: state.studyData[ownProps.set.id],
+    };
 }
 
 function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {

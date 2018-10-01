@@ -11,6 +11,7 @@ const initialCardStudyDataState: ICardStudyData = {
     cardId: "",
     dueDate: new Date(),
     redrawTime: null,
+    removeFromDeck: false,
 };
 
 export default function studyData(state: ISetStudyData = initialSetStudyDataState,
@@ -23,11 +24,11 @@ export default function studyData(state: ISetStudyData = initialSetStudyDataStat
             };
         case fromActions.UPDATE_CARD_STUDY_DATA:
             return {
+                ...state,
                 cardData: {
                     [action.payload.cardId]: cardStudyData(state.cardData[action.payload.cardId], action),
                     ...state.cardData,
                 },
-                ...state,
             };
         default:
             return state;
@@ -40,6 +41,7 @@ function cardStudyData(state: ICardStudyData = initialCardStudyDataState,
         case fromActions.RESET_SESSION_STUDY_DATA:
             return {
                 redrawTime: undefined,
+                removeFromDeck: false,
                 ...state,
             };
         case fromActions.UPDATE_CARD_STUDY_DATA:
@@ -47,6 +49,7 @@ function cardStudyData(state: ICardStudyData = initialCardStudyDataState,
                 cardId: cardStudyDataCardId(state.cardId, action),
                 dueDate: state.dueDate !== undefined ? state.dueDate : new Date(),
                 redrawTime: cardStudyDataCardRedrawTime(state.redrawTime, action),
+                removeFromDeck: state.removeFromDeck !== undefined ? state.removeFromDeck : false,
             };
         default:
             return state;
@@ -68,9 +71,9 @@ function cardStudyDataCardRedrawTime(state: Date | null = initialCardStudyDataSt
         case fromActions.RESET_SESSION_STUDY_DATA:
             return null;
         case fromActions.UPDATE_CARD_STUDY_DATA:
-            return action.payload.redrawTime;
+            return action.payload.redrawTime !== undefined ? action.payload.redrawTime : null;
         default:
-            return state;
+            return state !== undefined ? state : null;
     }
 }
 

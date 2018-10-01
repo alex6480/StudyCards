@@ -130,16 +130,18 @@ export function updateCardStudyData(cardId: string,
         case CardEvaluation.VeryGood:
         case CardEvaluation.Good:
             return {
-                cardId,
-                redrawTime: getDueTimeIncrease(studyData, evaluation),
                 ...studyData,
+                cardId,
+                dueDate: getDueTimeIncrease(studyData, evaluation),
+                redrawTime: null,
+                removeFromDeck: true,
             };
         case CardEvaluation.Decent:
         case CardEvaluation.Poor:
             return {
+                ...studyData,
                 cardId,
                 redrawTime: getDueTimeIncrease(studyData, evaluation),
-                ...studyData,
             };
     }
 }
@@ -160,7 +162,7 @@ export function getDueTimeIncrease(studyData: ICardStudyData, evaluation: CardEv
             due.setMinutes(due.getMinutes() + 10);
             return due;
         case CardEvaluation.Poor:
-            due.setDate(due.getMinutes() + 3);
+            due.setMinutes(due.getMinutes() + 3);
             return due;
     }
 }
@@ -182,16 +184,13 @@ export function drawCard(deck: string[], studyData: ISetStudyData): string {
     // 1. Try to return a card with a redraw time earlier than now
     const dueCards = deck.filter(id => {
         const card = studyData.cardData[id];
-        return card !== undefined && card.redrawTime !== null && card.redrawTime <= new Date();
+        return card !== undefined && card.redrawTime !== null && card.redrawTime.getTime() <= new Date().getTime();
     });
     if (dueCards.length > 0) { return dueCards[Math.floor(Math.random() * dueCards.length)]; }
 
     // 2. Try to return a card with no redraw time
     const cardWithoutRedraw = deck.filter(id =>
-        studyData.cardData[id] === undefined || studyData.cardData[id].redrawTime === undefined);
-    if (cardWithoutRedraw.length > 0) {
-        return cardWithoutRedraw[Math.floor(Math.random() * cardWithoutRedraw.length)];
-    }
+        studyData.cardData[id] === undefined || studyData.cardData[id].redrawTime === null);
     if (cardWithoutRedraw.length > 0) {
         return cardWithoutRedraw[Math.floor(Math.random() * cardWithoutRedraw.length)];
     }
