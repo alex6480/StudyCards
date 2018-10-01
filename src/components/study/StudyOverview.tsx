@@ -53,13 +53,14 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
                 <div className="card">
                 <div className="card-content">
                     <h2 className="title is-3">Current progress:</h2>
-                    <p>{newCardIds.length} cards are <Tooltip message="These cards have never been studied before">
-                        new
+                    <p>{newCardIds.length} cards are&#32;
+                        <Tooltip message="These cards have never been studied before">
+                            <span className="tag">new</span>
                         </Tooltip>
                     </p>
-                    <p>{knownCardIds.length} cards are ready for
+                    <p>{knownCardIds.length} cards are ready for&#32;
                         <Tooltip message="It's been some time since you've last studied these cards">
-                        review
+                            <span className="tag">review</span>
                         </Tooltip>
                     </p>
                 </div>

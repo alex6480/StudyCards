@@ -19,8 +19,7 @@ export default class Tooltip extends React.Component<ITooltipProps, ITooltipStat
 
     public render() {
         return <span className="tooltip">
-            <span className="tag is-dark"
-                onMouseEnter={() => this.setState({active: true})}
+            <span onMouseEnter={() => this.setState({active: true})}
                 onMouseLeave={() => this.setState({active: false})}>
                 {this.props.children}
             </span>
