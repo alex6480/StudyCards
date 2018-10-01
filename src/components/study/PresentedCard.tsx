@@ -24,6 +24,13 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
         };
     }
 
+    public componentWillReceiveProps(newProps: IPresentedCardProps) {
+        if (newProps.card.id !== this.props.card.id) {
+            // Hide the back whenever the card is changed
+            this.setState({ showBack: false });
+        }
+    }
+
     public render() {
         return <div className="container">
                 <div className="card">
