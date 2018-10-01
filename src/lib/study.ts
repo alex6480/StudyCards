@@ -26,7 +26,7 @@ export function selectStudyDeck(studyData: ISetStudyData, maxNewCards: number, m
 
     const newCards   = selectNewCardsForStudy(newCardIds, studyData, maxNewCards);
     const knownCards = selectKnownCardsForStudy(knownCardIds, studyData, maxTotalCards - newCards.length);
-    const studyDeck  = Utils.shuffle(newCards.concat(knownCards));
+    const studyDeck  = newCards.concat(knownCards);
 
     return studyDeck;
 }
@@ -63,7 +63,7 @@ function selectNewCardsForStudy(newCards: string[] | {[id: string]: IFlashCard},
     // Shuffle the deck and only return cards up to the limit
     const shuffledResult: string[] = (limit === undefined || result.length <= limit)
                                       ? result
-                                      : Utils.shuffle(result, limit);
+                                      : result.slice(0, limit);
 
     return shuffledResult;
 }
