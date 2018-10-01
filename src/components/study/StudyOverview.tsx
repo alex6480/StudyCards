@@ -27,7 +27,7 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
 
                 <p className="subtitle is-6">Last studied <time>never</time></p>
                 <p>
-                    This study section will include {newCardsInStudy} new {p("card", newCardsInStudy)}
+                    This study section will include {newCardsInStudy} new {p("card", newCardsInStudy)}&#32;
                     and {knownCardsInStudy} known {p("card", knownCardsInStudy)}.
                 </p>
                 <a href="#" className="button is-large is-primary" onClick={this.handleStartClick.bind(this)}>

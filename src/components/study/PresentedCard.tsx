@@ -32,7 +32,7 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
     }
 
     public render() {
-        return <div className="container">
+        return <React.Fragment>
                 <div className="card">
                 <div className="card-content content">
                     <PresentedCardFace face={this.props.card.faces.front}/>
@@ -66,7 +66,7 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
                 <a className="button" onClick={this.flipCard.bind(this)}>Flip Card</a>
             </div>
              }
-        </div>;
+        </React.Fragment>;
     }
 
     private flipCard() {

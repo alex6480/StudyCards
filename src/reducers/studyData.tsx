@@ -19,15 +19,15 @@ export default function studyData(state: ISetStudyData = initialSetStudyDataStat
     switch (action.type) {
         case fromActions.RESET_SESSION_STUDY_DATA:
             return {
-                cardData: Utils.objectMapString(state.cardData, (cardId, cardData) => cardStudyData(cardData, action)),
                 ...state,
+                cardData: Utils.objectMapString(state.cardData, (cardId, cardData) => cardStudyData(cardData, action)),
             };
         case fromActions.UPDATE_CARD_STUDY_DATA:
             return {
                 ...state,
                 cardData: {
-                    [action.payload.cardId]: cardStudyData(state.cardData[action.payload.cardId], action),
                     ...state.cardData,
+                    [action.payload.cardId]: cardStudyData(state.cardData[action.payload.cardId], action),
                 },
             };
         default:
@@ -40,9 +40,9 @@ function cardStudyData(state: ICardStudyData = initialCardStudyDataState,
     switch (action.type) {
         case fromActions.RESET_SESSION_STUDY_DATA:
             return {
-                redrawTime: undefined,
-                removeFromDeck: false,
                 ...state,
+                redrawTime: null,
+                removeFromDeck: false,
             };
         case fromActions.UPDATE_CARD_STUDY_DATA:
             return {

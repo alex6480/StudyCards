@@ -3,6 +3,7 @@ import IFlashCard from "../../lib/flashcard/flashcard";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../../lib/flashcard/StudyData";
 import * as Study from "../../lib/study";
+import * as Utils from "../../lib/utils";
 import PresentedCard from "./PresentedCard";
 import StudyOverview from "./StudyOverview";
 
@@ -13,9 +14,13 @@ interface IStudySectionProps {
     updateCardStudyData: (studyData: ICardStudyData) => void;
 }
 
+interface IStudySession {
+    deck: string[];
+    currentCardId: string;
+}
+
 interface IStudySectionState {
-    studyDeck?: string[];
-    currentCardId?: string;
+    currentSession?: IStudySession;
 }
 
 export default class StudySection extends React.Component<IStudySectionProps, IStudySectionState> {
@@ -29,7 +34,7 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
     }
 
     public render() {
-        if (this.state.currentCardId === undefined) {
+        if (this.state.currentSession === undefined) {
             return <div className="container">
                 <StudyOverview set={this.props.set}
                     studyData={this.props.studyData}
@@ -38,52 +43,63 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
                     startStudy={this.startStudy.bind(this)} />
             </div>;
         } else {
-            const card = this.props.set.cards[this.state.currentCardId];
-            return <PresentedCard
-                        studyData={this.props.studyData.cardData[this.state.currentCardId]}
+            const card = this.props.set.cards[this.state.currentSession.currentCardId];
+            return <div className="container">
+                <p>{this.state.currentSession.deck.length}&#32;
+                    {Utils.plural("card", this.state.currentSession.deck.length)} left</p>
+                <PresentedCard
+                        studyData={this.props.studyData.cardData[this.state.currentSession.currentCardId]}
                         card={card}
                         updateStudyData={this.updateCardStudyData.bind(this)}
-                        nextCard={this.nextCard.bind(this)} />;
+                        nextCard={this.nextCard.bind(this)} />
+            </div>;
         }
     }
 
     private startStudy(deck: string[]) {
         const currentCardId = Study.drawCard(deck, this.props.studyData);
         this.setState({
-            studyDeck: deck,
-            currentCardId,
+            currentSession: {
+                deck,
+                currentCardId,
+            },
         });
         // Make sure no temporary data is left from previous study session
         this.props.resetSessionStudyData();
     }
 
     private updateCardStudyData(studyData: ICardStudyData, nextCard: boolean) {
-        let newDeck: string[] | undefined = this.state.studyDeck;
-        if (this.state.studyDeck !== undefined && studyData.removeFromDeck) {
+        let newSession: IStudySession | undefined = this.state.currentSession;
+        if (this.state.currentSession !== undefined && studyData.removeFromDeck) {
             // Remove the card from the deck, if it the due date has been increased
-            newDeck = this.state.studyDeck.filter(d => d !== studyData.cardId);
+            newSession = {
+                ...this.state.currentSession,
+                deck: this.state.currentSession.deck.filter(d => d !== studyData.cardId),
+            };
 
-            if (newDeck.length > 0) {
-                this.setState({ studyDeck: newDeck });
+            if (newSession.deck.length > 0) {
+                this.setState({ currentSession: newSession });
             } else {
                 // Stop the study session if the deck is empty
-                this.setState({
-                    studyDeck: undefined,
-                    currentCardId: undefined,
-                });
+                this.setState({ currentSession: undefined });
             }
         }
         this.props.updateCardStudyData(studyData);
 
         if (nextCard) {
-            this.nextCard(studyData, newDeck);
+            if (newSession === undefined) {
+                throw new Error("nextCard cannot be true when a study session is not active");
+            }
+            this.nextCard(studyData, newSession);
         }
     }
 
-    private nextCard(updatedCardStudyData?: ICardStudyData, deck: string[] | undefined = this.state.studyDeck) {
-        if (deck === undefined) {
-            throw new Error("Cannot show the next card, when no deck is active");
+    private nextCard(updatedCardStudyData?: ICardStudyData,
+                     session: IStudySession | undefined = this.state.currentSession) {
+        if (session === undefined) {
+            throw new Error("Cannot show the next card, when no study session is active");
         }
+
         let studyData = this.props.studyData;
         if (updatedCardStudyData !== undefined) {
             studyData = {
@@ -95,7 +111,10 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
             };
         }
         this.setState({
-            currentCardId: Study.drawCard(deck, studyData),
+            currentSession: {
+                ...session,
+                currentCardId: Study.drawCard(session.deck, studyData),
+            },
         });
     }
 }
