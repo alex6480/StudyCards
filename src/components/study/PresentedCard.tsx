@@ -24,13 +24,6 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
         };
     }
 
-    public componentWillReceiveProps(newProps: IPresentedCardProps) {
-        if (newProps.card.id !== this.props.card.id) {
-            // Hide the back whenever the card is changed
-            this.setState({ showBack: false });
-        }
-    }
-
     public render() {
         return <React.Fragment>
                 <div className="card">
@@ -77,6 +70,9 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
         return (() => {
             const newData = Study.updateCardStudyData(this.props.card.id, this.props.studyData, evaluation);
             this.props.updateStudyData(newData, true);
+
+            // Make sure only the front of the next card is showed
+            this.setState({ showBack: false });
         }).bind(this);
     }
 }
