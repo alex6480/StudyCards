@@ -3,6 +3,7 @@ import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import { ISetStudyData } from "../../lib/flashcard/StudyData";
 import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
+import Tooltip from "../Tooltip";
 
 interface IStudyOverviewProps {
     set: IFlashCardSet;
@@ -32,6 +33,8 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
         } else {
             return <div className="columns">
                 <div className="column">
+                <div className="card">
+                <div className="card-content">
                     <h1 className="title is-3">Study {this.props.set.name} now</h1>
 
                     <p className="subtitle is-6">Last studied <time>never</time></p>
@@ -43,13 +46,24 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
                         Study Now
                     </a>
                 </div>
+                </div>
+                </div>
 
                 <div className="column">
+                <div className="card">
+                <div className="card-content">
                     <h2 className="title is-3">Current progress:</h2>
-                    <p>{newCardIds.length} cards are
-                        <span title="These cards have not been studied before">new</span></p>
+                    <p>{newCardIds.length} cards are <Tooltip message="These cards have never been studied before">
+                        new
+                        </Tooltip>
+                    </p>
                     <p>{knownCardIds.length} cards are ready for
-                        <span className="title is-1" title="REPL">review</span></p>
+                        <Tooltip message="It's been some time since you've last studied these cards">
+                        review
+                        </Tooltip>
+                    </p>
+                </div>
+                </div>
                 </div>
             </div>;
         }
