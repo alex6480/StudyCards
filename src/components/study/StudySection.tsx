@@ -113,7 +113,7 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
         this.setState({
             currentSession: {
                 ...session,
-                currentCardId: Study.drawCard(session.deck, studyData),
+                currentCardId: Study.drawCard(session.deck, studyData, session.currentCardId),
             },
         });
     }

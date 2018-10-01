@@ -173,30 +173,40 @@ export function getDueTimeIncrease(studyData: ICardStudyData, evaluation: CardEv
  * 2. If no cards with a redraw time earlier than now, it picks a random card without a redraw time
  * 3. If no cards have no redraw time, it picks a card with a redraw time in the future. Cards with an earlier
  * redraw time are more likely to be drawn.
- * @param deck The ids of the cards that can be drawn
+ * @param possibleCards The ids of the cards that can be drawn
  * @param StudyData Study data for the cards in the deck
  */
-export function drawCard(deck: string[], studyData: ISetStudyData): string {
+export function drawCard(deck: string[], studyData: ISetStudyData, currentCardId?: string): string {
     if (deck.length === 0) {
         throw new Error("Deck cannot be empty");
     }
+    if (deck.length === 1) {
+        // If only one item is left, there isn't much to draw from
+        return deck[0];
+    }
+
+    let possibleCards = deck;
+    if (currentCardId !== undefined) {
+        // The same card cannot be drawn twice
+        possibleCards = deck.filter(cardId => cardId !== currentCardId);
+    }
 
     // 1. Try to return a card with a redraw time earlier than now
-    const dueCards = deck.filter(id => {
+    const dueCards = possibleCards.filter(id => {
         const card = studyData.cardData[id];
         return card !== undefined && card.redrawTime !== null && card.redrawTime.getTime() <= new Date().getTime();
     });
     if (dueCards.length > 0) { return dueCards[Math.floor(Math.random() * dueCards.length)]; }
 
     // 2. Try to return a card with no redraw time
-    const cardWithoutRedraw = deck.filter(id =>
+    const cardWithoutRedraw = possibleCards.filter(id =>
         studyData.cardData[id] === undefined || studyData.cardData[id].redrawTime === null);
     if (cardWithoutRedraw.length > 0) {
         return cardWithoutRedraw[Math.floor(Math.random() * cardWithoutRedraw.length)];
     }
 
     // 3. Return a card with a future redraw time
-    const futureCards = deck.map(id => {
+    const futureCards = possibleCards.map(id => {
         const card = studyData.cardData[id];
         return {
             card,
