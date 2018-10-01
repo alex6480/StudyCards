@@ -25,18 +25,21 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
 
         if (Object.keys(this.props.set.cards).length === 0) {
             return <div className="container">
-                <p>This set contains no cards.</p>
-                <a href="#" className="button is-large is-primary" onClick={this.props.goToSetEditor}>
-                    Add Cards
-                </a>
+                <div className="card">
+                    <div className="card-content">
+                        <p>This set contains no cards.</p>
+                        <a href="#" className="button is-large is-primary" onClick={this.props.goToSetEditor}>
+                            Add Cards
+                        </a>
+                    </div>
+                </div>
             </div>;
         } else {
             return <div className="columns">
                 <div className="column">
                 <div className="card">
                 <div className="card-content">
-                    <h1 className="title is-3">Study {this.props.set.name} now</h1>
-
+                    <p className="title is-4">Begin Study</p>
                     <p className="subtitle is-6">Last studied <time>never</time></p>
                     <p>
                         This study section will include {newCardsInStudy} new {p("card", newCardsInStudy)}&#32;
@@ -52,7 +55,7 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
                 <div className="column">
                 <div className="card">
                 <div className="card-content">
-                    <h2 className="title is-3">Current progress:</h2>
+                    <h2 className="title is-4">Current progress:</h2>
                     <p>{newCardIds.length} cards are&#32;
                         <Tooltip message="These cards have never been studied before">
                             <span className="tag">new</span>

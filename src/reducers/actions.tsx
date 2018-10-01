@@ -33,6 +33,7 @@ export const UPDATE_CARD_FACE = "update card face";
 export const ADD_NEW_SET = "add new set";
 export const RESET_SESSION_STUDY_DATA = "reset session study data";
 export const UPDATE_CARD_STUDY_DATA = "update card study data";
+export const SWAP_CARD_FACES = "swap card faces";
 
 export const Actions = {
     addNewCard: (setId: string) => createAction(ADD_NEW_CARD, { setId }),
@@ -41,6 +42,7 @@ export const Actions = {
     updateCardFace: (cardId: string, face: IFlashCardFace) => createAction(UPDATE_CARD_FACE, { cardId, face }),
     addSet: (set?: IFlashCardSet) => createAction(ADD_NEW_SET, { set }),
     updateCardStudyData: (studyData: ICardStudyData) => createAction(UPDATE_CARD_STUDY_DATA, studyData),
+    swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),
 
     /**
      * Resets the parts of the studydata that are temporary for a single study session

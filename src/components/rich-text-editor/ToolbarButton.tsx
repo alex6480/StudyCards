@@ -5,7 +5,7 @@ import { BlockStyle, InlineStyle } from "./styles";
 interface IToolbarButtonProps {
     onClick?: (e: React.MouseEvent) => void;
     editorState: EditorState;
-    icon: string;
+    icon?: string;
 }
 
 interface IToolbarButtonState {
@@ -27,9 +27,10 @@ export class ToolbarButton<P extends IToolbarButtonProps> extends React.Componen
         return <p className="control">
             <a className={"button " + (this.state.isActive ? "is-active" : "")}
                 onMouseDown={this.handleMouseDown.bind(this)} onClick={this.onClick.bind(this)}>
-                <span className="icon">
+                { this.props.icon !== undefined && <span className="icon">
                     <i className={"fas fa-" + this.props.icon}></i>
-                </span>
+                </span> }
+                {this.props.children}
             </a>
         </p>;
     }

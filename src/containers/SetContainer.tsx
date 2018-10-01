@@ -28,6 +28,7 @@ interface ISetContainerDispatchProps {
     updateSetName: (set: IFlashCardSet, newName: string) => void;
     resetStudySessionData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
+    swapCardFaces: (setId: string, cardId: string) => void;
 }
 
 interface ISetContainerProps extends ISetContainerStateProps, ISetContainerDispatchProps { }
@@ -59,6 +60,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                 page = <SetCardEditor set={this.props.set}
                             addNewCard={this.props.addNewCard}
                             deleteCard={this.props.deleteCard}
+                            swapCardFaces={this.props.swapCardFaces}
                             updateCardFace={this.props.updateCardFace} />;
                 break;
             case SetSection.Export:
@@ -72,11 +74,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                         goToSection={this.goToSection.bind(this)}/>;
                 break;
             default:
-                page = <SetCardEditor set={this.props.set}
-                            addNewCard={this.props.addNewCard}
-                            deleteCard={this.props.deleteCard}
-                            updateCardFace={this.props.updateCardFace} />;
-                break;
+                throw new Error("Unknown section");
         }
 
         return <div>
@@ -147,6 +145,7 @@ function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
         updateSetName: (set: IFlashCardSet, newName: string) => dispatch(Actions.updateSetName(set, newName)),
         resetStudySessionData: () => dispatch(Actions.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Actions.updateCardStudyData(studyData)),
+        swapCardFaces: (setId: string, cardId: string) => dispatch(Actions.swapCardFaces(setId, cardId)),
     };
 }
 
