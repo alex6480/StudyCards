@@ -46,11 +46,13 @@ export function guid() {
  */
 export function shuffle<T>(deck: T[], limit?: number): T[] {
     const result: T[] = [];
-    for (let i = 0; i < (limit !== undefined ? limit : deck.length); i++) {
-        // Swap this card with a random card in the deck (the card can be swapped with itself to keep it's position)
-        const replacementIndex = Math.round(Math.random() * (deck.length - 1));
+    while (deck.length > 0) {
+        // Swap the first element with a random element in the deck
+        // (the element can be swapped with itself to keep it's position)
+        const replacementIndex = Math.floor(Math.random() * deck.length);
         result.push(deck[replacementIndex]);
-        deck[replacementIndex] = deck[i];
+        deck[replacementIndex] = deck[0];
+        deck = deck.slice(1);
     }
     return result;
 }
