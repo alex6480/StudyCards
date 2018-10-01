@@ -11,6 +11,7 @@ interface IStudyOverviewProps {
     maxTotalCards: number;
 
     startStudy?: (deck: string[]) => void;
+    goToSetEditor: () => void;
 }
 
 export default class StudyOverview extends React.Component<IStudyOverviewProps> {
@@ -21,26 +22,37 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
         const knownCardsInStudy = Math.min(knownCardIds.length, this.props.maxTotalCards - newCardsInStudy);
         const p = Utils.plural;
 
-        return <div className="columns">
-            <div className="column">
-                <h1 className="title is-3">Study {this.props.set.name} now</h1>
-
-                <p className="subtitle is-6">Last studied <time>never</time></p>
-                <p>
-                    This study section will include {newCardsInStudy} new {p("card", newCardsInStudy)}&#32;
-                    and {knownCardsInStudy} known {p("card", knownCardsInStudy)}.
-                </p>
-                <a href="#" className="button is-large is-primary" onClick={this.handleStartClick.bind(this)}>
-                    Study Now
+        if (Object.keys(this.props.set.cards).length === 0) {
+            return <div className="container">
+                <p>This set contains no cards.</p>
+                <a href="#" className="button is-large is-primary" onClick={this.props.goToSetEditor}>
+                    Add Cards
                 </a>
-            </div>
+            </div>;
+        } else {
+            return <div className="columns">
+                <div className="column">
+                    <h1 className="title is-3">Study {this.props.set.name} now</h1>
 
-            <div className="column">
-                <h2 className="title is-3">Current progress:</h2>
-                <p>{newCardIds.length} cards are <span title="These cards have not been studied before">new</span></p>
-                <p>{knownCardIds.length} cards are ready for <span className="title is-1" title="REPL">review</span></p>
-            </div>
-        </div>;
+                    <p className="subtitle is-6">Last studied <time>never</time></p>
+                    <p>
+                        This study section will include {newCardsInStudy} new {p("card", newCardsInStudy)}&#32;
+                        and {knownCardsInStudy} known {p("card", knownCardsInStudy)}.
+                    </p>
+                    <a href="#" className="button is-large is-primary" onClick={this.handleStartClick.bind(this)}>
+                        Study Now
+                    </a>
+                </div>
+
+                <div className="column">
+                    <h2 className="title is-3">Current progress:</h2>
+                    <p>{newCardIds.length} cards are
+                        <span title="These cards have not been studied before">new</span></p>
+                    <p>{knownCardIds.length} cards are ready for
+                        <span className="title is-1" title="REPL">review</span></p>
+                </div>
+            </div>;
+        }
     }
 
     private handleStartClick() {

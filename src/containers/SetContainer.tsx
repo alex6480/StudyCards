@@ -33,10 +33,10 @@ interface ISetContainerDispatchProps {
 interface ISetContainerProps extends ISetContainerStateProps, ISetContainerDispatchProps { }
 
 interface ISetContainerState {
-    section: ISetContainer;
+    section: SetSection;
 }
 
-enum ISetContainer {
+export enum SetSection {
     Study,
     Edit,
     Export,
@@ -48,27 +48,28 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
         super(props);
         // Set initial state
         this.state = {
-            section: ISetContainer.Study,
+            section: SetSection.Study,
         };
     }
 
     public render() {
         let page: React.ReactElement<any>;
         switch (this.state.section) {
-            case ISetContainer.Edit:
+            case SetSection.Edit:
                 page = <SetCardEditor set={this.props.set}
                             addNewCard={this.props.addNewCard}
                             deleteCard={this.props.deleteCard}
                             updateCardFace={this.props.updateCardFace} />;
                 break;
-            case ISetContainer.Export:
+            case SetSection.Export:
                 page = <SetExporter set={this.props.set}/>;
                 break;
-            case ISetContainer.Study:
+            case SetSection.Study:
                 page = <StudySection set={this.props.set}
                         resetSessionStudyData={this.props.resetStudySessionData}
                         updateCardStudyData={this.props.updateCardStudyData}
-                        studyData={this.props.studyData} />;
+                        studyData={this.props.studyData}
+                        goToSection={this.goToSection.bind(this)}/>;
                 break;
             default:
                 page = <SetCardEditor set={this.props.set}
@@ -105,11 +106,11 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                             </span>&nbsp;
                             Back
                         </a>
-                        <a className="navbar-item" onClick={() => this.goToSection(ISetContainer.Study)}>Study</a>
-                        <a className="navbar-item" onClick={() => this.goToSection(ISetContainer.Edit)}>Edit Cards</a>
+                        <a className="navbar-item" onClick={() => this.goToSection(SetSection.Study)}>Study</a>
+                        <a className="navbar-item" onClick={() => this.goToSection(SetSection.Edit)}>Edit Cards</a>
                         <a className="navbar-item"
-                            onClick={() => this.goToSection(ISetContainer.Properties)}>Set Properties</a>
-                        <a className="navbar-item" onClick={() => this.goToSection(ISetContainer.Export)}>Export</a>
+                            onClick={() => this.goToSection(SetSection.Properties)}>Set Properties</a>
+                        <a className="navbar-item" onClick={() => this.goToSection(SetSection.Export)}>Export</a>
                     </div>
                 </div>
             </nav>
@@ -119,7 +120,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
         </div>;
     }
 
-    private goToSection(newPage: ISetContainer) {
+    private goToSection(newPage: SetSection) {
         this.setState({section: newPage});
     }
 

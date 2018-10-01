@@ -1,5 +1,5 @@
 import * as React from "react";
-import IFlashCard from "../../lib/flashcard/flashcard";
+import { SetSection } from "../../containers/SetContainer";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../../lib/flashcard/StudyData";
 import * as Study from "../../lib/study";
@@ -12,6 +12,7 @@ interface IStudySectionProps {
     studyData: ISetStudyData;
     resetSessionStudyData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
+    goToSection: (section: SetSection) => void;
 }
 
 interface IStudySession {
@@ -40,7 +41,8 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
                     studyData={this.props.studyData}
                     maxNewCards={this.StudyMaxNewCards}
                     maxTotalCards={this.StudyMaxTotalCards}
-                    startStudy={this.startStudy.bind(this)} />
+                    startStudy={this.startStudy.bind(this)}
+                    goToSetEditor={() => this.props.goToSection(SetSection.Edit)}/>
             </div>;
         } else {
             const card = this.props.set.cards[this.state.currentSession.currentCardId];
