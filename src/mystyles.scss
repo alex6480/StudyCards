@@ -48,18 +48,17 @@ $modal-content-width: 900px;
 // These should be moved to appropriate locations
 // Used by the RichFieldEditor
 .listed-flashcard {
-    .flashcard-face {
-        & .flashcard-face-toolbar {
-            display: flex;
-            padding: 0.5rem;
+    & .flashcard-toolbar {
+        display: flex;
+        padding: 0.25rem;
+        flex-wrap: wrap;
 
-            & > .field {
-                margin: 0;
-                &:not(:first-child) {
-                    margin-left: 0.5rem;
-                }
-            }
+        > .field {
+            margin: 0.25rem;
         }
+    }
+    & .flashcard-face {
+        border-left: 1px solid $grey-lighter;
     }
 }
 
