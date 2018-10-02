@@ -1,5 +1,6 @@
 import { CompositeDecorator, Editor, EditorState, RichUtils } from "draft-js";
 import * as React from "react";
+import "../../../node_modules/draft-js/dist/Draft.css";
 import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import DropDown from "../rich-text-editor/DropDown";
 import { RevealDecorator, RevealEntity } from "../rich-text-editor/RevealEntity";
@@ -70,6 +71,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
                     onChange={this.onChange.bind(this)}
                     ref={editor => this.editor = editor}
                     onBlur={this.onBlur.bind(this)}
+                    placeholder={this.props.face.id === "front" ? "Front" : "Back"}
                 />
             </div>
         </>;
