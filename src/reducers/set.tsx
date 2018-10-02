@@ -10,13 +10,18 @@ const initialState: IFlashCardSet = {
     id: "",
 };
 
-function cards(state: { [id: number]: IFlashCard; } = initialState.cards,
-               action: fromActions.Actions): { [id: number]: IFlashCard; } {
+function cards(state: { [id: string]: IFlashCard; } = initialState.cards,
+               setId: string,
+               action: fromActions.Actions): { [id: string]: IFlashCard; } {
     switch (action.type) {
-        case fromActions.ADD_NEW_CARD:
+        case fromActions.SWAP_CARD_FACES:
         case fromActions.UPDATE_CARD_FACE:
-            // Propagate to the individual cards, so only the correct card is being edited
-            return utils.objectMapString(state, (k: string, c: IFlashCard) => card(c, action));
+            if (action.payload.setId === setId) {
+                return {
+                    ...state,
+                    [action.payload.cardId]: card(state[action.payload.cardId], action),
+                };
+            }
         default:
             return state;
     }
@@ -45,15 +50,17 @@ export default function set(state: IFlashCardSet = initialState, action: fromAct
             if (action.payload.setId === state.id) {
                 const newCard = card(undefined, action);
                 return {
-                    cards: { ...cards(state.cards, action),
-                        [newCard.id]: newCard },
+                    cards: {
+                        ...cards(state.cards, state.id, action),
+                        [newCard.id]: newCard,
+                    },
                     name: name(state.name, action),
                     id: setId,
                 };
             }
         default:
             return {
-                cards: cards(state.cards, action),
+                cards: cards(state.cards, state.id, action),
                 name: name(state.name, action),
                 id: setId,
             };

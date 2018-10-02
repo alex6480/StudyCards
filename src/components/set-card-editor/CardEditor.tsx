@@ -9,6 +9,7 @@ interface ICardEditorProps {
     card: IFlashCard;
     deleteCard: (card: IFlashCard) => void;
     updateCardFace: (cardId: string, face: IFlashCardFace) => void;
+    swapCardFaces: (cardId: string) => void;
 }
 
 /**
@@ -20,11 +21,15 @@ export default class CardEditor extends React.PureComponent<ICardEditorProps> {
             <div className="columns listed-flashcard">
                 <div className="column is-half ">
                     <CardFaceEditor cardId={this.props.card.id}
-                        face={this.props.card.faces.front} updateCardFace={this.props.updateCardFace}/>
+                        face={this.props.card.faces.front}
+                        updateCardFace={this.props.updateCardFace}
+                        swapCardFaces={this.props.swapCardFaces}/>
                 </div>
                 <div className="column is-half ">
                     <CardFaceEditor cardId={this.props.card.id}
-                        face={this.props.card.faces.back} updateCardFace={this.props.updateCardFace}/>
+                        face={this.props.card.faces.back}
+                        updateCardFace={this.props.updateCardFace}
+                        swapCardFaces={this.props.swapCardFaces}/>
                 </div>
             </div>
         </li>;

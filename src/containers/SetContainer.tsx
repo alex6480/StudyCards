@@ -24,7 +24,7 @@ interface ISetContainerStateProps extends ISetContainerOwnProps {
 interface ISetContainerDispatchProps {
     addNewCard: (setId: string) => void;
     deleteCard: (card: IFlashCard) => void;
-    updateCardFace: (cardId: string, face: IFlashCardFace) => void;
+    updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) => void;
     updateSetName: (set: IFlashCardSet, newName: string) => void;
     resetStudySessionData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
@@ -141,7 +141,8 @@ function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
     return {
         addNewCard: (setId: string) => dispatch(Actions.addNewCard(setId)),
         deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
-        updateCardFace: (cardId: string, face: IFlashCardFace) => dispatch(Actions.updateCardFace(cardId, face)),
+        updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
+            dispatch(Actions.updateCardFace(setId, cardId, face)),
         updateSetName: (set: IFlashCardSet, newName: string) => dispatch(Actions.updateSetName(set, newName)),
         resetStudySessionData: () => dispatch(Actions.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Actions.updateCardStudyData(studyData)),

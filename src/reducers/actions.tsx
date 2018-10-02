@@ -39,7 +39,8 @@ export const Actions = {
     addNewCard: (setId: string) => createAction(ADD_NEW_CARD, { setId }),
     updateSetName: (set: IFlashCardSet, newName: string) => createAction(UPDATE_SET_NAME, { set, name: newName }),
     deleteCard: (card: IFlashCard) => createAction(DELETE_CARD, card),
-    updateCardFace: (cardId: string, face: IFlashCardFace) => createAction(UPDATE_CARD_FACE, { cardId, face }),
+    updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
+        createAction(UPDATE_CARD_FACE, { setId, cardId, face }),
     addSet: (set?: IFlashCardSet) => createAction(ADD_NEW_SET, { set }),
     updateCardStudyData: (studyData: ICardStudyData) => createAction(UPDATE_CARD_STUDY_DATA, studyData),
     swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),

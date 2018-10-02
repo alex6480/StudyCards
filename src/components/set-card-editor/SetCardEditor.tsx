@@ -8,7 +8,8 @@ interface ISetCardEditorProps {
     onChange?: (newSet: IFlashCardSet) => void;
     addNewCard: (setId: string) => void;
     deleteCard: (card: IFlashCard) => void;
-    updateCardFace: (cardId: string, face: IFlashCardFace) => void;
+    updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) => void;
+    swapCardFaces: (setId: string, cardId: string) => void;
     set: IFlashCardSet;
 }
 
@@ -24,8 +25,8 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
     public render() {
         return <div className="container">
             { /* Set name */ }
-            <h2 className="title is-3">Cards in {this.props.set.name}</h2>
-            <h3 className="subtitle is-4">{this.cardCount === 0
+            <h2 className="title is-4">Edit cards in {this.props.set.name}</h2>
+            <h3 className="subtitle is-6">{this.cardCount === 0
                 ? "This set contains no cards."
                 : "This set contains " + this.cardCount + " card" + (this.cardCount === 1 ? "" : "s") + "." }</h3>
 
@@ -45,6 +46,14 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
         return Object.keys(this.props.set.cards).length;
     }
 
+    private swapFaces(cardId: string) {
+        this.props.swapCardFaces(this.props.set.id, cardId);
+    }
+
+    private updateCardFace(cardId: string, card: IFlashCardFace) {
+        this.props.updateCardFace(this.props.set.id, cardId, card);
+    }
+
     private renderCards() {
         if (this.cardCount === 0) {
             // In case no cards currently exist
@@ -54,21 +63,13 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
             for (const id of Object.keys(this.props.set.cards)) {
                 const card = this.props.set.cards[id];
                 cards.push(<CardEditor key={id} card={card}
-                    deleteCard={this.props.deleteCard} updateCardFace={this.props.updateCardFace}/>);
+                    deleteCard={this.props.deleteCard}
+                    updateCardFace={this.updateCardFace.bind(this)}
+                    swapCardFaces={this.swapFaces.bind(this)}/>);
             }
-            return <div>
-                <div className="columns">
-                    <div className="column">
-                        <h4 className="title is-4">Front</h4>
-                    </div>
-                    <div className="column">
-                        <h4 className="title is-4">Back</h4>
-                    </div>
-                </div>
-                <ul>
-                    {cards}
-                </ul>
-            </div>;
+            return <ul>
+                {cards}
+            </ul>;
         }
     }
 }
