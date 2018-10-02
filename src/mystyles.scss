@@ -34,6 +34,7 @@ $modal-content-width: 900px;
 @import "../node_modules/bulma/sass/elements/title.sass";
 @import "../node_modules/bulma/sass/elements/tag.sass";
 @import "../node_modules/bulma/sass/elements/notification.sass";
+@import "../node_modules/bulma/sass/elements/other.sass";
 @import "../node_modules/bulma/sass/elements/content.sass";
 @import "../node_modules/bulma/sass/layout/hero.sass";
 @import "../node_modules/bulma/sass/layout/section.sass";
@@ -59,6 +60,13 @@ $modal-content-width: 900px;
     }
     & .flashcard-face {
         border-left: 1px solid $grey-lighter;
+    }
+    & .tag-editor {
+        padding: 0.5rem;
+        .tag-input {
+            background-color: white;
+            border: 0;
+        }
     }
 }
 

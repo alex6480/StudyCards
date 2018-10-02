@@ -5,9 +5,11 @@ import IFlashCard from "../../lib/flashcard/flashcard";
 import { FlashCardFaceId, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import CardFaceEditor from "./CardFaceEditor";
 import { CardFaceEditorToolbar } from "./CardFaceEditorToolbar";
+import { TagEditor } from "./TagEditor";
 
 interface ICardEditorState {
     activeFace: FlashCardFaceId;
+    tags: string[];
 }
 
 interface ICardEditorProps {
@@ -33,6 +35,7 @@ export default class CardEditor extends React.PureComponent<ICardEditorProps, IC
         super(props);
         this.state = {
             activeFace: "front",
+            tags: [],
         };
     }
 
@@ -54,9 +57,13 @@ export default class CardEditor extends React.PureComponent<ICardEditorProps, IC
                     </div>
                 </div>
                 <div className="card-footer">
-                    <p>This is a list of tags</p>
+                    <TagEditor tags={this.state.tags} onChange={this.updateTags.bind(this)} />
                 </div>
             </div>
         </li>;
+    }
+
+    private updateTags(newTags: string[]) {
+        this.setState({tags: newTags});
     }
 }
