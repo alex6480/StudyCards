@@ -16,7 +16,7 @@ interface IStudyCardsAppStateProps {
 }
 
 interface IStudyCardsAppDispatchProps {
-    addSet: (set?: IFlashCardSet) => void;
+    addSet: (set?: IFlashCardSet, callback?: (id: string) => void) => void;
     addNewCard: (setId: string) => void;
     deleteCard: (card: IFlashCard) => void;
     updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) => void;
@@ -49,7 +49,7 @@ class StudyCardsApp extends React.Component<IStudyCardsAppProps, IStudyCardsAppS
                         addSet={this.props.addSet}/>;
         } else if (this.state.currentSetId == null) {
             return <Dashboard sets={this.props.sets}
-                        addSet={this.props.addSet}
+                        addSet={callback => this.props.addSet(undefined, callback )}
                         goToImport={this.goToImport.bind(this)}
                         goToSet={this.goToSet.bind(this)}/>;
         } else {
@@ -65,9 +65,9 @@ class StudyCardsApp extends React.Component<IStudyCardsAppProps, IStudyCardsAppS
         });
     }
 
-    private goToSet(set: IFlashCardSet) {
+    private goToSet(setId: string) {
         this.setState({
-            currentSetId: set.id,
+            currentSetId: setId,
             setBeingImported: false,
         });
     }
@@ -88,7 +88,7 @@ function mapStateToProps(state: IAppState): IStudyCardsAppStateProps {
 
 function mapDispatchToProps(dispatch: Dispatch): IStudyCardsAppDispatchProps {
     return {
-        addSet: (set?: IFlashCardSet) => dispatch(Actions.addSet(set)),
+        addSet: (set, callback) => dispatch(Actions.addSet(set, callback)),
         addNewCard: (setId: string) => dispatch(Actions.addNewCard(setId)),
         deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
         updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>

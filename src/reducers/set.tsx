@@ -49,6 +49,7 @@ export default function set(state: IFlashCardSet = initialState, action: fromAct
         case fromActions.ADD_NEW_CARD:
             if (action.payload.setId === state.id) {
                 const newCard = card(undefined, action);
+                if (action.payload.callback !== undefined) { action.payload.callback(newCard.id); }
                 return {
                     cards: {
                         ...cards(state.cards, state.id, action),

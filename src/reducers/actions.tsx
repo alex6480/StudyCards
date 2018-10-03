@@ -36,12 +36,14 @@ export const UPDATE_CARD_STUDY_DATA = "update card study data";
 export const SWAP_CARD_FACES = "swap card faces";
 
 export const Actions = {
-    addNewCard: (setId: string) => createAction(ADD_NEW_CARD, { setId }),
+    addNewCard: (setId: string, callback?: (id: string) => void) =>
+        createAction(ADD_NEW_CARD, { setId, callback }),
     updateSetName: (set: IFlashCardSet, newName: string) => createAction(UPDATE_SET_NAME, { set, name: newName }),
     deleteCard: (card: IFlashCard) => createAction(DELETE_CARD, card),
     updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
         createAction(UPDATE_CARD_FACE, { setId, cardId, face }),
-    addSet: (set?: IFlashCardSet) => createAction(ADD_NEW_SET, { set }),
+    addSet: (set?: IFlashCardSet, callback?: (id: string) => void) =>
+        createAction(ADD_NEW_SET, { set, callback }),
     updateCardStudyData: (studyData: ICardStudyData) => createAction(UPDATE_CARD_STUDY_DATA, studyData),
     swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),
 

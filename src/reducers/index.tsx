@@ -23,6 +23,8 @@ export default function studyCardsStore(state: IAppState = initialState, action:
                 setId: newSet.id,
                 cardData: {},
             };
+            if (action.payload.callback !== undefined) { action.payload.callback(newSet.id); }
+
             return {
                 sets: {
                     [newSet.id]: newSet,

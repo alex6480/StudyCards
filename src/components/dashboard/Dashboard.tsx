@@ -6,8 +6,8 @@ import SetTile from "./SetTile";
 interface IDashboardProps {
     sets: { [id: string]: IFlashCardSet };
     goToImport: () => void;
-    goToSet: (set: IFlashCardSet) => void;
-    addSet: () => void;
+    goToSet: (setId: string) => void;
+    addSet: (callback?: (id: string) => void) => void;
 }
 
 export default class Dashboard extends React.Component<IDashboardProps> {
@@ -43,7 +43,9 @@ export default class Dashboard extends React.Component<IDashboardProps> {
     }
 
     private handleAddSet() {
-        this.props.addSet();
+        this.props.addSet(id => {
+            this.props.goToSet(id);
+        });
     }
 
     private getSetTiles(sets: { [id: string]: IFlashCardSet }) {

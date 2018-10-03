@@ -3,7 +3,7 @@ import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 
 interface ISetTileProps {
     set: IFlashCardSet;
-    goToSet: (set: IFlashCardSet) => void;
+    goToSet: (setId: string) => void;
 }
 
 export default class SetTile extends React.Component<ISetTileProps> {
@@ -57,6 +57,6 @@ export default class SetTile extends React.Component<ISetTileProps> {
     }
 
     private goToSetDashboard() {
-        this.props.goToSet(this.props.set);
+        this.props.goToSet(this.props.set.id);
     }
 }
