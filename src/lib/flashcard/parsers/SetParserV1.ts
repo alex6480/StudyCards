@@ -31,12 +31,12 @@ export class SetParser implements ISetParser {
 
     private Set(set: ExportFlashCardSet, onError: onErrorHandler): IFlashCardSet {
         const id = this.SetId(set, onError);
-        throw new Error("Importing is not currently supported due to lacking card order");
+        const cards = this.SetCards(set, id, onError);
         const result: IFlashCardSet = {
             id,
             name: this.SetName(set, onError),
-            cards: this.SetCards(set, id, onError),
-            cardOrder: [],
+            cards,
+            cardOrder: this.SetCardOrder(set, cards, onError),
         };
         return result;
     }
@@ -56,6 +56,12 @@ export class SetParser implements ISetParser {
             return "Unnamed Set";
         }
         return set.name;
+    }
+
+    private SetCardOrder(set: ExportFlashCardSet,
+                         cards: {[id: string]: IFlashCard},
+                         onError: onErrorHandler): string[] {
+        return Object.keys(cards).sort();
     }
 
     private SetCards(set: ExportFlashCardSet, setId: string, onError: onErrorHandler): { [id: string]: IFlashCard } {
