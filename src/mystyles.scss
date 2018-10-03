@@ -94,16 +94,11 @@ $transition-short: 0.1s;
         &.is-discrete {
             & > * {
                 display: flex;
-                opacity: 0;
                 width: 2rem;
                 height: 2rem;
-                transition: opacity $transition-short;
                 border-radius: 50%;
                 border: 2px solid $grey-lighter;
             }
-        }
-        &.is-discrete:hover > * {
-            opacity: 1;
         }
     }
 }
