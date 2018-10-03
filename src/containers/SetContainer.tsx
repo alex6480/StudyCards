@@ -22,7 +22,7 @@ interface ISetContainerStateProps extends ISetContainerOwnProps {
 }
 
 interface ISetContainerDispatchProps {
-    addNewCard: (setId: string) => void;
+    addNewCard: (setId: string, afterCardId?: string) => void;
     deleteCard: (card: IFlashCard) => void;
     updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) => void;
     updateSetName: (set: IFlashCardSet, newName: string) => void;
@@ -139,7 +139,7 @@ function mapStateToProps(state: IAppState, ownProps: ISetContainerOwnProps): ISe
 
 function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
     return {
-        addNewCard: (setId: string) => dispatch(Actions.addNewCard(setId)),
+        addNewCard: (setId: string, afterCardId?: string) => dispatch(Actions.addNewCard(setId, afterCardId)),
         deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
         updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
             dispatch(Actions.updateCardFace(setId, cardId, face)),

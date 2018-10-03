@@ -2,7 +2,7 @@ import * as React from "react";
 
 interface ICardDividerProps {
     addCard?: (after?: string) => void;
-    afterCardId: string;
+    afterCardId?: string;
     isSubtle: boolean;
 }
 

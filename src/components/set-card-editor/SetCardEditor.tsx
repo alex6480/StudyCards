@@ -7,7 +7,7 @@ import CardEditor from "./CardEditor";
 
 interface ISetCardEditorProps {
     onChange?: (newSet: IFlashCardSet) => void;
-    addNewCard: (setId: string) => void;
+    addNewCard: (setId: string, afterCardId?: string) => void;
     deleteCard: (card: IFlashCard) => void;
     updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) => void;
     swapCardFaces: (setId: string, cardId: string) => void;
@@ -35,7 +35,10 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
             {this.renderCards()}
 
             { /* Button for adding new card to the set*/ }
-            <a className="button is-primary" onClick={this.addNewCard.bind(this)}>Add new card</a>
+            <CardDivider
+                isSubtle={false}
+                addCard={after => this.props.addNewCard(this.props.set.id, after)}
+            />
         </div>;
     }
 
@@ -60,24 +63,31 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
             // In case no cards currently exist
         } else {
             // This deck contains cards and they should be rendered
-            const cards: JSX.Element[] = [];
-            for (const id of Object.keys(this.props.set.cards)) {
+            const cardsWithDividers: JSX.Element[] = [];
+            let index = 0;
+            for (const id of this.props.set.cardOrder) {
                 const card = this.props.set.cards[id];
-                cards.push(<CardEditor key={id} card={card}
+                // Add the actual card editor
+                cardsWithDividers.push(<CardEditor key={id} card={card}
                         deleteCard={this.props.deleteCard}
                         updateCardFace={this.updateCardFace.bind(this)}
                         swapCardFaces={this.swapFaces.bind(this)}/>);
+
+                // Add a divider / add card button as long as the card is not the last
+                if (index !== this.props.set.cardOrder.length - 1) {
+                    cardsWithDividers.push(<CardDivider
+                        afterCardId={id}
+                        key={"divider-" + id}
+                        isSubtle={true}
+                        addCard={after => this.props.addNewCard(this.props.set.id, after)}
+                    />);
+                }
+
+                index++;
             }
-            // Weave in dividers
-            const cardsWithDividers = cards.map((c, i) => [c, <CardDivider
-                afterCardId={c.props.card.id}
-                key={"divider-" + c.props.card.id}
-                isSubtle={i !== cards.length - 1}
-                addCard={() => this.props.addNewCard(this.props.set.id)}
-            />]);
 
             return <ul>
-                {cardsWithDividers}
+                { cardsWithDividers }
             </ul>;
         }
     }

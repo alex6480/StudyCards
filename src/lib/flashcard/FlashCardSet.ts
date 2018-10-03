@@ -3,6 +3,7 @@ import IFlashCard, { ExportFlashCard } from "./flashcard";
 
 export default interface IFlashCardSet {
     cards: { [id: string]: IFlashCard; };
+    cardOrder: string[];
     name: string;
     id: string;
 }

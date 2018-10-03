@@ -31,10 +31,12 @@ export class SetParser implements ISetParser {
 
     private Set(set: ExportFlashCardSet, onError: onErrorHandler): IFlashCardSet {
         const id = this.SetId(set, onError);
+        throw new Error("Importing is not currently supported due to lacking card order");
         const result: IFlashCardSet = {
             id,
             name: this.SetName(set, onError),
             cards: this.SetCards(set, id, onError),
+            cardOrder: [],
         };
         return result;
     }

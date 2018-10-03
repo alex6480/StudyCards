@@ -7,6 +7,7 @@ import card, * as fromCard from "./card";
 const initialState: IFlashCardSet = {
     cards: {},
     name: "New Set",
+    cardOrder: [],
     id: "",
 };
 
@@ -36,6 +37,20 @@ function name(state: string = initialState.name, action: fromActions.Actions): s
     }
 }
 
+function cardOrder(state: string[] = initialState.cardOrder, action: fromActions.Actions) {
+    switch (action.type) {
+        case fromActions.ADD_NEW_CARD:
+            if (action.payload.afterCardId !== undefined) {
+                const afterIndex = state.indexOf(action.payload.afterCardId);
+                return [...state.slice(0, afterIndex + 1), action.payload.cardId, ...state.slice(afterIndex + 1)];
+            } else {
+                return state.concat(action.payload.cardId);
+            }
+        default:
+            return state;
+    }
+}
+
 export default function set(state: IFlashCardSet = initialState, action: fromActions.Actions): IFlashCardSet {
     // Generate a new id if none has been supplied
     const setId = state.id === initialState.id ? utils.guid() : state.id;
@@ -44,11 +59,13 @@ export default function set(state: IFlashCardSet = initialState, action: fromAct
             return {
                 cards: state.cards,
                 name: action.payload.set.id === state.id ? name(state.name, action) : state.name,
+                cardOrder: cardOrder(state.cardOrder, action),
                 id: setId,
             };
         case fromActions.ADD_NEW_CARD:
             if (action.payload.setId === state.id) {
                 const newCard = card(undefined, action);
+                action.payload.cardId = newCard.id;
                 if (action.payload.callback !== undefined) { action.payload.callback(newCard.id); }
                 return {
                     cards: {
@@ -56,6 +73,7 @@ export default function set(state: IFlashCardSet = initialState, action: fromAct
                         [newCard.id]: newCard,
                     },
                     name: name(state.name, action),
+                    cardOrder: cardOrder(state.cardOrder, action),
                     id: setId,
                 };
             }
@@ -63,6 +81,7 @@ export default function set(state: IFlashCardSet = initialState, action: fromAct
             return {
                 cards: cards(state.cards, state.id, action),
                 name: name(state.name, action),
+                cardOrder: cardOrder(state.cardOrder, action),
                 id: setId,
             };
     }
