@@ -2,6 +2,7 @@ import * as React from "react";
 import IFlashCard from "../../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
+import { CardDivider } from "./CardDivider";
 import CardEditor from "./CardEditor";
 
 interface ISetCardEditorProps {
@@ -23,7 +24,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
     }
 
     public render() {
-        return <div className="container">
+        return <div className="container card-editor">
             { /* Set name */ }
             <h2 className="title is-4">Edit cards in {this.props.set.name}</h2>
             <h3 className="subtitle is-6">{this.cardCount === 0
@@ -67,8 +68,16 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
                     updateCardFace={this.updateCardFace.bind(this)}
                     swapCardFaces={this.swapFaces.bind(this)}/>);
             }
+            // Weave in dividers
+            const cardsWithDividers = cards.map((c, i) => [c, <CardDivider
+                afterCardId={c.props.card.id}
+                key={"divider-" + c.props.card.id}
+                discrete={i !== cards.length - 1}
+                addCard={() => this.props.addNewCard(this.props.set.id)}
+            />]);
+
             return <ul>
-                {cards}
+                {cardsWithDividers}
             </ul>;
         }
     }

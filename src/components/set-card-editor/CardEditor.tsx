@@ -40,8 +40,8 @@ export default class CardEditor extends React.PureComponent<ICardEditorProps, IC
     }
 
     public render() {
-        return <li>
-            <div className="card listed-flashcard">
+        return <li className="listed-flashcard">
+            <div className="card">
                 <div className="columns is-gapless is-marginless">
                     <div className="column is-half ">
                         <CardFaceEditor cardId={this.props.card.id}
