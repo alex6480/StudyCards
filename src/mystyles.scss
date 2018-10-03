@@ -24,7 +24,8 @@ $input-shadow: none;
 $modal-content-width: 900px;
 
 // Used for css transitions
-$transition-short: 0.1s;
+$transition-short: 0.2s;
+$transition-medium: 0.5s;
 
 // Import only what you need from Bulma
 @import "../node_modules/bulma/sass/utilities/_all.sass";
@@ -72,33 +73,34 @@ $transition-short: 0.1s;
             border: 0;
         }
     }
-    & + .hr {
-        cursor: pointer;
-        padding: 1rem 0;
-        margin: 1rem 0;
-        position: relative;
-        &::before {
-            content: " ";
-            display: block;
-            background-color: $grey-lighter;
-            height: 2px;
-        }
-        & > * {
-            border-radius: $radius;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translateX(-50%) translateY(-50%);
-        }
+}
 
-        &.is-discrete {
-            & > * {
-                display: flex;
-                width: 2rem;
-                height: 2rem;
-                border-radius: 50%;
-                border: 2px solid $grey-lighter;
-            }
+.editor-card-divider {
+    cursor: pointer;
+    padding: 1rem 0;
+    margin: 1rem 0;
+    position: relative;
+    &::before {
+        content: " ";
+        display: block;
+        background-color: $grey-lighter;
+        height: 2px;
+    }
+    & > * {
+        border-radius: $radius;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+    }
+
+    &.is-subtle {
+        & > * {
+            display: flex;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: 2px solid $grey-lighter;
         }
     }
 }
@@ -164,5 +166,24 @@ $transition-short: 0.1s;
         left: 50%;
         z-index: 50;
         text-align: center;
+    }
+}
+
+.transition.slide {
+    overflow: hidden;
+    transition: height $transition-short;
+    transition-timing-function: ease-out;
+    background-color: white;
+
+    & > * {
+        transition: opacity $transition-short;
+        transition-timing-function: ease-in-out;
+    }
+
+    &.collapsed {
+        height: 0px;
+        & > * {
+            opacity: 0;
+        }
     }
 }

@@ -3,7 +3,7 @@ import * as React from "react";
 interface ICardDividerProps {
     addCard?: (after?: string) => void;
     afterCardId: string;
-    discrete: boolean;
+    isSubtle: boolean;
 }
 
 interface ICardDividerState {
@@ -25,15 +25,15 @@ export class CardDivider extends React.Component<ICardDividerProps, ICardDivider
 
     public render() {
         if (this.props.addCard === undefined) {
-            return <div className="hr"></div>;
+            return <div className="editor-card-divider"></div>;
         } else {
-            return <div className={"hr " + (this.props.discrete ? "is-discrete" : "")}
+            return <div className={"editor-card-divider " + (this.props.isSubtle ? "is-subtle" : "")}
                         onMouseDown={this.mouseDown.bind(this)}
                         onMouseEnter={this.mouseEnter.bind(this)}
                         onMouseLeave={this.mouseLeave.bind(this)}
                         onClick={this.addCard.bind(this)}>
-                <a className={"button " + (this.props.discrete ? "is-light " : "is-primary ") + this.getStateClasses()}>
-                    {this.props.discrete ? "+" : "Add new card"}
+                <a className={"button " + (this.props.isSubtle ? "is-light " : "is-primary ") + this.getStateClasses()}>
+                    {this.props.isSubtle ? "+" : "Add new card"}
                 </a>
             </div>;
         }

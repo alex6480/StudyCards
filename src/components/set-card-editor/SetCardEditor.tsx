@@ -64,15 +64,15 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
             for (const id of Object.keys(this.props.set.cards)) {
                 const card = this.props.set.cards[id];
                 cards.push(<CardEditor key={id} card={card}
-                    deleteCard={this.props.deleteCard}
-                    updateCardFace={this.updateCardFace.bind(this)}
-                    swapCardFaces={this.swapFaces.bind(this)}/>);
+                        deleteCard={this.props.deleteCard}
+                        updateCardFace={this.updateCardFace.bind(this)}
+                        swapCardFaces={this.swapFaces.bind(this)}/>);
             }
             // Weave in dividers
             const cardsWithDividers = cards.map((c, i) => [c, <CardDivider
                 afterCardId={c.props.card.id}
                 key={"divider-" + c.props.card.id}
-                discrete={i !== cards.length - 1}
+                isSubtle={i !== cards.length - 1}
                 addCard={() => this.props.addNewCard(this.props.set.id)}
             />]);
 
