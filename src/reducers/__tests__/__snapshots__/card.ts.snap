@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`existing card added throw error on wrong face ids 1`] = `"received is not a function"`;
+
+exports[`existing card added throw error on wrong face ids 2`] = `"received is not a function"`;

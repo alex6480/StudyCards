@@ -30,19 +30,19 @@ export default function card(state: IFlashCard = initialState, action: fromActio
         case fromActions.ADD_NEW_CARD:
             if (state.id === initialState.id) {
                 const cardId = Utils.guid();
+                if (state.faces.back.id !== "back") { throw Error("Invalid ID for card face back"); }
+                if (state.faces.front.id !== "front") { throw Error("Invalid ID for card face front"); }
                 return { ...state,
                     id: cardId,
                     setId: action.payload.setId,
                     faces: {
                         front: {
                             ...state.faces.front,
-                            id: "front",
                             cardId,
                             setId: action.payload.setId,
                         },
                         back: {
                             ...state.faces.back,
-                            id: "back",
                             cardId,
                             setId: action.payload.setId,
                         },

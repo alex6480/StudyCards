@@ -9,13 +9,13 @@
             "label": "Build (dev)",
             "command": "${workspaceFolder}/node_modules/.bin/webpack",
             "windows": {
-                "command": "${workspaceFolder}/node_modules/.bin/webpack.cmd",
+                "command": "${workspaceFolder}/node_modules/.bin/webpack.cmd"
             },
             "args": [
                 "--display-modules",
                 "--progress",
                 "--watch",
-                "-d",
+                "-d"
             ],
             "group": {
                 "kind": "build",
@@ -26,13 +26,13 @@
             "label": "Build (dist)",
             "command": "${workspaceFolder}/node_modules/.bin/webpack",
             "windows": {
-                "command": "${workspaceFolder}/node_modules/.bin/webpack.cmd",
+                "command": "${workspaceFolder}/node_modules/.bin/webpack.cmd"
             },
             "args": [
                 "--display-modules",
                 "--progress",
-                "-d",
-            ],
+                "-d"
+            ]
         },
         {
             "label": "Lint",
@@ -41,6 +41,11 @@
                 "base": "$tslint5",
                 "fileLocation": "relative"
             }
+        },
+        {
+            "label": "Test",
+            "command": "npm run test",
+            "problemMatcher": []
         }
     ]
 }
