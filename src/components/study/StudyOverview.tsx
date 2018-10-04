@@ -31,9 +31,14 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
                 {Object.keys(this.props.set.cards).length === 0  ? <>
                     { /* There are no cards in this set */ }
                     <p className="subtitle is-6">This set contains no cards.</p>
-                    <a href="#" className="button is-info" onClick={this.props.goToSetEditor}>
-                        Add cards
-                    </a>
+                    <div className="buttons">
+                        <button className="button is-info" disabled>
+                            Study Now
+                        </button>
+                        <a className="button is-info" onClick={this.props.goToSetEditor}>
+                            Add cards
+                        </a>
+                    </div>
                 </> : <>
                     { /* The set contains cards*/ }
                     <p className="subtitle is-6">Last studied <time>never</time></p>
