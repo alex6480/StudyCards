@@ -142,8 +142,7 @@ $transition-medium: 0.5s;
     }
 
     &:hover, &:focus {
-        border: 1px solid white;
-        background-color: rgba(white, $alpha: 0.1);
+        background-color: rgba(black, $alpha: 0.1);
     }
 }
 
