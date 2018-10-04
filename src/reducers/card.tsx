@@ -36,11 +36,13 @@ export default function card(state: IFlashCard = initialState, action: fromActio
                     faces: {
                         front: {
                             ...state.faces.front,
+                            id: "front",
                             cardId,
                             setId: action.payload.setId,
                         },
                         back: {
                             ...state.faces.back,
+                            id: "back",
                             cardId,
                             setId: action.payload.setId,
                         },
