@@ -23,54 +23,50 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
         const knownCardsInStudy = Math.min(knownCardIds.length, this.props.maxTotalCards - newCardsInStudy);
         const p = Utils.plural;
 
-        if (Object.keys(this.props.set.cards).length === 0) {
-            return <div className="container">
-                <div className="card">
-                    <div className="card-content">
-                        <p>This set contains no cards.</p>
-                        <a href="#" className="button is-large is-primary" onClick={this.props.goToSetEditor}>
-                            Add Cards
-                        </a>
-                    </div>
-                </div>
-            </div>;
-        } else {
-            return <div className="columns">
-                <div className="column">
-                <div className="card">
-                <div className="card-content">
-                    <p className="title is-4">Begin Study</p>
+        return <div className="columns">
+            <div className="column">
+            <div className="card">
+            <div className="card-content">
+                <p className="title is-4">Begin Study</p>
+                {Object.keys(this.props.set.cards).length === 0  ? <>
+                    { /* There are no cards in this set */ }
+                    <p className="subtitle is-6">This set contains no cards.</p>
+                    <a href="#" className="button is-info" onClick={this.props.goToSetEditor}>
+                        Add cards
+                    </a>
+                </> : <>
+                    { /* The set contains cards*/ }
                     <p className="subtitle is-6">Last studied <time>never</time></p>
                     <p>
                         This study section will include {newCardsInStudy} new {p("card", newCardsInStudy)}&#32;
                         and {knownCardsInStudy} known {p("card", knownCardsInStudy)}.
                     </p>
-                    <a href="#" className="button is-large is-primary" onClick={this.handleStartClick.bind(this)}>
+                    <a href="#" className="button is-primary" onClick={this.handleStartClick.bind(this)}>
                         Study Now
                     </a>
-                </div>
-                </div>
-                </div>
+                </> }
+            </div>
+            </div>
+            </div>
 
-                <div className="column">
-                <div className="card">
-                <div className="card-content">
-                    <h2 className="title is-4">Current progress:</h2>
-                    <p>{newCardIds.length} cards are&#32;
-                        <Tooltip message="These cards have never been studied before">
-                            <span className="tag">new</span>
-                        </Tooltip>
-                    </p>
-                    <p>{knownCardIds.length} cards are ready for&#32;
-                        <Tooltip message="It's been some time since you've last studied these cards">
-                            <span className="tag">review</span>
-                        </Tooltip>
-                    </p>
-                </div>
-                </div>
-                </div>
-            </div>;
-        }
+            <div className="column">
+            <div className="card">
+            <div className="card-content">
+                <h2 className="title is-4">Current progress:</h2>
+                <p>{newCardIds.length} cards are&#32;
+                    <Tooltip message="These cards have never been studied before">
+                        <span className="tag">new</span>
+                    </Tooltip>
+                </p>
+                <p>{knownCardIds.length} cards are ready for&#32;
+                    <Tooltip message="It's been some time since you've last studied these cards">
+                        <span className="tag">review</span>
+                    </Tooltip>
+                </p>
+            </div>
+            </div>
+            </div>
+        </div>;
     }
 
     private handleStartClick() {
