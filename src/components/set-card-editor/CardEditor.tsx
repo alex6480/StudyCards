@@ -19,6 +19,12 @@ interface ICardEditorState {
 interface ICardEditorOwnProps {
     setId: string;
     cardId: string;
+
+    /**
+     * Whether or not this card should have an animated transition when it is added to the DOM
+     * Default: true
+     */
+    doTransition?: boolean;
 }
 
 interface ICardEditorStateProps extends ICardEditorOwnProps {
@@ -53,10 +59,12 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
 
     constructor(props: ICardEditorProps) {
         super(props);
+
+        const doTransition = props.doTransition === undefined || props.doTransition === true;
         this.state = {
             activeFace: "front",
             tags: [],
-            transitionState: CardEditorTransitionState.Expanding,
+            transitionState: doTransition ? CardEditorTransitionState.Expanding : CardEditorTransitionState.None,
         };
     }
 

@@ -13,6 +13,12 @@ interface ISetCardEditorProps {
 }
 
 export default class SetCardEditor extends React.Component<ISetCardEditorProps> {
+    /**
+     * Indicates whether the current render is the first one taking place
+     * Used to prevent card animations when they are first added in
+     */
+    private isFirstRender: boolean = true;
+
     constructor(props: ISetCardEditorProps) {
         super(props);
         // Set initial state
@@ -22,7 +28,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
     }
 
     public render() {
-        return <div className="container card-editor">
+        const content = <div className="container card-editor">
             { /* Set name */ }
             <h2 className="title is-4">Edit cards in {this.props.set.name}</h2>
             <h3 className="subtitle is-6">{this.cardCount === 0
@@ -38,6 +44,11 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
                 addCard={this.addNewCard.bind(this)}
             />
         </div>;
+
+        // Make sure future card transitions will be shown
+        this.isFirstRender = false;
+
+        return content;
     }
 
     private addNewCard(afterCardId?: string) {
@@ -58,7 +69,9 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
             for (const id of this.props.set.cardOrder) {
                 const card = this.props.set.cards[id];
                 // Add the actual card editor
-                cardsWithDividers.push(<CardEditor key={id} setId={this.props.set.id} cardId={id} />);
+                cardsWithDividers.push(
+                    <CardEditor key={id} setId={this.props.set.id} cardId={id} doTransition={!this.isFirstRender}/>,
+                );
 
                 // Add a divider / add card button as long as the card is not the last
                 if (index !== this.props.set.cardOrder.length - 1) {
