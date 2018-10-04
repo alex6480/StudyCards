@@ -4,10 +4,7 @@
 **Redraw time:** The time within a study session that a card should be shown again.
 **Study new card limit (default 15):** The number of new cards (cards that have not been studied before) that will be put into a study deck.
 **Study total card limit (default 30):** The number of cards in a study deck
-**Understanding level** This is an internal score that indicates how comfortable the user is with a certain card. This score is used when calculating a new due date. Algorithm is still undecided. Preferably the algorithm should have the following properties:
-1. It goes to infinity
-2. For low understanding scores, the gap between due dates increases whenever the score is increased
-3. For high understanding scores, the gap between due dates decreases when the score is increased (but still stays positive).
+**Understanding level** This is an internal score that indicates how comfortable the user is with a certain card. This score is used when calculating a new due date. Algorithm is still undecided.
 
 ## Before beginning a study session
 The user can do the following:
@@ -31,14 +28,21 @@ During the study session
     2. If no cards have a readraw time before the current time, a random card is selected without a redraw time.
     3. If all cards have a redraw time in the future, the user is shown a card using the algorithm used to make the deck. A random card is selected but cards due early are prefered
 2. The user is asked to evaluate the card and can answer the following, based on how well their memory of the card was.
-    1. POOR: The user does not feel comfortable with the card and would like to study it again this session. The card is give a due date a random short interval in the future.
-    The understanding level of the card is reset to 0.
-    2. DECENT: The user feels reasonably comfortable with the card.
-    The card is given a reshuffle time slightly longer than if poorly was selected. After selecting this option, the GOOD option will be available the next time this ard is shown.
-    3. GOOD: The user feels comfortable with the card.
-    The card is taken out of the set. The understanding level of the card is incremented by 1 and a new due date is calculated based on this.
-    4. VERY GOOD: The user feels very comfortable with the card.
-    The card is taken out of the set. The understanding level of the card is incremented by 2 and a new due date is calculated based on this.
+    1. POOR: The user does not remember the card or important details on the card. The card is given a redraw time a random short interval in the future.
+    2. DECENT: The user remembers the important parts of the card, but would still like to see the card again this study session. The card is given a redraw time date a random medium interval in the future.
+    3. GOOD: The user remembered the card in a satisfying way. This removes the card from the current study session and the understanding score for the card is updated.
+
+## Calculating the uderstanding score
+For each card the following considerations are made
+1. If the user chose GOOD on the first card evaluation, the understanding level will be incremented. If this happens in multiple different study sessions in a row, the understanding level will be exponentially incremented.
+2. If the user hit POOR on a card (no matter what other evaluations the same card got) it will be have its undetstanding level reset.
+3. If the user hit DECENT one or more times before hitting GOOD the understanding score is neither decreased or increased. However, depending on how many times the user hit DECENT, the score will be capped.
+Maybe something along the lines of (where the number is the number of time the card was evaluated DECENT before GOOD):
+    1. Understanding level is capped so the card will be drawn in no more than 4 days.
+    2. Understanding level is capped so the card will be drawn in  no more than 3 days
+    3. Understanding level is capped so the card will be prioritized to be drawn in no more than 2 days.
+    4. The understanding level of the card is reset as if it was given the poor evaluation
 
 ## Completing the session
 When the study deck is empty, the study is complete.
+The user should be shown statistics about the cards
