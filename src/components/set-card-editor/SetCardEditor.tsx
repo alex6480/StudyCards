@@ -9,8 +9,6 @@ interface ISetCardEditorProps {
     onChange?: (newSet: IFlashCardSet) => void;
     addNewCard: (setId: string, afterCardId?: string) => void;
     deleteCard: (card: IFlashCard) => void;
-    updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) => void;
-    swapCardFaces: (setId: string, cardId: string) => void;
     set: IFlashCardSet;
 }
 
@@ -48,14 +46,6 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
 
     private get cardCount(): number {
         return Object.keys(this.props.set.cards).length;
-    }
-
-    private swapFaces(cardId: string) {
-        this.props.swapCardFaces(this.props.set.id, cardId);
-    }
-
-    private updateCardFace(cardId: string, card: IFlashCardFace) {
-        this.props.updateCardFace(this.props.set.id, cardId, card);
     }
 
     private renderCards() {

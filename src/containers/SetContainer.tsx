@@ -24,11 +24,9 @@ interface ISetContainerStateProps extends ISetContainerOwnProps {
 interface ISetContainerDispatchProps {
     addNewCard: (setId: string, afterCardId?: string) => void;
     deleteCard: (card: IFlashCard) => void;
-    updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) => void;
     updateSetName: (set: IFlashCardSet, newName: string) => void;
     resetStudySessionData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
-    swapCardFaces: (setId: string, cardId: string) => void;
 }
 
 interface ISetContainerProps extends ISetContainerStateProps, ISetContainerDispatchProps { }
@@ -59,9 +57,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
             case SetSection.Edit:
                 page = <SetCardEditor set={this.props.set}
                             addNewCard={this.props.addNewCard}
-                            deleteCard={this.props.deleteCard}
-                            swapCardFaces={this.props.swapCardFaces}
-                            updateCardFace={this.props.updateCardFace} />;
+                            deleteCard={this.props.deleteCard} />;
                 break;
             case SetSection.Export:
                 page = <SetExporter set={this.props.set}/>;
@@ -141,12 +137,9 @@ function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
     return {
         addNewCard: (setId: string, afterCardId?: string) => dispatch(Actions.addNewCard(setId, afterCardId)),
         deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
-        updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
-            dispatch(Actions.updateCardFace(setId, cardId, face)),
         updateSetName: (set: IFlashCardSet, newName: string) => dispatch(Actions.updateSetName(set, newName)),
         resetStudySessionData: () => dispatch(Actions.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Actions.updateCardStudyData(studyData)),
-        swapCardFaces: (setId: string, cardId: string) => dispatch(Actions.swapCardFaces(setId, cardId)),
     };
 }
 

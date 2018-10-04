@@ -17,12 +17,6 @@ interface IStudyCardsAppStateProps {
 
 interface IStudyCardsAppDispatchProps {
     addSet: (set?: IFlashCardSet, callback?: (id: string) => void) => void;
-    addNewCard: (setId: string) => void;
-    deleteCard: (card: IFlashCard) => void;
-    updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) => void;
-    updateSetName: (set: IFlashCardSet, newName: string) => void;
-    updateCardStudyData: (studyData: ICardStudyData) => void;
-    resetStudySessionData: () => void;
 }
 
 interface IStudyCardsAppProps extends IStudyCardsAppStateProps, IStudyCardsAppDispatchProps {}
@@ -89,13 +83,6 @@ function mapStateToProps(state: IAppState): IStudyCardsAppStateProps {
 function mapDispatchToProps(dispatch: Dispatch): IStudyCardsAppDispatchProps {
     return {
         addSet: (set, callback) => dispatch(Actions.addSet(set, callback)),
-        addNewCard: (setId: string) => dispatch(Actions.addNewCard(setId)),
-        deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
-        updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
-            dispatch(Actions.updateCardFace(setId, cardId, face)),
-        updateSetName: (set: IFlashCardSet, newName: string) => dispatch(Actions.updateSetName(set, newName)),
-        resetStudySessionData: () => dispatch(Actions.resetSessionStudyData()),
-        updateCardStudyData: (studyData: ICardStudyData) => dispatch(Actions.updateCardStudyData(studyData)),
     };
 }
 
