@@ -6,7 +6,6 @@ import DropDown from "../rich-text-editor/DropDown";
 import { RevealDecorator, RevealEntity } from "../rich-text-editor/RevealEntity";
 import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
 import { ToolbarButton, ToolbarButtonBlock, ToolbarButtonInline } from "../rich-text-editor/ToolbarButton";
-import LazyLoad from "../transition/LazyLoad";
 import { CardFaceEditorToolbar } from "./CardFaceEditorToolbar";
 
 type ICardFaceEditorState = IRichTextCardFaceEditorState;
@@ -59,7 +58,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
     }
 
     public render() {
-        return <LazyLoad>
+        return <>
             <CardFaceEditorToolbar
                 editorState={this.state.editorState}
                 face={this.props.face}
@@ -75,7 +74,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
                     placeholder={this.props.face.id === "front" ? "Front" : "Back"}
                 />
             </div>
-        </LazyLoad>;
+        </>;
     }
 
     private focusEditor(e: React.MouseEvent) {

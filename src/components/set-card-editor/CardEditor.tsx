@@ -3,6 +3,8 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import IFlashCard from "../../lib/flashcard/flashcard";
 import { FlashCardFaceId, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
+import { IAppState } from "../../reducers";
+import { Actions } from "../../reducers/actions";
 import SlideTransition from "../transition/SlideTransition";
 import CardFaceEditor from "./CardFaceEditor";
 import { CardFaceEditorToolbar } from "./CardFaceEditorToolbar";
@@ -14,12 +16,22 @@ interface ICardEditorState {
     transitionState: CardEditorTransitionState;
 }
 
-interface ICardEditorProps {
+interface ICardEditorOwnProps {
+    setId: string;
+    cardId: string;
+}
+
+interface ICardEditorStateProps extends ICardEditorOwnProps {
     card: IFlashCard;
+}
+
+interface ICardEditorDispatchProps {
     deleteCard: (card: IFlashCard) => void;
     updateCardFace: (cardId: string, face: IFlashCardFace) => void;
     swapCardFaces: (cardId: string) => void;
 }
+
+interface ICardEditorProps extends ICardEditorStateProps, ICardEditorDispatchProps { }
 
 enum CardEditorTransitionState {
     Expanding,
@@ -30,7 +42,7 @@ enum CardEditorTransitionState {
 /**
  * A card that is part of a cardlist
  */
-export default class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState> {
+class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     private faceEditors: {
         front: CardFaceEditor | null,
         back: CardFaceEditor | null,
@@ -91,3 +103,21 @@ export default class CardEditor extends React.PureComponent<ICardEditorProps, IC
         this.setState({tags: newTags});
     }
 }
+
+function mapStateToProps(state: IAppState, ownProps: ICardEditorOwnProps): ICardEditorStateProps {
+    return {
+        ...ownProps,
+        card: state.sets[ownProps.setId].cards[ownProps.cardId],
+    };
+}
+
+function mapDispatchToProps(dispatch: Dispatch, props: ICardEditorOwnProps): ICardEditorDispatchProps {
+    return {
+        deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
+        updateCardFace: (cardId: string, face: IFlashCardFace) =>
+            dispatch(Actions.updateCardFace(props.setId, cardId, face)),
+        swapCardFaces: (cardId: string) => dispatch(Actions.swapCardFaces(props.setId, cardId)),
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CardEditor);

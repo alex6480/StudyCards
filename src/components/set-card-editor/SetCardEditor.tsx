@@ -68,10 +68,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
             for (const id of this.props.set.cardOrder) {
                 const card = this.props.set.cards[id];
                 // Add the actual card editor
-                cardsWithDividers.push(<CardEditor key={id} card={card}
-                        deleteCard={this.props.deleteCard}
-                        updateCardFace={this.updateCardFace.bind(this)}
-                        swapCardFaces={this.swapFaces.bind(this)}/>);
+                cardsWithDividers.push(<CardEditor key={id} setId={this.props.set.id} cardId={id} />);
 
                 // Add a divider / add card button as long as the card is not the last
                 if (index !== this.props.set.cardOrder.length - 1) {
