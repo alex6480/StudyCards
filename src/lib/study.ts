@@ -9,7 +9,6 @@ export enum CardEvaluation {
     Poor,
     Decent,
     Good,
-    VeryGood,
 }
 
 export function selectStudyDeck(studyData: ISetStudyData, maxNewCards: number,
@@ -127,7 +126,6 @@ export function updateCardStudyData(cardId: string,
                                     studyData: ICardStudyData,
                                     evaluation: CardEvaluation): ICardStudyData {
     switch (evaluation) {
-        case CardEvaluation.VeryGood:
         case CardEvaluation.Good:
             return {
                 ...studyData,
@@ -152,9 +150,6 @@ export function updateCardStudyData(cardId: string,
 export function getDueTimeIncrease(studyData: ICardStudyData, evaluation: CardEvaluation) {
     const due: Date = new Date();
     switch (evaluation) {
-        case CardEvaluation.VeryGood:
-            due.setDate(due.getDate() + 4);
-            return due;
         case CardEvaluation.Good:
             due.setDate(due.getDate() + 2);
             return due;

@@ -2,6 +2,7 @@ import * as React from "react";
 import IFlashCard from "../../lib/flashcard/flashcard";
 import { ICardStudyData } from "../../lib/flashcard/StudyData";
 import * as Study from "../../lib/study";
+import Tooltip from "../Tooltip";
 import PresentedCardFace from "./PresentedCardFace";
 
 interface IPresentedCardProps {
@@ -39,21 +40,30 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
             { /* Button below card */ }
             { this.state.showBack
             ? <div>
-                <p>How well did you remember this card?</p>
+                <p>How good is your memory of this card?</p>
                 <div className="buttons">
                     <a className="button" onClick={this.evaluateCard(Study.CardEvaluation.Poor).bind(this)}>
-                        Poor (3 min)
+                        Poor
                     </a>
                     <a className="button" onClick={this.evaluateCard(Study.CardEvaluation.Decent).bind(this)}>
-                        Decent (10 min)
+                        Decent
                     </a>
                     <a className="button" onClick={this.evaluateCard(Study.CardEvaluation.Good).bind(this)}>
-                        Good (2 days)
-                    </a>
-                    <a className="button" onClick={this.evaluateCard(Study.CardEvaluation.VeryGood).bind(this)}>
-                        Very Good (4 days)
+                        Good
                     </a>
                 </div>
+                <p className="title is-5">Explanation</p>
+                <p>
+                    <strong>Poor:</strong> You did not remember this card at all,
+                    or missed important details of the card. You will be shown the card again this session.
+                </p>
+                <p>
+                    <strong>Decent:</strong> You mostly know this card, but would like to study it again this session.
+                </p>
+                <p>
+                    <strong>Good:</strong> You know everything on the card. When you select this option,
+                    you will not see this card again this study session.
+                </p>
             </div>
             : <div className="buttons">
                 <a className="button" onClick={this.flipCard.bind(this)}>Flip Card</a>
