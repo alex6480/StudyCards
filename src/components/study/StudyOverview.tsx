@@ -32,7 +32,7 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
                     { /* There are no cards in this set */ }
                     <p className="subtitle is-6">This set contains no cards.</p>
                     <div className="buttons">
-                        <button className="button is-info" disabled>
+                        <button className="button is-primary" disabled>
                             Study Now
                         </button>
                         <a className="button is-info" onClick={this.props.goToSetEditor}>
