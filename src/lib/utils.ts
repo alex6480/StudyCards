@@ -73,15 +73,9 @@ export function plural(word: string, count?: number) {
  * @param filter A function that returns true for all items that should be included in the result
  */
 export function selectKeys<T>(keys: string[] | {[key: string]: T}, filter: (key: string) => boolean) {
-    if (typeof keys === "object") {
+    if (! Array.isArray(keys)) {
         keys = Object.keys(keys);
     }
-    const result: string[] = [];
-    for (const key of keys) {
-        if (filter(key)) {
-            result.push(key);
-        }
-    }
-
+    const result: string[] = keys.filter(filter);
     return result;
 }
