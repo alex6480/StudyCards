@@ -54,3 +54,26 @@ describe("card added", () => {
         });
     });
 });
+
+describe("action performed on different set (different id)", () => {
+    test("update card face", () => {
+        const updatedState = set(state, Actions.updateCardFace("wrong-id", "a", state.cards.a.faces.front));
+        expect(updatedState).toStrictEqual(state);
+    });
+
+    test("swap card faces", () => {
+        const updatedState = set(state, Actions.swapCardFaces("wrong-id", "a"));
+        expect(updatedState).toStrictEqual(state);
+    });
+
+    test("update name", () => {
+        const updatedState = set(state, Actions.updateSetName({...state, id: "wrong-id"}, "something"));
+        expect(updatedState).toStrictEqual(state);
+    });
+});
+
+test("update name (correct id)", () => {
+    const newName = "new-name";
+    const updatedState = set(state, Actions.updateSetName(state, newName));
+    expect(updatedState.name).toBe(newName);
+});

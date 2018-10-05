@@ -28,9 +28,12 @@ function cards(state: { [id: string]: IFlashCard; } = initialState.cards,
     }
 }
 
-function name(state: string = initialState.name, action: fromActions.Actions): string {
+function name(state: string = initialState.name, setId: string, action: fromActions.Actions): string {
     switch (action.type) {
         case fromActions.UPDATE_SET_NAME:
+            if (action.payload.set.id !== setId) {
+                return state;
+            }
             return action.payload.name;
         default:
             return state;
@@ -55,11 +58,6 @@ export default function set(state: IFlashCardSet = initialState, action: fromAct
     // Generate a new id if none has been supplied
     const setId = state.id === initialState.id ? utils.guid() : state.id;
     switch (action.type) {
-        case fromActions.UPDATE_SET_NAME:
-            return {
-                ...state,
-                name: action.payload.set.id === state.id ? name(state.name, action) : state.name,
-            };
         case fromActions.ADD_NEW_CARD:
             if (action.payload.setId === state.id) {
                 const newCard = card(undefined, action);
@@ -70,7 +68,7 @@ export default function set(state: IFlashCardSet = initialState, action: fromAct
                         ...cards(state.cards, state.id, action),
                         [newCard.id]: newCard,
                     },
-                    name: name(state.name, action),
+                    name: name(state.name, state.id, action),
                     cardOrder: cardOrder(state.cardOrder, action),
                     id: setId,
                 };
@@ -78,7 +76,7 @@ export default function set(state: IFlashCardSet = initialState, action: fromAct
         default:
             return {
                 cards: cards(state.cards, state.id, action),
-                name: name(state.name, action),
+                name: name(state.name, state.id, action),
                 cardOrder: cardOrder(state.cardOrder, action),
                 id: setId,
             };
