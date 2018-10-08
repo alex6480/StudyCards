@@ -31,12 +31,13 @@ interface ICardEditorOwnProps {
 
 interface ICardEditorStateProps extends ICardEditorOwnProps {
     card: IRemote<IFlashCard>;
+    storage: IStorageProvider;
 }
 
 interface ICardEditorDispatchProps {
     deleteCard: (card: IFlashCard) => void;
-    updateCardFace: (cardId: string, face: IFlashCardFace) => void;
-    swapCardFaces: (cardId: string) => void;
+    saveCardFace: (storage: IStorageProvider, setId: string, cardId: string, face: IFlashCardFace) => void;
+    swapCardFaces: (setId: string, cardId: string) => void;
     loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) => void;
 }
 
@@ -90,14 +91,14 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                         <div className="column is-half">
                             <CardFaceEditor cardId={card.id}
                                 face={card.faces.front}
-                                updateCardFace={this.props.updateCardFace}
-                                swapCardFaces={this.props.swapCardFaces} />
+                                updateCardFace={this.saveCardFace.bind(this)}
+                                swapCardFaces={this.swapCardFaces.bind(this)} />
                         </div>
                         <div className="column is-half">
                             <CardFaceEditor cardId={card.id}
                                 face={card.faces.back}
-                                updateCardFace={this.props.updateCardFace}
-                                swapCardFaces={this.props.swapCardFaces} />
+                                updateCardFace={this.saveCardFace.bind(this)}
+                                swapCardFaces={this.swapCardFaces.bind(this)} />
                         </div>
                     </div>
                     <div className="card-footer">
@@ -119,6 +120,14 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
         }
     }
 
+    private saveCardFace(face: IFlashCardFace) {
+        this.props.saveCardFace(this.props.storage, this.props.setId, this.props.cardId, face);
+    }
+
+    private swapCardFaces() {
+        this.props.swapCardFaces(this.props.setId, this.props.cardId);
+    }
+
     private introComplete() {
         this.setState({ transitionState: CardEditorTransitionState.None });
     }
@@ -136,15 +145,16 @@ function mapStateToProps(state: IAppState, ownProps: ICardEditorOwnProps): ICard
             isFetching: true,
             value: undefined,
         },
+        storage: state.storageProvider,
     };
 }
 
-function mapDispatchToProps(dispatch: Dispatch, props: ICardEditorOwnProps): ICardEditorDispatchProps {
+function mapDispatchToProps(dispatch: Dispatch): ICardEditorDispatchProps {
     return {
         deleteCard: (card: IFlashCard) => dispatch(Action.deleteCard(card)),
-        updateCardFace: (cardId: string, face: IFlashCardFace) =>
-            dispatch(Action.updateCardFace(props.setId, cardId, face)),
-        swapCardFaces: (cardId: string) => dispatch(Action.swapCardFaces(props.setId, cardId)),
+        saveCardFace: (storage: IStorageProvider, setId: string, cardId: string, face: IFlashCardFace) =>
+            storage.saveCardFace(dispatch, setId, cardId, face),
+        swapCardFaces: (setId: string, cardId: string) => dispatch(Action.swapCardFaces(setId, cardId)),
         loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) =>
             storage.loadCards(dispatch, setId, cardIds),
     };

@@ -1,6 +1,7 @@
 import { Dispatch } from "redux";
 import { IAppState } from "../../reducers";
 import * as fromActions from "../../reducers/actions";
+import { IFlashCardFace } from "../flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 
 export default interface IStorageProvider {
@@ -30,4 +31,6 @@ export default interface IStorageProvider {
      * Returns the id of the newly added set
      */
     addSet: (dispatch: Dispatch, set?: IFlashCardSet) => string;
+
+    saveCardFace: (dispatch: Dispatch, setId: string, cardId: string, face: IFlashCardFace) => void;
 }

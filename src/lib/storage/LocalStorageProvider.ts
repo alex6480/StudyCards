@@ -4,6 +4,7 @@ import * as fromActions from "../../reducers/actions";
 import { initialCard } from "../../reducers/card";
 import * as fromSet from "../../reducers/set";
 import IFlashCard, { ExportFlashCard } from "../flashcard/flashcard";
+import { IFlashCardFace } from "../flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 import { SetParser } from "../flashcard/parsers/SetParserV1";
 import { ICardStudyData, ISetStudyData, ISetStudyDataMeta } from "../flashcard/StudyData";
@@ -104,6 +105,22 @@ export class LocalStorageProvider implements IStorageProvider {
         }
 
         dispatch(fromActions.Action.loadCardsComplete(setId, Utils.arrayToObject(cards, c => [c.id, c])));
+    }
+
+    public saveCardFace(dispatch: Dispatch, setId: string, cardId: string, face: IFlashCardFace) {
+        dispatch(fromActions.Action.saveCardFaceBegin(setId, cardId, face));
+
+        // Save the card face
+        const card = this.getCard(setId, cardId);
+        this.saveCard({
+            ...card,
+            faces: {
+                ...card.faces,
+                [face.id]: face,
+            },
+        });
+
+        dispatch(fromActions.Action.saveCardFaceComplete(setId, cardId));
     }
 
     private getCardStudyData(setId: string, cardId: string): ICardStudyData {

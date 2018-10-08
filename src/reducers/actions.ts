@@ -29,12 +29,14 @@ export type ActionsUnion<A extends IActionsCreatorMapObject> = ReturnType<A[keyo
 
 export const UPDATE_SET_NAME = "update set name";
 export const DELETE_CARD = "delete card";
-export const UPDATE_CARD_FACE = "update card face";
 export const RESET_SESSION_STUDY_DATA = "reset session study data";
 export const UPDATE_CARD_STUDY_DATA = "update card study data";
 export const SWAP_CARD_FACES = "swap card faces";
 
 // Remote actions
+export const SAVE_CARD_FACE_BEGIN = "save card face begin";
+export const SAVE_CARD_FACE_COMPLETE = "save card face complete";
+
 export const ADD_NEW_SET_BEGIN = "add new set begin";
 export const ADD_NEW_SET_COMPLETE = "add new set complete";
 
@@ -75,10 +77,13 @@ export const Action = {
         createAction(ADD_NEW_SET_BEGIN, { setId, set }),
     addSetComplete: (setId: string) => createAction(ADD_NEW_SET_COMPLETE, { setId }),
 
+    saveCardFaceBegin: (setId: string, cardId: string, face: IFlashCardFace) =>
+        createAction(SAVE_CARD_FACE_BEGIN, { setId, cardId, face }),
+    saveCardFaceComplete: (setId: string, cardId: string) =>
+        createAction(SAVE_CARD_FACE_COMPLETE, { setId, cardId }),
+
     updateSetName: (setId: string, newName: string) => createAction(UPDATE_SET_NAME, { setId, name: newName }),
     deleteCard: (card: IFlashCard) => createAction(DELETE_CARD, card),
-    updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
-        createAction(UPDATE_CARD_FACE, { setId, cardId, face }),
     updateCardStudyData: (studyData: ICardStudyData) => createAction(UPDATE_CARD_STUDY_DATA, studyData),
     swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),
 

@@ -28,7 +28,7 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
             <div className="card">
             <div className="card-content">
                 <p className="title is-4">Begin Study</p>
-                {Object.keys(this.props.set.cards).length === 0  ? <>
+                {this.props.set.cardOrder.length === 0  ? <>
                     { /* There are no cards in this set */ }
                     <p className="subtitle is-6">This set contains no cards.</p>
                     <div className="buttons">
