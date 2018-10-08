@@ -12,6 +12,14 @@ export const initialState: IFlashCardSet = {
     id: "",
 };
 
+export function id(state: string = initialState.id, action: fromActions.Action) {
+    if (state === undefined || state === initialState.id) {
+        return Utils.guid();
+    } else {
+        return state;
+    }
+}
+
 function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.cards,
                setId: string,
                action: fromActions.Action): { [id: string]: IRemote<IFlashCard>; } {
@@ -64,22 +72,53 @@ function cardOrder(state: string[] = initialState.cardOrder, action: fromActions
     }
 }
 
-export default function set(state: IFlashCardSet = initialState, action: fromActions.Action): IFlashCardSet {
+export function set(state: Partial<IFlashCardSet> = initialState, action: fromActions.Action): IFlashCardSet {
     // Generate a new id if none has been supplied
-    if (state.id === initialState.id) {
-        state.id = Utils.guid();
-    }
+    const stateId = id(state.id, action);
 
     switch (action.type) {
-        case fromActions.ADD_NEW_CARD_BEGIN:
-            if (state.id !== state.id) {
-                return {
-                    cards: cards(state.cards, state.id, action),
-                    name: name(state.name, state.id, action),
-                    cardOrder: cardOrder(state.cardOrder, action),
-                    id: state.id,
-                };
-            }
+        default:
+            return {
+                cards: cards(state.cards, stateId, action),
+                name: name(state.name, stateId, action),
+                cardOrder: cardOrder(state.cardOrder, action),
+                id: stateId,
+            };
+    }
+}
+
+export default function sets(state: IRemote<{ [id: string]: IFlashCardSet }>,
+                             action: fromActions.Action): IRemote<{ [id: string]: IFlashCardSet }> {
+
+    switch (action.type) {
+        case fromActions.LOAD_SET_META_ALL_BEGIN:
+            return { ...state, isFetching: true };
+        case fromActions.LOAD_SET_META_ALL_COMPLETE:
+            return {
+                ...state,
+                isFetching: false,
+                value: Utils.objectMapString(action.payload, (k, loadedSet) => ({
+                    ...loadedSet,
+                    cards: state.value !== undefined
+                        && state.value[loadedSet.id] !== undefined
+                        ? state.value[loadedSet.id].cards
+                        : { },
+                })),
+            };
+        case fromActions.LOAD_SET_META_ALL_ERROR:
+            return {
+                ...state,
+                error: action.payload.message,
+            };
+        case fromActions.ADD_NEW_SET_BEGIN:
+        case fromActions.ADD_NEW_SET_COMPLETE:
+            const setId = id(action.payload.setId, action);
+            return {
+                ...state,
+                value: {
+                    [setId]: set({ id: setId }, action),
+                },
+            };
         default:
             return state;
     }

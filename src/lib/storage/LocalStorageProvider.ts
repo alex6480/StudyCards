@@ -14,32 +14,6 @@ import IStorageProvider from "./StorageProvider";
 export class LocalStorageProvider implements IStorageProvider {
     private idDelimiter = ".";
 
-    public updateSet(setIsNew: boolean, set: IFlashCardSet, dispatch: Dispatch) {
-        const {cards, ...rest} = set;
-        const setMeta: IFlashCardSetMeta = rest;
-
-        // Make sure the set index contains the specified set
-        const setIds = this.getSetIds();
-        if (setIds.indexOf(set.id) === -1) {
-            localStorage.setItem("sets", setIds.concat(set.id).join(this.idDelimiter));
-        }
-
-        // Save the set
-        localStorage.setItem(this.setKey(set.id), JSON.stringify(setMeta));
-
-        if (setIsNew) {
-            // Save the cards
-            for (const cardId of set.cardOrder) {
-                const cardValue = cards[cardId].value;
-                if (cardValue === undefined) {
-                    throw new Error("Card value cannot be undefined for a new set");
-                } else {
-                    this.saveCard(cardValue);
-                }
-            }
-        }
-    }
-
     public getSetMetaAll(dispatch: Dispatch) {
         dispatch(fromActions.Action.loadSetMetaAllBegin());
 
@@ -68,15 +42,18 @@ export class LocalStorageProvider implements IStorageProvider {
     }
 
     public addSet(dispatch: Dispatch, set?: IFlashCardSet) {
-        if (set === undefined) {
+        if (set === undefined || set.id === undefined) {
             set = {
                 ...fromSet.initialState,
                 id: Utils.guid(),
             };
         }
 
-        dispatch(fromActions.Action.addSetBegin(set));
-        return set.id;
+        this.saveSet(set, true);
+
+        dispatch(fromActions.Action.addSetBegin(set.id!, set));
+        dispatch(fromActions.Action.addSetComplete(set.id!));
+        return set.id!;
     }
 
     private getSetMeta(setId: string): IFlashCardSetMeta {
@@ -85,6 +62,32 @@ export class LocalStorageProvider implements IStorageProvider {
             throw new Error("No metadata is available for set with id " + setId);
         }
         return JSON.parse(data);
+    }
+
+    private saveSet(set: IFlashCardSet, saveCards: boolean) {
+        const {cards, ...rest} = set;
+        const setMeta: IFlashCardSetMeta = rest;
+
+        // Make sure the set index contains the specified set
+        const setIds = this.getSetIds();
+        if (setIds.indexOf(set.id) === -1) {
+            localStorage.setItem("sets", setIds.concat(set.id).join(this.idDelimiter));
+        }
+
+        // Save the set
+        localStorage.setItem(this.setKey(set.id), JSON.stringify(setMeta));
+
+        if (saveCards) {
+            // Save the cards
+            for (const cardId of set.cardOrder) {
+                const cardValue = cards[cardId].value;
+                if (cardValue === undefined) {
+                    throw new Error("Card value cannot be undefined for a new set");
+                } else {
+                    this.saveCard(cardValue);
+                }
+            }
+        }
     }
 
     /**

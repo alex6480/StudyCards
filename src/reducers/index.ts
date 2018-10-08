@@ -5,8 +5,9 @@ import { LocalStorageProvider } from "../lib/storage/LocalStorageProvider";
 import IStorageProvider from "../lib/storage/StorageProvider";
 import * as Utils from "../lib/utils";
 import * as fromActions from "./actions";
-import set, * as fromSet from "./set";
+import sets, * as fromSet from "./set";
 import setStudyData from "./studyData";
+import studyData from "./studyData";
 
 export interface IAppState {
     storageProvider: IStorageProvider;
@@ -23,64 +24,20 @@ const initialState: IAppState = {
 export default function studyCardsStore(state: IAppState = initialState, action: fromActions.Action): IAppState {
     switch (action.type) {
         case fromActions.ADD_NEW_SET_BEGIN:
-            const newSet = action.payload.set !== undefined ? action.payload.set : set(undefined, action);
-            const newStudyData: ISetStudyData = {
-                setId: newSet.id,
-                cardData: {},
-            };
-            if (action.payload.callback !== undefined) { action.payload.callback(newSet.id); }
-
+            // Make sure the action has a set id
+            action.payload.set.id = fromSet.id(action.payload.set.id, action);
             return {
                 ...state,
-                sets: {
-                    ...state.sets,
-                    value: {
-                        ...state.sets.value,
-                        [newSet.id]: newSet,
-                    },
-                },
+                sets: sets(state.sets, action),
                 studyData: {
                     ...state.studyData,
-                    [newSet.id]: newStudyData,
-                },
-            };
-        case fromActions.LOAD_SET_META_ALL_BEGIN:
-            return {
-                ...state,
-                sets: { ...state.sets, isFetching: true },
-            };
-        case fromActions.LOAD_SET_META_ALL_COMPLETE:
-            return {
-                ...state,
-                sets: {
-                    ...state.sets,
-                    isFetching: false,
-                    value: Utils.objectMapString(action.payload, (k, loadedSet) => ({
-                        ...loadedSet,
-                        cards: state.sets.value !== undefined
-                            && state.sets.value[loadedSet.id] !== undefined
-                            ? state.sets.value[loadedSet.id].cards
-                            : { },
-                    })),
-                },
-            };
-        case fromActions.LOAD_SET_META_ALL_ERROR:
-            return {
-                ...state,
-                sets: {
-                    ...state.sets,
-                    error: action.payload.message,
+                    [action.payload.set.id]: studyData({ setId: action.payload.set.id }, action),
                 },
             };
         default:
             return {
                 ...state,
-                sets: {
-                    ...state.sets,
-                    value: state.sets.value !== undefined
-                        ? Utils.objectMapString(state.sets.value, (k, v) => set(v, action))
-                        : undefined,
-                },
+                sets: sets(state.sets, action),
                 studyData: Utils.objectMapString(state.studyData, (k, v) => setStudyData(v, action)),
             };
     }

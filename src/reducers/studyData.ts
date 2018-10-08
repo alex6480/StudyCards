@@ -14,21 +14,26 @@ const initialCardStudyDataState: ICardStudyData = {
     removeFromDeck: false,
 };
 
-export default function studyData(state: ISetStudyData = initialSetStudyDataState,
+export default function studyData(state: Partial<ISetStudyData> = initialSetStudyDataState,
                                   action: fromActions.Action): ISetStudyData {
     switch (action.type) {
-        case fromActions.RESET_SESSION_STUDY_DATA:
+        default:
             return {
-                ...state,
-                cardData: Utils.objectMapString(state.cardData, (cardId, cardData) => cardStudyData(cardData, action)),
+                setId: state.setId!,
+                cardData: cardData(state.cardData, action),
             };
+    }
+}
+
+function cardData(state: {[id: string]: ICardStudyData} = initialSetStudyDataState.cardData,
+                  action: fromActions.Action) {
+    switch (action.type) {
+        case fromActions.RESET_SESSION_STUDY_DATA:
+            return Utils.objectMapString(state, (cardId, data) => cardStudyData(data, action));
         case fromActions.UPDATE_CARD_STUDY_DATA:
             return {
                 ...state,
-                cardData: {
-                    ...state.cardData,
-                    [action.payload.cardId]: cardStudyData(state.cardData[action.payload.cardId], action),
-                },
+                [action.payload.cardId]: cardStudyData(state[action.payload.cardId], action),
             };
         default:
             return state;

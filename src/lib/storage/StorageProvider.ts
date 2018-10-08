@@ -5,12 +5,6 @@ import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 
 export default interface IStorageProvider {
     /**
-     * This function is called when or more meta data properties of this set was modified
-     * However, if the set is new, the cards can have any value
-     */
-    updateSet: (setIsNew: boolean, set: IFlashCardSet, dispatch: Dispatch) => void;
-
-    /**
      * Used to get meta data for all sets
      */
     getSetMetaAll: (dispatch: Dispatch) => void;

@@ -57,9 +57,9 @@ export const Action = {
     addNewCardComplete: (setId: string, cardId: string) =>
         createAction(ADD_NEW_CARD_COMPLETE, { setId, cardId }),
 
-    addSetBegin: (set?: IFlashCardSet, callback?: (id: string) => void) =>
-        createAction(ADD_NEW_SET_BEGIN, { set, callback }),
-    addSetComplete: () => createAction(ADD_NEW_SET_COMPLETE),
+    addSetBegin: (setId: string, set: Partial<IFlashCardSet>) =>
+        createAction(ADD_NEW_SET_BEGIN, { setId, set }),
+    addSetComplete: (setId: string) => createAction(ADD_NEW_SET_COMPLETE, { setId }),
 
     updateSetName: (setId: string, newName: string) => createAction(UPDATE_SET_NAME, { setId, name: newName }),
     deleteCard: (card: IFlashCard) => createAction(DELETE_CARD, card),

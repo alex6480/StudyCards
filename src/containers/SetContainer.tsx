@@ -48,6 +48,7 @@ export enum SetSection {
 class SetContainer extends React.Component<ISetContainerProps, ISetContainerState> {
     constructor(props: ISetContainerProps) {
         super(props);
+
         // Set initial state
         this.state = {
             section: SetSection.Study,
@@ -140,6 +141,7 @@ function mapStateToProps(state: IAppState, ownProps: ISetContainerOwnProps): ISe
     }
     return {
         ...ownProps,
+        set: state.sets.value![ownProps.setId],
         studyData: state.studyData[ownProps.setId],
         storage: state.storageProvider,
     };
