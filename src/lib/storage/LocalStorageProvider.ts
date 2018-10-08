@@ -16,6 +16,16 @@ import IStorageProvider from "./StorageProvider";
  */
 export class LocalStorageProvider implements IStorageProvider {
     private idDelimiter = ".";
+    private virtualDelay: number;
+
+    /**
+     * Stores all data in the local storage so it is persistant between sessions
+     * @param virtualDelay A simulated latency in ms that is added to all storage operations.
+     * Used to emulate the experience with a remote storage source
+     */
+    constructor(virtualDelay: number = 0) {
+        this.virtualDelay = virtualDelay;
+    }
 
     public loadSetMetaAll(dispatch: Dispatch) {
         dispatch(fromActions.Action.loadSetMetaAllBegin());
@@ -27,7 +37,7 @@ export class LocalStorageProvider implements IStorageProvider {
             return result;
         }, {});
 
-        dispatch(fromActions.Action.loadSetMetaAllComplete(meta));
+        this.result(() => dispatch(fromActions.Action.loadSetMetaAllComplete(meta)));
     }
 
     public addCard(dispatch: Dispatch, setId: string, afterCardId?: string) {
@@ -52,7 +62,7 @@ export class LocalStorageProvider implements IStorageProvider {
         }
         this.saveSetMeta({ ...setMeta, cardOrder });
 
-        dispatch(fromActions.Action.addNewCardComplete(setId, cardId));
+        this.result(() => dispatch(fromActions.Action.addNewCardComplete(setId, cardId)));
 
         return cardId;
     }
@@ -64,6 +74,7 @@ export class LocalStorageProvider implements IStorageProvider {
                 id: Utils.guid(),
             };
         }
+        const setId = set.id!;
 
         this.saveSet(set, true);
         this.saveSetStudyData({
@@ -71,9 +82,9 @@ export class LocalStorageProvider implements IStorageProvider {
             cardData: { },
         }, set.cardOrder);
 
-        dispatch(fromActions.Action.addSetBegin(set.id!, set));
-        dispatch(fromActions.Action.addSetComplete(set.id!));
-        return set.id!;
+        dispatch(fromActions.Action.addSetBegin(setId, set));
+        this.result(() => dispatch(fromActions.Action.addSetComplete(setId)));
+        return setId;
     }
 
     public loadSetStudyData(dispatch: Dispatch, setId: string) {
@@ -92,7 +103,7 @@ export class LocalStorageProvider implements IStorageProvider {
                 val => [val.cardId, val]),
         };
 
-        dispatch(fromActions.Action.loadSetStudyDataComplete(result));
+        this.result(() => dispatch(fromActions.Action.loadSetStudyDataComplete(result)));
     }
 
     public loadCards(dispatch: Dispatch, setId: string, cardIds: string[]) {
@@ -104,7 +115,8 @@ export class LocalStorageProvider implements IStorageProvider {
             cards.push(this.getCard(setId, cardId));
         }
 
-        dispatch(fromActions.Action.loadCardsComplete(setId, Utils.arrayToObject(cards, c => [c.id, c])));
+        this.result(() =>
+            dispatch(fromActions.Action.loadCardsComplete(setId, Utils.arrayToObject(cards, c => [c.id, c]))));
     }
 
     public saveCardFace(dispatch: Dispatch, setId: string, cardId: string, face: IFlashCardFace) {
@@ -120,7 +132,8 @@ export class LocalStorageProvider implements IStorageProvider {
             },
         });
 
-        dispatch(fromActions.Action.saveCardFaceComplete(setId, cardId));
+        this.result(() =>
+            dispatch(fromActions.Action.saveCardFaceComplete(setId, cardId)));
     }
 
     private getCardStudyData(setId: string, cardId: string): ICardStudyData {
@@ -252,5 +265,13 @@ export class LocalStorageProvider implements IStorageProvider {
 
     private cardStudyDataKey(setId: string, cardId: string) {
         return "cardStudyData" + this.idDelimiter + setId + this.idDelimiter + cardId;
+    }
+
+    private result(fn: () => void) {
+        if (this.virtualDelay === 0) {
+            fn();
+        } else {
+            setTimeout(fn, this.virtualDelay);
+        }
     }
 }
