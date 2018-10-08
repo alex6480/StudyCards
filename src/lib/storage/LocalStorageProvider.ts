@@ -15,7 +15,7 @@ import IStorageProvider from "./StorageProvider";
 export class LocalStorageProvider implements IStorageProvider {
     private idDelimiter = ".";
 
-    public getSetMetaAll(dispatch: Dispatch) {
+    public loadSetMetaAll(dispatch: Dispatch) {
         dispatch(fromActions.Action.loadSetMetaAllBegin());
 
         const setIds = this.getSetIds();
@@ -62,7 +62,7 @@ export class LocalStorageProvider implements IStorageProvider {
         return set.id!;
     }
 
-    public getSetStudyData(dispatch: Dispatch, setId: string) {
+    public loadSetStudyData(dispatch: Dispatch, setId: string) {
         dispatch(fromActions.Action.loadSetStudyDataBegin(setId));
 
         const setStudyMetaData = localStorage.getItem(this.setStudyDataKey(setId));
@@ -78,7 +78,19 @@ export class LocalStorageProvider implements IStorageProvider {
                 val => [val.cardId, val]),
         };
 
-        dispatch(fromActions.Action.loadSetStudyDataComplete(setId, result));
+        dispatch(fromActions.Action.loadSetStudyDataComplete(result));
+    }
+
+    public loadCards(dispatch: Dispatch, setId: string, cardIds: string[]) {
+        dispatch(fromActions.Action.loadCardsBegin(setId, cardIds));
+
+        const cards: IFlashCard[] = [];
+        const setMeta = this.getSetMeta(setId);
+        for (const cardId of setMeta.cardOrder) {
+            cards.push(this.getCard(setId, cardId));
+        }
+
+        dispatch(fromActions.Action.loadCardsComplete(setId, Utils.arrayToObject(cards, c => [c.id, c])));
     }
 
     private getCardStudyData(setId: string, cardId: string): ICardStudyData {
@@ -92,6 +104,14 @@ export class LocalStorageProvider implements IStorageProvider {
                 redrawTime: null,
                 removeFromSession: false,
             };
+        }
+        return JSON.parse(data);
+    }
+
+    private getCard(setId: string, cardId: string): IFlashCard {
+        const data = localStorage.getItem(this.cardKey(setId, cardId));
+        if (data === null) {
+            throw new Error("Card does not exist");
         }
         return JSON.parse(data);
     }

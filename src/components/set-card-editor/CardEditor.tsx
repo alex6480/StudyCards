@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import IFlashCard from "../../lib/flashcard/flashcard";
 import { FlashCardFaceId, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
+import IStorageProvider from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
 import SlideTransition from "../transition/SlideTransition";
@@ -35,6 +36,7 @@ interface ICardEditorDispatchProps {
     deleteCard: (card: IFlashCard) => void;
     updateCardFace: (cardId: string, face: IFlashCardFace) => void;
     swapCardFaces: (cardId: string) => void;
+    loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) => void;
 }
 
 interface ICardEditorProps extends ICardEditorStateProps, ICardEditorDispatchProps { }
@@ -72,13 +74,13 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
         const editor = <li className="listed-flashcard">
             <div className="card">
                 <div className="columns is-gapless is-marginless">
-                    <div className="column is-half ">
+                    <div className="column is-half">
                         <CardFaceEditor cardId={this.props.card.id}
                             face={this.props.card.faces.front}
                             updateCardFace={this.props.updateCardFace}
                             swapCardFaces={this.props.swapCardFaces} />
                     </div>
-                    <div className="column is-half ">
+                    <div className="column is-half">
                         <CardFaceEditor cardId={this.props.card.id}
                             face={this.props.card.faces.back}
                             updateCardFace={this.props.updateCardFace}
@@ -126,6 +128,8 @@ function mapDispatchToProps(dispatch: Dispatch, props: ICardEditorOwnProps): ICa
         updateCardFace: (cardId: string, face: IFlashCardFace) =>
             dispatch(Action.updateCardFace(props.setId, cardId, face)),
         swapCardFaces: (cardId: string) => dispatch(Action.swapCardFaces(props.setId, cardId)),
+        loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) =>
+            storage.loadCards(dispatch, setId, cardIds),
     };
 }
 

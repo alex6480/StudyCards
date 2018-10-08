@@ -49,6 +49,9 @@ export const LOAD_SET_META_ALL_ERROR = "load meta data for all sets error";
 export const LOAD_SET_STUDY_DATA_BEGIN = "load set study data begin";
 export const LOAD_SET_STUDY_DATA_COMPLETE = "load set study data complete";
 
+export const LOAD_CARDS_BEGIN = "load cards begin";
+export const LOAD_CARDS_COMPLETE = "load cards complete";
+
 export const Action = {
     loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
     loadSetMetaAllComplete: (setMeta: {[id: string]: IFlashCardSetMeta}) =>
@@ -56,8 +59,12 @@ export const Action = {
     loadSetMetaAllError: (message: string) => createAction(LOAD_SET_META_ALL_ERROR, { message }),
 
     loadSetStudyDataBegin: (setId: string) => createAction(LOAD_SET_STUDY_DATA_BEGIN, { setId }),
-    loadSetStudyDataComplete: (setId: string, result: ISetStudyData) =>
-        createAction(LOAD_SET_STUDY_DATA_COMPLETE, { setId, result }),
+    loadSetStudyDataComplete: (result: ISetStudyData) =>
+        createAction(LOAD_SET_STUDY_DATA_COMPLETE, { setId: result.setId, result }),
+
+    loadCardsBegin: (setId: string, cardIds: string[]) => createAction(LOAD_CARDS_BEGIN, { setId, cardIds }),
+    loadCardsComplete: (setId: string, cards: {[id: string]: IFlashCard }) =>
+        createAction(LOAD_CARDS_COMPLETE, { setId, cards }),
 
     addNewCardBegin: (cardId: string, setId: string, afterCardId?: string) =>
         createAction(ADD_NEW_CARD_BEGIN, { cardId, setId, afterCardId }),

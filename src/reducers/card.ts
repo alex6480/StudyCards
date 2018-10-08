@@ -3,7 +3,7 @@ import IFlashCard from "../lib/flashcard/flashcard";
 import { FlashCardFaceType } from "../lib/flashcard/FlashCardFace";
 import IRemote from "../lib/remote";
 import * as Utils from "../lib/utils";
-import * as Actions from "./actions";
+import * as fromActions from "./actions";
 
 export const initialCard: IFlashCard = {
     id: "",
@@ -27,28 +27,38 @@ export const initialCard: IFlashCard = {
 };
 export const initialState = { isFetching: true, lastUpdated: Date.now(), value: initialCard };
 
-function value(state: Partial<IFlashCard> = initialState.value, action: Actions.Action): IFlashCard {
+function value(state: Partial<IFlashCard> = initialState.value,
+               cardId: string, action: fromActions.Action): IFlashCard {
     switch (action.type) {
         default:
             return {
-                id: state.id !== undefined ? state.id : Utils.guid(),
+                id: cardId,
                 setId: state.setId as string,
                 faces: state.faces !== undefined ? state.faces : initialCard.faces,
             };
     }
 }
 
-function id(state: string | undefined, action: Actions.Action): string {
-    switch (action.type) {
-        default:
-            return state === undefined ? Utils.guid() : state;
-    }
-}
-
 export default function card(state: IRemote<Partial<IFlashCard>> = initialState,
-                             action: Actions.Action): IRemote<IFlashCard> {
-    return {
-        ...state,
-        value: value(state.value, action),
-    };
+                             cardId: string,
+                             action: fromActions.Action): IRemote<IFlashCard> {
+    switch (action.type) {
+        case fromActions.LOAD_CARDS_BEGIN:
+            return {
+                ...state,
+                value: value(state.value, cardId, action),
+                isFetching: true,
+            };
+        case fromActions.LOAD_CARDS_COMPLETE:
+            return {
+                ...state,
+                value: action.payload.cards[cardId],
+                isFetching: false,
+            };
+        default:
+            return {
+                ...state,
+                value: value(state.value, cardId, action),
+            };
+    }
 }

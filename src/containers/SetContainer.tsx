@@ -139,7 +139,6 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
 }
 
 function mapStateToProps(state: IAppState, ownProps: ISetContainerOwnProps): ISetContainerStateProps {
-    console.log(state);
     return {
         ...ownProps,
         set: state.sets.value![ownProps.setId],
@@ -156,7 +155,7 @@ function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
         updateSetName: (setId: string, newName: string) => dispatch(Action.updateSetName(setId, newName)),
         resetStudySessionData: () => dispatch(Action.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Action.updateCardStudyData(studyData)),
-        getSetStudyData: (storage: IStorageProvider, setId: string) => storage.getSetStudyData(dispatch, setId),
+        getSetStudyData: (storage: IStorageProvider, setId: string) => storage.loadSetStudyData(dispatch, setId),
     };
 }
 

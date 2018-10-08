@@ -7,12 +7,17 @@ export default interface IStorageProvider {
     /**
      * Used to get meta data for all sets
      */
-    getSetMetaAll: (dispatch: Dispatch) => void;
+    loadSetMetaAll: (dispatch: Dispatch) => void;
 
     /**
      * Fetches the studydata for the specified set
      */
-    getSetStudyData: (dispatch: Dispatch, setId: string) => void;
+    loadSetStudyData: (dispatch: Dispatch, setId: string) => void;
+
+    /**
+     * Fetches card data for the specified card ids
+     */
+    loadCards: (dispatch: Dispatch, setId: string, cardIds: string[]) => void;
 
     /**
      * Adds a new card to the deck

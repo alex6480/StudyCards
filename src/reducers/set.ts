@@ -31,14 +31,24 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
                         isFetching: false,
                         value: {
                             setId: action.payload.setId,
-                            id: action.payload.cardId,
                         },
-                    }, action),
+                    }, action.payload.cardId, action),
                 };
         case fromActions.ADD_NEW_CARD_COMPLETE:
             return {
                 ...state,
-                [action.payload.cardId]: card(state[action.payload.cardId], action),
+                [action.payload.cardId]: card(state[action.payload.cardId], action.payload.cardId, action),
+            };
+        case fromActions.LOAD_CARDS_BEGIN:
+            return {
+                ...state,
+                ...Utils.arrayToObject(action.payload.cardIds, cardId => [cardId, card(state[cardId], cardId, action)]),
+            };
+        case fromActions.LOAD_CARDS_COMPLETE:
+            return {
+                ...state,
+                ...Utils.objectMapString(action.payload.cards,
+                    (cardId, value) => card(state[cardId], cardId, action)),
             };
         default:
             return state;
@@ -111,6 +121,8 @@ export default function sets(state: IRemote<{ [id: string]: IFlashCardSet }>,
             };
         case fromActions.ADD_NEW_SET_BEGIN:
         case fromActions.ADD_NEW_SET_COMPLETE:
+        case fromActions.LOAD_CARDS_BEGIN:
+        case fromActions.LOAD_CARDS_COMPLETE:
             const setId = id(action.payload.setId, action);
             return {
                 ...state,

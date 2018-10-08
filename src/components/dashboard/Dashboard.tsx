@@ -93,7 +93,7 @@ function mapStateToProps(state: IAppState): IDashboardStateProps {
 function mapDispatchToProps(dispatch: Dispatch): IDashboardDispatchProps {
     return {
         addSet: (storage: IStorageProvider, set?: IFlashCardSet) => storage.addSet(dispatch, set),
-        loadSetMetaAll: (storageProvider: IStorageProvider) => storageProvider.getSetMetaAll(dispatch),
+        loadSetMetaAll: (storageProvider: IStorageProvider) => storageProvider.loadSetMetaAll(dispatch),
     };
 }
 
