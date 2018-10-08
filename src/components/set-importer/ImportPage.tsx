@@ -23,7 +23,7 @@ export default class SetImporter extends React.Component<ISetImporterProps, ISet
         // Set initial state
         this.state = {
             importedSet: null,
-            mergingSet: { isFetching: false, lastUpdated: Date.now() },
+            mergingSet: { isFetching: false },
         };
     }
 

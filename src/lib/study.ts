@@ -132,7 +132,7 @@ export function updateCardStudyData(cardId: string,
                 cardId,
                 dueDate: getDueTimeIncrease(studyData, evaluation),
                 redrawTime: null,
-                removeFromDeck: true,
+                removeFromSession: true,
             };
         case CardEvaluation.Decent:
         case CardEvaluation.Poor:

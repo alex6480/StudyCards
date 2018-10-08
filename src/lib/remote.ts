@@ -4,11 +4,6 @@ export default interface IRemote<T> {
      */
     isFetching: boolean;
 
-    /**
-     * The time when this value was last updated with the remote source
-     */
-    lastUpdated: number;
-
     error?: string;
 
     /**

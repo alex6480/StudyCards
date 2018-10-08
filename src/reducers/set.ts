@@ -29,7 +29,6 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
                     ...state,
                     [action.payload.cardId]: card({
                         isFetching: false,
-                        lastUpdated: Date.now(),
                         value: {
                             setId: action.payload.setId,
                             id: action.payload.cardId,

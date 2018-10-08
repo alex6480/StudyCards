@@ -1,6 +1,7 @@
 import IFlashCard from "./flashcard";
 
 export interface ICardStudyData {
+    setId: string;
     cardId: string;
     dueDate: Date;
 
@@ -14,11 +15,14 @@ export interface ICardStudyData {
      * Whether or not this card should be removed from the current study deck
      * This is temporary and set to false at the beginning of each study session
      */
-    removeFromDeck: boolean;
+    removeFromSession: boolean;
 }
 
-export interface ISetStudyData {
+export interface ISetStudyData extends ISetStudyDataMeta {
+    cardData: { [cardId: string]: ICardStudyData };
+}
+
+export interface ISetStudyDataMeta {
     setId: string;
     lastStudied?: Date;
-    cardData: { [cardId: string]: ICardStudyData };
 }

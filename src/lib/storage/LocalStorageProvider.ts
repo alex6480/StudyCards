@@ -5,6 +5,7 @@ import { initialCard } from "../../reducers/card";
 import * as fromSet from "../../reducers/set";
 import IFlashCard from "../flashcard/flashcard";
 import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
+import { ICardStudyData, ISetStudyData, ISetStudyDataMeta } from "../flashcard/StudyData";
 import * as Utils from "../utils";
 import IStorageProvider from "./StorageProvider";
 
@@ -19,7 +20,8 @@ export class LocalStorageProvider implements IStorageProvider {
 
         const setIds = this.getSetIds();
         const meta = setIds.reduce((result: {[id: string]: IFlashCardSetMeta}, item, index, array) => {
-            result[index] = this.getSetMeta(item);
+            const setMeta = this.getSetMeta(item);
+            result[setMeta.id] = setMeta;
             return result;
         }, {});
 
@@ -50,10 +52,48 @@ export class LocalStorageProvider implements IStorageProvider {
         }
 
         this.saveSet(set, true);
+        this.saveSetStudyData({
+            setId: set.id,
+            cardData: { },
+        }, set.cardOrder);
 
         dispatch(fromActions.Action.addSetBegin(set.id!, set));
         dispatch(fromActions.Action.addSetComplete(set.id!));
         return set.id!;
+    }
+
+    public getSetStudyData(dispatch: Dispatch, setId: string) {
+        dispatch(fromActions.Action.loadSetStudyDataBegin(setId));
+
+        const setStudyMetaData = localStorage.getItem(this.setStudyDataKey(setId));
+        if (setStudyMetaData === null) {
+            throw new Error("No study metadata is available for set with id " + setId);
+        }
+        const setStudyMeta: ISetStudyDataMeta = JSON.parse(setStudyMetaData);
+        const setMeta = this.getSetMeta(setId);
+        const result = {
+            ...setStudyMeta,
+            cardData: Utils.arrayToObject(
+                setMeta.cardOrder.map(cardId => this.getCardStudyData(setId, cardId)),
+                val => [val.cardId, val]),
+        };
+
+        dispatch(fromActions.Action.loadSetStudyDataComplete(setId, result));
+    }
+
+    private getCardStudyData(setId: string, cardId: string): ICardStudyData {
+        const data = localStorage.getItem(this.cardStudyDataKey(setId, cardId));
+        if (data === null) {
+            // Return an empty study data object instead
+            return {
+                setId,
+                cardId,
+                dueDate: new Date(),
+                redrawTime: null,
+                removeFromSession: false,
+            };
+        }
+        return JSON.parse(data);
     }
 
     private getSetMeta(setId: string): IFlashCardSetMeta {
@@ -82,7 +122,14 @@ export class LocalStorageProvider implements IStorageProvider {
             for (const cardId of set.cardOrder) {
                 const cardValue = cards[cardId].value;
                 if (cardValue === undefined) {
-                    throw new Error("Card value cannot be undefined for a new set");
+                    // Just save a generic cardstudydata
+                    this.saveCardStudyData({
+                        setId: set.id,
+                        cardId,
+                        dueDate: new Date(),
+                        redrawTime: null,
+                        removeFromSession: false,
+                    });
                 } else {
                     this.saveCard(cardValue);
                 }
@@ -90,11 +137,42 @@ export class LocalStorageProvider implements IStorageProvider {
         }
     }
 
+    private saveSetStudyData(studyData: ISetStudyData, saveCards: string[]) {
+        const {cardData, ...rest} = studyData;
+        const setMeta = rest as ISetStudyDataMeta;
+
+        // Save the set data meta
+        localStorage.setItem(this.setStudyDataKey(studyData.setId), JSON.stringify(setMeta));
+
+        // Save the cards
+        for (const cardId of saveCards) {
+            const cardValue = cardData[cardId];
+            if (cardValue === undefined) {
+                throw new Error("Card data value cannot be undefined");
+            } else {
+                this.saveCardStudyData(cardValue);
+            }
+        }
+    }
+
+    private saveCardStudyData(card: ICardStudyData) {
+        localStorage.setItem(this.cardStudyDataKey(card.setId, card.cardId), JSON.stringify(card));
+    }
+
     /**
      * Saves all data associated with a single flashcard
      */
     private saveCard(card: IFlashCard) {
         localStorage.setItem(this.cardKey(card.setId, card.id), JSON.stringify(card));
+    }
+
+    /**
+     * Returns all stored set ids
+     */
+    private getSetIds() {
+        const setIdData = localStorage.getItem("sets");
+        const setIds = setIdData === null ? [] : setIdData.split(this.idDelimiter);
+        return setIds;
     }
 
     /**
@@ -111,12 +189,11 @@ export class LocalStorageProvider implements IStorageProvider {
         return "cards" + this.idDelimiter + setId + this.idDelimiter + cardId;
     }
 
-    /**
-     * Returns all stored set ids
-     */
-    private getSetIds() {
-        const setIdData = localStorage.getItem("sets");
-        const setIds = setIdData === null ? [] : setIdData.split(this.idDelimiter);
-        return setIds;
+    private setStudyDataKey(setId: string) {
+        return "setStudyData" + this.idDelimiter + setId;
+    }
+
+    private cardStudyDataKey(setId: string, cardId: string) {
+        return "cardStudyData" + this.idDelimiter + setId + this.idDelimiter + cardId;
     }
 }

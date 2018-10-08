@@ -29,6 +29,18 @@ export function objectMapNumber<V, R>(object: { [key: number]: V},
 }
 
 /**
+ * Converts an array into an object by using the function to select the key and value for each entry
+ */
+export function arrayToObject<OV, AV>(array: AV[], fn: (value: AV) => [string, OV]) {
+    const kvps = array.map(fn);
+    const output: {[key: string]: OV} = { };
+    for (const kvp of kvps) {
+        output[kvp[0]] = kvp[1];
+    }
+    return output;
+}
+
+/**
  * Returns a pseudorandom ID that is likely to be unique
  */
 export function guid() {

@@ -9,6 +9,7 @@ import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
+import IRemote from "../lib/remote";
 import IStorageProvider from "../lib/storage/StorageProvider";
 import { IAppState } from "../reducers";
 import { Action } from "../reducers/actions";
@@ -21,7 +22,7 @@ interface ISetContainerOwnProps {
 interface ISetContainerStateProps extends ISetContainerOwnProps {
     storage: IStorageProvider;
     set?: IFlashCardSet;
-    studyData: ISetStudyData;
+    studyData: IRemote<ISetStudyData>;
 }
 
 interface ISetContainerDispatchProps {
@@ -30,6 +31,7 @@ interface ISetContainerDispatchProps {
     updateSetName: (setId: string, newName: string) => void;
     resetStudySessionData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
+    getSetStudyData: (storage: IStorageProvider, setId: string) => void;
 }
 
 interface ISetContainerProps extends ISetContainerStateProps, ISetContainerDispatchProps { }
@@ -75,7 +77,8 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                         resetSessionStudyData={this.props.resetStudySessionData}
                         updateCardStudyData={this.props.updateCardStudyData}
                         studyData={this.props.studyData}
-                        goToSection={this.goToSection.bind(this)}/>;
+                        goToSection={this.goToSection.bind(this)}
+                        loadStudyData={() => this.props.getSetStudyData(this.props.storage, this.props.setId)}/>;
                 break;
             default:
                 throw new Error("Unknown section");
@@ -136,9 +139,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
 }
 
 function mapStateToProps(state: IAppState, ownProps: ISetContainerOwnProps): ISetContainerStateProps {
-    if (state.studyData[ownProps.setId] === undefined) {
-        throw new Error("Studydata object does not exist for set " + ownProps.setId);
-    }
+    console.log(state);
     return {
         ...ownProps,
         set: state.sets.value![ownProps.setId],
@@ -155,6 +156,7 @@ function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
         updateSetName: (setId: string, newName: string) => dispatch(Action.updateSetName(setId, newName)),
         resetStudySessionData: () => dispatch(Action.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Action.updateCardStudyData(studyData)),
+        getSetStudyData: (storage: IStorageProvider, setId: string) => storage.getSetStudyData(dispatch, setId),
     };
 }
 

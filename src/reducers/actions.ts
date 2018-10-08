@@ -2,7 +2,7 @@ import { Dispatch } from "redux";
 import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
-import { ICardStudyData } from "../lib/flashcard/StudyData";
+import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 
 /*
     Boilerplate stuff used to get typesafety within Redux
@@ -46,11 +46,18 @@ export const LOAD_SET_META_ALL_BEGIN = "load meta data for all sets begin";
 export const LOAD_SET_META_ALL_COMPLETE = "load meta data for all sets complete";
 export const LOAD_SET_META_ALL_ERROR = "load meta data for all sets error";
 
+export const LOAD_SET_STUDY_DATA_BEGIN = "load set study data begin";
+export const LOAD_SET_STUDY_DATA_COMPLETE = "load set study data complete";
+
 export const Action = {
     loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
     loadSetMetaAllComplete: (setMeta: {[id: string]: IFlashCardSetMeta}) =>
         createAction(LOAD_SET_META_ALL_COMPLETE, setMeta),
     loadSetMetaAllError: (message: string) => createAction(LOAD_SET_META_ALL_ERROR, { message }),
+
+    loadSetStudyDataBegin: (setId: string) => createAction(LOAD_SET_STUDY_DATA_BEGIN, { setId }),
+    loadSetStudyDataComplete: (setId: string, result: ISetStudyData) =>
+        createAction(LOAD_SET_STUDY_DATA_COMPLETE, { setId, result }),
 
     addNewCardBegin: (cardId: string, setId: string, afterCardId?: string) =>
         createAction(ADD_NEW_CARD_BEGIN, { cardId, setId, afterCardId }),
