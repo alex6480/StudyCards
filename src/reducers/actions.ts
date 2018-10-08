@@ -27,7 +27,6 @@ interface IActionsCreatorMapObject {
 
 export type ActionsUnion<A extends IActionsCreatorMapObject> = ReturnType<A[keyof A]>;
 
-export const ADD_NEW_CARD = "add new card";
 export const UPDATE_SET_NAME = "update set name";
 export const DELETE_CARD = "delete card";
 export const UPDATE_CARD_FACE = "update card face";
@@ -37,13 +36,25 @@ export const UPDATE_CARD_STUDY_DATA = "update card study data";
 export const SWAP_CARD_FACES = "swap card faces";
 
 // Remote actions
+export const ADD_NEW_CARD_BEGIN = "add new card begin";
+export const ADD_NEW_CARD_COMPLETE = "add new card complete";
+export const ADD_NEW_CARD_ERROR = "add new card error";
+
 export const LOAD_SET_META_ALL_BEGIN = "load meta data for all sets begin";
 export const LOAD_SET_META_ALL_COMPLETE = "load meta data for all sets complete";
 export const LOAD_SET_META_ALL_ERROR = "load meta data for all sets error";
 
 export const Actions = {
-    addNewCard: (setId: string, afterCardId?: string, callback?: (id: string) => void) =>
-        createAction(ADD_NEW_CARD, { setId, callback, afterCardId, cardId: "" }),
+    loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
+    loadSetMetaAllComplete: (setMeta: {[id: string]: IFlashCardSetMeta}) =>
+        createAction(LOAD_SET_META_ALL_COMPLETE, setMeta),
+    loadSetMetaAllError: (message: string) => createAction(LOAD_SET_META_ALL_ERROR, { message }),
+
+    addNewCardBegin: (setId: string, afterCardId?: string, callback?: (id: string) => void) =>
+        createAction(ADD_NEW_CARD_BEGIN, { setId, callback, afterCardId, cardId: "" }),
+    addNewCardComplete: (setId: string, cardId: string) =>
+        createAction(ADD_NEW_CARD_COMPLETE, { setId, cardId }),
+
     updateSetName: (setId: string, newName: string) => createAction(UPDATE_SET_NAME, { setId, name: newName }),
     deleteCard: (card: IFlashCard) => createAction(DELETE_CARD, card),
     updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
@@ -57,12 +68,6 @@ export const Actions = {
      * Resets the parts of the studydata that are temporary for a single study session
      */
     resetSessionStudyData: () => createAction(RESET_SESSION_STUDY_DATA),
-
-    // Storage actions
-    loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
-    loadSetMetaAllComplete: (setMeta: {[id: string]: IFlashCardSetMeta}) =>
-        createAction(LOAD_SET_META_ALL_COMPLETE, setMeta),
-    loadSetMetaAllError: (message: string) => createAction(LOAD_SET_META_ALL_ERROR, { message }),
 };
 
 export type Actions = ActionsUnion<typeof Actions>;

@@ -14,4 +14,9 @@ export default interface IStorageProvider {
      * Used to get meta data for all sets
      */
     getSetMetaAll: (dispatch: Dispatch) => void;
+
+    /**
+     * Adds a new card to the deck
+     */
+    addCard: (dispatch: Dispatch, setId: string, afterCardId?: string) => void;
 }

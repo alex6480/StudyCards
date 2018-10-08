@@ -1,6 +1,7 @@
 import { Dispatch } from "redux";
 import { IAppState } from "../../reducers";
 import * as fromActions from "../../reducers/actions";
+import { initialCard } from "../../reducers/card";
 import IFlashCard from "../flashcard/flashcard";
 import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 import IStorageProvider from "./StorageProvider";
@@ -42,6 +43,18 @@ export class LocalStorageProvider implements IStorageProvider {
         }, {});
 
         dispatch(fromActions.Actions.loadSetMetaAllComplete(meta));
+    }
+
+    public addCard(dispatch: Dispatch, setId: string, afterCardId?: string) {
+        dispatch(fromActions.Actions.addNewCardBegin(setId, afterCardId, (cardId => {
+            this.saveCard({
+                ...initialCard,
+                setId,
+                id: cardId,
+            });
+
+            dispatch(fromActions.Actions.addNewCardComplete(setId, cardId));
+        })));
     }
 
     private getSetMeta(setId: string): IFlashCardSetMeta {

@@ -140,7 +140,7 @@ function mapStateToProps(state: IAppState, ownProps: ISetContainerOwnProps): ISe
 
 function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
     return {
-        addNewCard: (setId: string, afterCardId?: string) => dispatch(Actions.addNewCard(setId, afterCardId)),
+        addNewCard: (setId: string, afterCardId?: string) => dispatch(Actions.addNewCardBegin(setId, afterCardId)),
         deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
         updateSetName: (setId: string, newName: string) => dispatch(Actions.updateSetName(setId, newName)),
         resetStudySessionData: () => dispatch(Actions.resetSessionStudyData()),
