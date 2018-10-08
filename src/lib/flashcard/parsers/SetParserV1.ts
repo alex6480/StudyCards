@@ -130,7 +130,7 @@ export class SetParser implements ISetParser {
                     onError("More than one back face exists for card " + cardId + " in set " + setId);
                     break;
                 }
-                faces.back = this.CardFace(face, "front", cardId, setId, onError);
+                faces.back = this.CardFace(face, "back", cardId, setId, onError);
             } else {
                 onError("Unknown flash card face on card " + cardId + " in set " + setId);
                 continue;

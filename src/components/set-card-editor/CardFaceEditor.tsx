@@ -18,7 +18,7 @@ interface IRichTextCardFaceEditorState {
 export interface ICardFaceEditorProps {
     face: IFlashCardFace;
     cardId: string;
-    updateCardFace: (cardId: string, face: IFlashCardFace) => void;
+    saveCardFace: (face: IFlashCardFace) => void;
     swapCardFaces: (cardId: string) => void;
 }
 
@@ -99,7 +99,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
 
     private updateGlobalState() {
         if (this.props.face.type === FlashCardFaceType.RichText) {
-            this.props.updateCardFace(this.props.cardId, {
+            this.props.saveCardFace({
                 ...this.props.face,
                 richTextContent: this.state.editorState.getCurrentContent(),
             });
