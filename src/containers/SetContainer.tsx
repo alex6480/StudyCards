@@ -32,6 +32,7 @@ interface ISetContainerDispatchProps {
     resetStudySessionData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
     getSetStudyData: (storage: IStorageProvider, setId: string) => void;
+    loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) => void;
 }
 
 interface ISetContainerProps extends ISetContainerStateProps, ISetContainerDispatchProps { }
@@ -67,7 +68,8 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
             case SetSection.Edit:
                 page = <SetCardEditor set={this.props.set}
                             addNewCard={this.addNewCard.bind(this)}
-                            deleteCard={this.props.deleteCard} />;
+                            deleteCard={this.props.deleteCard}
+                            loadCards={this.loadCards.bind(this)} />;
                 break;
             case SetSection.Export:
                 page = <SetExporter set={this.props.set}/>;
@@ -129,6 +131,10 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
         return this.props.addNewCard(this.props.storage, this.props.setId, afterCardId);
     }
 
+    private loadCards(cardIds: string[]) {
+        return this.props.loadCards(this.props.storage, this.props.setId, cardIds);
+    }
+
     private goToSection(newPage: SetSection) {
         this.setState({section: newPage});
     }
@@ -151,11 +157,13 @@ function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
     return {
         addNewCard: (store: IStorageProvider, setId: string, afterCardId?: string) =>
             store.addCard(dispatch, setId, afterCardId),
+        getSetStudyData: (storage: IStorageProvider, setId: string) => storage.loadSetStudyData(dispatch, setId),
         deleteCard: (card: IFlashCard) => dispatch(Action.deleteCard(card)),
         updateSetName: (setId: string, newName: string) => dispatch(Action.updateSetName(setId, newName)),
         resetStudySessionData: () => dispatch(Action.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Action.updateCardStudyData(studyData)),
-        getSetStudyData: (storage: IStorageProvider, setId: string) => storage.loadSetStudyData(dispatch, setId),
+        loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) =>
+            storage.loadCards(dispatch, setId, cardIds),
     };
 }
 

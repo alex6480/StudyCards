@@ -119,15 +119,17 @@ export default function sets(state: IRemote<{ [id: string]: IFlashCardSet }>,
                 ...state,
                 error: action.payload.message,
             };
+        case fromActions.ADD_NEW_CARD_BEGIN:
         case fromActions.ADD_NEW_SET_BEGIN:
         case fromActions.ADD_NEW_SET_COMPLETE:
         case fromActions.LOAD_CARDS_BEGIN:
         case fromActions.LOAD_CARDS_COMPLETE:
             const setId = id(action.payload.setId, action);
+            const previousSet = state.value === undefined ? undefined : state.value[setId];
             return {
                 ...state,
                 value: {
-                    [setId]: set({ id: setId }, action),
+                    [setId]: set({ ...previousSet, id: setId }, action),
                 },
             };
         default:

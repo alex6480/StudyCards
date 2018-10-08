@@ -3,8 +3,9 @@ import { IAppState } from "../../reducers";
 import * as fromActions from "../../reducers/actions";
 import { initialCard } from "../../reducers/card";
 import * as fromSet from "../../reducers/set";
-import IFlashCard from "../flashcard/flashcard";
+import IFlashCard, { ExportFlashCard } from "../flashcard/flashcard";
 import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
+import { SetParser } from "../flashcard/parsers/SetParserV1";
 import { ICardStudyData, ISetStudyData, ISetStudyDataMeta } from "../flashcard/StudyData";
 import * as Utils from "../utils";
 import IStorageProvider from "./StorageProvider";
@@ -32,11 +33,23 @@ export class LocalStorageProvider implements IStorageProvider {
         const cardId = Utils.guid();
         dispatch(fromActions.Action.addNewCardBegin(cardId, setId, afterCardId));
 
+        // Save the added card
         this.saveCard({
             ...initialCard,
             setId,
             id: cardId,
         });
+
+        // Update the set meta table
+        const setMeta = this.getSetMeta(setId);
+        let cardOrder = setMeta.cardOrder;
+        if (afterCardId !== undefined) {
+            const afterIndex = cardOrder.indexOf(afterCardId);
+            cardOrder = [...cardOrder.slice(0, afterIndex + 1), cardId, ...cardOrder.slice(afterIndex + 1)];
+        } else {
+            cardOrder = setMeta.cardOrder.concat(cardId);
+        }
+        this.saveSetMeta({ ...setMeta, cardOrder });
 
         dispatch(fromActions.Action.addNewCardComplete(setId, cardId));
 
@@ -113,7 +126,10 @@ export class LocalStorageProvider implements IStorageProvider {
         if (data === null) {
             throw new Error("Card does not exist");
         }
-        return JSON.parse(data);
+        const exportCard = JSON.parse(data) as ExportFlashCard;
+        const card = new SetParser().parseCard(exportCard, setId);
+
+        return card as IFlashCard;
     }
 
     private getSetMeta(setId: string): IFlashCardSetMeta {
@@ -128,14 +144,7 @@ export class LocalStorageProvider implements IStorageProvider {
         const {cards, ...rest} = set;
         const setMeta: IFlashCardSetMeta = rest;
 
-        // Make sure the set index contains the specified set
-        const setIds = this.getSetIds();
-        if (setIds.indexOf(set.id) === -1) {
-            localStorage.setItem("sets", setIds.concat(set.id).join(this.idDelimiter));
-        }
-
-        // Save the set
-        localStorage.setItem(this.setKey(set.id), JSON.stringify(setMeta));
+        this.saveSetMeta(setMeta);
 
         if (saveCards) {
             // Save the cards
@@ -155,6 +164,17 @@ export class LocalStorageProvider implements IStorageProvider {
                 }
             }
         }
+    }
+
+    private saveSetMeta(setMeta: IFlashCardSetMeta) {
+        // Make sure the set index contains the specified set
+        const setIds = this.getSetIds();
+        if (setIds.indexOf(setMeta.id) === -1) {
+            localStorage.setItem("sets", setIds.concat(setMeta.id).join(this.idDelimiter));
+        }
+
+        // Save the set
+        localStorage.setItem(this.setKey(setMeta.id), JSON.stringify(setMeta));
     }
 
     private saveSetStudyData(studyData: ISetStudyData, saveCards: string[]) {
@@ -183,7 +203,7 @@ export class LocalStorageProvider implements IStorageProvider {
      * Saves all data associated with a single flashcard
      */
     private saveCard(card: IFlashCard) {
-        localStorage.setItem(this.cardKey(card.setId, card.id), JSON.stringify(card));
+        localStorage.setItem(this.cardKey(card.setId, card.id), JSON.stringify(new ExportFlashCard(card)));
     }
 
     /**

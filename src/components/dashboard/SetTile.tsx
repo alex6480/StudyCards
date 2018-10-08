@@ -14,7 +14,7 @@ export default class SetTile extends React.Component<ISetTileProps> {
     }
 
     public render() {
-        const cardCount = Object.keys(this.props.set.cards).length;
+        const cardCount = this.props.set.cardOrder.length;
         return <div className="column is-3">
             <div className="card">
                 <div className="card-content">

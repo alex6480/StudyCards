@@ -9,6 +9,7 @@ interface ISetCardEditorProps {
     onChange?: (newSet: IFlashCardSet) => void;
     addNewCard: (setId: string, afterCardId?: string) => void;
     deleteCard: (card: IFlashCard) => void;
+    loadCards: (cardIds: string[]) => void;
     set: IFlashCardSet;
 }
 
@@ -25,6 +26,9 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
         this.state = {
             cardBeingEdited: undefined,
         };
+
+        // Load the cards to be edited
+        props.loadCards(props.set.cardOrder);
     }
 
     public render() {
@@ -56,7 +60,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
     }
 
     private get cardCount(): number {
-        return Object.keys(this.props.set.cards).length;
+        return this.props.set.cardOrder.length;
     }
 
     private renderCards() {

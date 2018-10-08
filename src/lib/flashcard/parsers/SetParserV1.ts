@@ -30,6 +30,18 @@ export class SetParser implements ISetParser {
         }
     }
 
+    public parseCard(card: ExportFlashCard, setId: string): IFlashCard | ParseError[] {
+        const errors: ParseError[] = [];
+        const err = (error: ParseError) => { errors.push(error); };
+
+        const result = this.Card(card, setId, err);
+        if (errors.length === 0) {
+            return result;
+        } else {
+            return errors;
+        }
+    }
+
     private Set(set: ExportFlashCardSet, onError: onErrorHandler): IFlashCardSet {
         const id = this.SetId(set, onError);
         const cards = this.SetCards(set, id, onError);

@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import IFlashCard from "../../lib/flashcard/flashcard";
 import { FlashCardFaceId, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
+import IRemote from "../../lib/remote";
 import IStorageProvider from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
@@ -29,7 +30,7 @@ interface ICardEditorOwnProps {
 }
 
 interface ICardEditorStateProps extends ICardEditorOwnProps {
-    card: IFlashCard;
+    card: IRemote<IFlashCard>;
 }
 
 interface ICardEditorDispatchProps {
@@ -71,27 +72,40 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     }
 
     public render() {
-        const editor = <li className="listed-flashcard">
-            <div className="card">
-                <div className="columns is-gapless is-marginless">
-                    <div className="column is-half">
-                        <CardFaceEditor cardId={this.props.card.id}
-                            face={this.props.card.faces.front}
-                            updateCardFace={this.props.updateCardFace}
-                            swapCardFaces={this.props.swapCardFaces} />
-                    </div>
-                    <div className="column is-half">
-                        <CardFaceEditor cardId={this.props.card.id}
-                            face={this.props.card.faces.back}
-                            updateCardFace={this.props.updateCardFace}
-                            swapCardFaces={this.props.swapCardFaces} />
+        let editor: JSX.Element;
+        if (this.props.card.isFetching === true || this.props.card.value === undefined) {
+            // No up to date card is currently available
+            editor = <li className="listed-flashcard">
+                <div className="card">
+                    <div className="card-content">
+                        <p>Loading</p>
                     </div>
                 </div>
-                <div className="card-footer">
-                    <TagEditor tags={this.state.tags} onChange={this.updateTags.bind(this)} />
+            </li>;
+        } else {
+            const card = this.props.card.value;
+            editor = <li className="listed-flashcard">
+                <div className="card">
+                    <div className="columns is-gapless is-marginless">
+                        <div className="column is-half">
+                            <CardFaceEditor cardId={card.id}
+                                face={card.faces.front}
+                                updateCardFace={this.props.updateCardFace}
+                                swapCardFaces={this.props.swapCardFaces} />
+                        </div>
+                        <div className="column is-half">
+                            <CardFaceEditor cardId={card.id}
+                                face={card.faces.back}
+                                updateCardFace={this.props.updateCardFace}
+                                swapCardFaces={this.props.swapCardFaces} />
+                        </div>
+                    </div>
+                    <div className="card-footer">
+                        <TagEditor tags={this.state.tags} onChange={this.updateTags.bind(this)} />
+                    </div>
                 </div>
-            </div>
-        </li>;
+            </li>;
+        }
 
         switch (this.state.transitionState) {
             case (CardEditorTransitionState.Expanding):
@@ -115,10 +129,13 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
 }
 
 function mapStateToProps(state: IAppState, ownProps: ICardEditorOwnProps): ICardEditorStateProps {
-    const sets = state.sets.value;
+    const card = state.sets.value![ownProps.setId].cards[ownProps.cardId];
     return {
         ...ownProps,
-        card: state.sets.value![ownProps.setId].cards[ownProps.cardId].value!,
+        card: card !== undefined ? card : {
+            isFetching: true,
+            value: undefined,
+        },
     };
 }
 
