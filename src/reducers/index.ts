@@ -1,16 +1,20 @@
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
 import { ISetStudyData } from "../lib/flashcard/StudyData";
+import { LocalStorageProvider } from "../lib/storage/LocalStorageProvider";
+import IStorageProvider from "../lib/storage/StorageProvider";
 import * as utils from "../lib/utils";
 import * as fromActions from "./actions";
 import set, * as fromSet from "./set";
 import setStudyData from "./studyData";
 
 export interface IAppState {
+    storageProvider: IStorageProvider;
     sets: { [id: string]: IFlashCardSet };
     studyData: { [id: string]: ISetStudyData };
 }
 
 const initialState: IAppState = {
+    storageProvider: new LocalStorageProvider(),
     sets: { },
     studyData: { },
 };
@@ -26,6 +30,7 @@ export default function studyCardsStore(state: IAppState = initialState, action:
             if (action.payload.callback !== undefined) { action.payload.callback(newSet.id); }
 
             return {
+                ...state,
                 sets: {
                     [newSet.id]: newSet,
                     ...state.sets,
@@ -37,6 +42,7 @@ export default function studyCardsStore(state: IAppState = initialState, action:
             };
         default:
             return {
+                ...state,
                 sets: utils.objectMapString(state.sets, (k, v) => set(v, action)),
                 studyData: utils.objectMapString(state.studyData, (k, v) => setStudyData(v, action)),
             };
