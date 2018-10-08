@@ -48,7 +48,7 @@ export class LocalStorageProvider implements IStorageProvider {
             const afterIndex = cardOrder.indexOf(afterCardId);
             cardOrder = [...cardOrder.slice(0, afterIndex + 1), cardId, ...cardOrder.slice(afterIndex + 1)];
         } else {
-            cardOrder = setMeta.cardOrder.concat(cardId);
+            cardOrder = cardOrder.concat(cardId);
         }
         this.saveSetMeta({ ...setMeta, cardOrder });
 

@@ -7,7 +7,7 @@ import CardEditor from "./CardEditor";
 
 interface ISetCardEditorProps {
     onChange?: (newSet: IFlashCardSet) => void;
-    addNewCard: (setId: string, afterCardId?: string) => void;
+    addNewCard: (afterCardId?: string) => void;
     deleteCard: (card: IFlashCard) => void;
     loadCards: (cardIds: string[]) => void;
     set: IFlashCardSet;
@@ -45,7 +45,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
             { /* Button for adding new card to the set*/ }
             <CardDivider
                 isSubtle={false}
-                addCard={this.addNewCard.bind(this)}
+                addCard={this.props.addNewCard}
             />
         </div>;
 
@@ -53,10 +53,6 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
         this.isFirstRender = false;
 
         return content;
-    }
-
-    private addNewCard(afterCardId?: string) {
-        this.props.addNewCard(this.props.set.id, afterCardId);
     }
 
     private get cardCount(): number {
@@ -83,7 +79,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
                         afterCardId={id}
                         key={"divider-" + id}
                         isSubtle={true}
-                        addCard={after => this.props.addNewCard(this.props.set.id, after)}
+                        addCard={this.props.addNewCard}
                     />);
                 }
 
