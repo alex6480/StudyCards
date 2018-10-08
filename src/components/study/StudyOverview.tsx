@@ -17,8 +17,8 @@ interface IStudyOverviewProps {
 
 export default class StudyOverview extends React.Component<IStudyOverviewProps> {
     public render() {
-        const newCardIds = Study.getNewCardIds(this.props.set.cards, this.props.studyData);
-        const knownCardIds = Study.getKnownCardIds(this.props.set.cards, this.props.studyData);
+        const newCardIds = Study.getNewCardIds(this.props.set.cardOrder, this.props.studyData);
+        const knownCardIds = Study.getKnownCardIds(this.props.set.cardOrder, this.props.studyData);
         const newCardsInStudy = Math.min(newCardIds.length, this.props.maxNewCards);
         const knownCardsInStudy = Math.min(knownCardIds.length, this.props.maxTotalCards - newCardsInStudy);
         const p = Utils.plural;
@@ -78,7 +78,7 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
         const deck = Study.selectStudyDeck(this.props.studyData,
             this.props.maxNewCards,
             this.props.maxTotalCards,
-            this.props.set.cards);
+            this.props.set.cardOrder);
 
         if (this.props.startStudy !== undefined) {
             this.props.startStudy(deck);

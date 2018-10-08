@@ -1,10 +1,11 @@
 import { ContentState } from "draft-js";
 import IFlashCard from "../lib/flashcard/flashcard";
 import { FlashCardFaceType } from "../lib/flashcard/FlashCardFace";
+import Remote from "../lib/remote";
 import * as Utils from "../lib/utils";
 import * as fromActions from "./actions";
 
-export const initialState: IFlashCard = {
+export const initialCard: IFlashCard = {
     id: "",
     setId: "",
     faces: {
@@ -24,11 +25,13 @@ export const initialState: IFlashCard = {
         },
     },
 };
+export const initialState = new Remote(false, initialCard);
 
-export default function card(state: IFlashCard = initialState, action: fromActions.Actions): IFlashCard {
-    switch (action.type) {
-        case fromActions.ADD_NEW_CARD:
-            if (state.id === initialState.id) {
+export default function card(state: Remote<IFlashCard> = initialState,
+                             action: fromActions.Actions): Remote<IFlashCard> {
+    // switch (action.type) {
+        /*case fromActions.ADD_NEW_CARD:
+            if (state.isFetching === initialState.id) {
                 const cardId = Utils.guid();
                 if (state.faces.back.id !== "back") { throw Error("Invalid ID for card face back"); }
                 if (state.faces.front.id !== "front") { throw Error("Invalid ID for card face front"); }
@@ -80,6 +83,6 @@ export default function card(state: IFlashCard = initialState, action: fromActio
                 };
             }
             break;
-    }
+    }*/
     return state;
 }

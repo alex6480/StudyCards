@@ -13,18 +13,19 @@ import { IAppState } from "../reducers";
 import { Actions } from "../reducers/actions";
 
 interface ISetContainerOwnProps {
-    set: IFlashCardSet;
     goToDashboard: () => void;
+    setId: string;
 }
 
 interface ISetContainerStateProps extends ISetContainerOwnProps {
+    set?: IFlashCardSet;
     studyData: ISetStudyData;
 }
 
 interface ISetContainerDispatchProps {
     addNewCard: (setId: string, afterCardId?: string) => void;
     deleteCard: (card: IFlashCard) => void;
-    updateSetName: (set: IFlashCardSet, newName: string) => void;
+    updateSetName: (setId: string, newName: string) => void;
     resetStudySessionData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
 }
@@ -53,6 +54,10 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
 
     public render() {
         let page: React.ReactElement<any>;
+        if (this.props.set === undefined) {
+            return <p>Loading set</p>;
+        }
+
         switch (this.state.section) {
             case SetSection.Edit:
                 page = <SetCardEditor set={this.props.set}
@@ -119,17 +124,17 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
     }
 
     private updateSetName(newName: string) {
-        this.props.updateSetName(this.props.set, newName);
+        this.props.updateSetName(this.props.setId, newName);
     }
 }
 
 function mapStateToProps(state: IAppState, ownProps: ISetContainerOwnProps): ISetContainerStateProps {
-    if (state.studyData[ownProps.set.id] === undefined) {
-        throw new Error("Studydata object does not exist for set " + ownProps.set.id);
+    if (state.studyData[ownProps.setId] === undefined) {
+        throw new Error("Studydata object does not exist for set " + ownProps.setId);
     }
     return {
         ...ownProps,
-        studyData: state.studyData[ownProps.set.id],
+        studyData: state.studyData[ownProps.setId],
     };
 }
 
@@ -137,7 +142,7 @@ function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
     return {
         addNewCard: (setId: string, afterCardId?: string) => dispatch(Actions.addNewCard(setId, afterCardId)),
         deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
-        updateSetName: (set: IFlashCardSet, newName: string) => dispatch(Actions.updateSetName(set, newName)),
+        updateSetName: (setId: string, newName: string) => dispatch(Actions.updateSetName(setId, newName)),
         resetStudySessionData: () => dispatch(Actions.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Actions.updateCardStudyData(studyData)),
     };

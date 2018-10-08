@@ -51,7 +51,7 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
                     {Utils.plural("card", this.state.currentSession.deck.length)} left</p>
                 <PresentedCard
                         studyData={this.props.studyData.cardData[this.state.currentSession.currentCardId]}
-                        card={card}
+                        card={card.value()}
                         updateStudyData={this.updateCardStudyData.bind(this)}
                         nextCard={this.nextCard.bind(this)} />
             </div>;

@@ -1,11 +1,15 @@
-import { objectMapString } from "./../utils";
+import Remote from "../remote";
+import { objectMapString } from "../utils";
 import IFlashCard, { ExportFlashCard } from "./flashcard";
 
-export default interface IFlashCardSet {
-    cards: { [id: string]: IFlashCard; };
+export interface IFlashCardSetMeta {
     cardOrder: string[];
     name: string;
     id: string;
+}
+
+export default interface IFlashCardSet extends IFlashCardSetMeta {
+    cards: { [id: string]: Remote<IFlashCard>; };
 }
 
 export class ExportFlashCardSet {
@@ -15,7 +19,8 @@ export class ExportFlashCardSet {
     public readonly exportVersion: string = "1";
 
     constructor(set: IFlashCardSet) {
-        this.cards = objectMapString(set.cards, (k, v) => new ExportFlashCard(v));
+        throw new Error("CAnnot export at the moment");
+        // this.cards = objectMapString(set.cards, (k, v) => new ExportFlashCard(v));
         this.name = set.name;
         this.id = set.id;
     }

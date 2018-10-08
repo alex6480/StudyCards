@@ -1,17 +1,20 @@
 import * as React from "react";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
+import Remote from "../../lib/remote";
+import IStorageProvider from "../../lib/storage/StorageProvider";
 import SetCardEditor from "../set-card-editor/SetCardEditor";
 import SetExporter from "../SetExporter";
 import SetFilePicker from "./SetFilePicker";
 
 interface ISetImporterProps {
-    sets: { [id: string]: IFlashCardSet };
+    storageProvider: IStorageProvider;
     goToDashboard: () => void;
     addSet: (set?: IFlashCardSet) => void;
 }
 
 interface ISetImporterState {
     importedSet: IFlashCardSet | null;
+    mergingSet: Remote<IFlashCardSet | null>;
 }
 
 export default class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> {
@@ -20,6 +23,7 @@ export default class SetImporter extends React.Component<ISetImporterProps, ISet
         // Set initial state
         this.state = {
             importedSet: null,
+            mergingSet: new Remote<IFlashCardSet | null>(false),
         };
     }
 
@@ -73,8 +77,12 @@ export default class SetImporter extends React.Component<ISetImporterProps, ISet
             throw new Error("Set must have been imported in order to merge with it");
         }
 
-        const mergeSet = this.props.sets[this.state.importedSet.id];
-        if (mergeSet === undefined) {
+        if (this.state.mergingSet.isFetching) {
+            return <p>Fetching set to merge with.</p>;
+        }
+
+        const mergingSet = this.state.mergingSet.value();
+        if (mergingSet === null) {
             return <div>
                 <h3 className="title is-3">Merge with preexisting set</h3>
                 <div className="box">The imported set will be imported as a new set as
@@ -84,7 +92,7 @@ export default class SetImporter extends React.Component<ISetImporterProps, ISet
             return <div>
                 <h3 className="title is-3">Merge with preexisting set</h3>
                 <div className="box">
-                    <p>The imported set can be merged with the set '{mergeSet.name}'.
+                    <p>The imported set can be merged with the set '{mergingSet.name}'.
                         Do you want to merge the sets or import it as a new set?</p>
                     <div className="tabs is-toggle">
                         <ul>

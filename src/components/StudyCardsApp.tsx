@@ -6,13 +6,14 @@ import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData } from "../lib/flashcard/StudyData";
+import IStorageProvider from "../lib/storage/StorageProvider";
 import { IAppState } from "../reducers";
 import { Actions } from "../reducers/actions";
 import Dashboard from "./dashboard/Dashboard";
 import SetImporter from "./set-importer/ImportPage";
 
 interface IStudyCardsAppStateProps {
-    sets: { [id: string]: IFlashCardSet };
+    storageProvider: IStorageProvider;
 }
 
 interface IStudyCardsAppDispatchProps {
@@ -38,17 +39,14 @@ class StudyCardsApp extends React.Component<IStudyCardsAppProps, IStudyCardsAppS
 
     public render() {
         if (this.state.setBeingImported) {
-            return <SetImporter sets={this.props.sets}
-                        goToDashboard={this.goToDashboard.bind(this)}
-                        addSet={this.props.addSet}/>;
-        } else if (this.state.currentSetId == null) {
-            return <Dashboard sets={this.props.sets}
-                        addSet={callback => this.props.addSet(undefined, callback )}
-                        goToImport={this.goToImport.bind(this)}
+            return <SetImporter goToDashboard={this.goToDashboard.bind(this)}
+                        addSet={this.props.addSet}
+                        storageProvider={this.props.storageProvider}/>;
+        } else if (this.state.currentSetId === null) {
+            return <Dashboard goToImport={this.goToImport.bind(this)}
                         goToSet={this.goToSet.bind(this)}/>;
         } else {
-            return <SetContainer set={this.props.sets[this.state.currentSetId] as IFlashCardSet}
-                        goToDashboard={this.goToDashboard.bind(this)} />;
+            return <SetContainer setId={this.state.currentSetId} goToDashboard={this.goToDashboard.bind(this)} />;
         }
     }
 
@@ -74,9 +72,9 @@ class StudyCardsApp extends React.Component<IStudyCardsAppProps, IStudyCardsAppS
     }
 }
 
-function mapStateToProps(state: IAppState): IStudyCardsAppStateProps {
+function mapStateToProps(state: IAppState) {
     return {
-        sets: state.sets,
+        storageProvider: state.storageProvider,
     };
 }
 
