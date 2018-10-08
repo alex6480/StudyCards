@@ -4,7 +4,7 @@ import * as fromActions from "../../reducers/actions";
 import { initialCard } from "../../reducers/card";
 import * as fromSet from "../../reducers/set";
 import IFlashCard, { ExportFlashCard } from "../flashcard/flashcard";
-import { IFlashCardFace } from "../flashcard/FlashCardFace";
+import { IFlashCardFace, IRichTextFlashCardFace } from "../flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 import { SetParser } from "../flashcard/parsers/SetParserV1";
 import { ICardStudyData, ISetStudyData, ISetStudyDataMeta } from "../flashcard/StudyData";
