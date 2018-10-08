@@ -4,7 +4,7 @@ import { Dispatch } from "redux";
 import IFlashCard from "../../lib/flashcard/flashcard";
 import { FlashCardFaceId, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import { IAppState } from "../../reducers";
-import { Actions } from "../../reducers/actions";
+import { Action } from "../../reducers/actions";
 import SlideTransition from "../transition/SlideTransition";
 import CardFaceEditor from "./CardFaceEditor";
 import { CardFaceEditorToolbar } from "./CardFaceEditorToolbar";
@@ -113,18 +113,19 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
 }
 
 function mapStateToProps(state: IAppState, ownProps: ICardEditorOwnProps): ICardEditorStateProps {
+    const sets = state.sets.value;
     return {
         ...ownProps,
-        card: state.sets.value()[ownProps.setId].cards[ownProps.cardId].value(),
+        card: state.sets.value![ownProps.setId].cards[ownProps.cardId].value!,
     };
 }
 
 function mapDispatchToProps(dispatch: Dispatch, props: ICardEditorOwnProps): ICardEditorDispatchProps {
     return {
-        deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
+        deleteCard: (card: IFlashCard) => dispatch(Action.deleteCard(card)),
         updateCardFace: (cardId: string, face: IFlashCardFace) =>
-            dispatch(Actions.updateCardFace(props.setId, cardId, face)),
-        swapCardFaces: (cardId: string) => dispatch(Actions.swapCardFaces(props.setId, cardId)),
+            dispatch(Action.updateCardFace(props.setId, cardId, face)),
+        swapCardFaces: (cardId: string) => dispatch(Action.swapCardFaces(props.setId, cardId)),
     };
 }
 

@@ -1,43 +1,44 @@
 import IFlashCard from "../lib/flashcard/flashcard";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
-import Remote from "../lib/remote";
+import IRemote from "../lib/remote";
 import * as Utils from "../lib/utils";
 import * as fromActions from "./actions";
 import card, * as fromCard from "./card";
 
-const initialState: IFlashCardSet = {
+export const initialState: IFlashCardSet = {
     cards: {},
     name: "New Set",
     cardOrder: [],
     id: "",
 };
 
-function cards(state: { [id: string]: Remote<IFlashCard>; } = initialState.cards,
+function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.cards,
                setId: string,
-               action: fromActions.Actions): { [id: string]: Remote<IFlashCard>; } {
+               action: fromActions.Action): { [id: string]: IRemote<IFlashCard>; } {
     switch (action.type) {
         case fromActions.ADD_NEW_CARD_BEGIN:
-            const newCardId = Utils.guid();
-            if (action.payload.callback !== undefined) { action.payload.callback(newCardId); }
             return {
                     ...state,
-                    [newCardId]: new Remote<IFlashCard>(true),
+                    [action.payload.cardId]: card({
+                        isFetching: false,
+                        lastUpdated: Date.now(),
+                        value: {
+                            setId: action.payload.setId,
+                            id: action.payload.cardId,
+                        },
+                    }, action),
                 };
         case fromActions.ADD_NEW_CARD_COMPLETE:
             return {
                 ...state,
-                [action.payload.cardId]: new Remote<IFlashCard>(false, {
-                    ...fromCard.initialCard,
-                    setId: action.payload.setId,
-                    id: action.payload.cardId,
-                }),
+                [action.payload.cardId]: card(state[action.payload.cardId], action),
             };
         default:
             return state;
     }
 }
 
-function name(state: string = initialState.name, setId: string, action: fromActions.Actions): string {
+function name(state: string = initialState.name, setId: string, action: fromActions.Action): string {
     switch (action.type) {
         case fromActions.UPDATE_SET_NAME:
             if (action.payload.setId !== setId) {
@@ -49,7 +50,7 @@ function name(state: string = initialState.name, setId: string, action: fromActi
     }
 }
 
-function cardOrder(state: string[] = initialState.cardOrder, action: fromActions.Actions) {
+function cardOrder(state: string[] = initialState.cardOrder, action: fromActions.Action) {
     switch (action.type) {
         case fromActions.ADD_NEW_CARD_BEGIN:
             if (action.payload.afterCardId !== undefined) {
@@ -63,7 +64,7 @@ function cardOrder(state: string[] = initialState.cardOrder, action: fromActions
     }
 }
 
-export default function set(state: IFlashCardSet = initialState, action: fromActions.Actions): IFlashCardSet {
+export default function set(state: IFlashCardSet = initialState, action: fromActions.Action): IFlashCardSet {
     // Generate a new id if none has been supplied
     if (state.id === initialState.id) {
         state.id = Utils.guid();

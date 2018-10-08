@@ -1,4 +1,4 @@
-import Remote from "../remote";
+import IRemote from "../remote";
 import { objectMapString } from "../utils";
 import IFlashCard, { ExportFlashCard } from "./flashcard";
 
@@ -9,7 +9,7 @@ export interface IFlashCardSetMeta {
 }
 
 export default interface IFlashCardSet extends IFlashCardSetMeta {
-    cards: { [id: string]: Remote<IFlashCard>; };
+    cards: { [id: string]: IRemote<IFlashCard>; };
 }
 
 export class ExportFlashCardSet {

@@ -30,12 +30,14 @@ export type ActionsUnion<A extends IActionsCreatorMapObject> = ReturnType<A[keyo
 export const UPDATE_SET_NAME = "update set name";
 export const DELETE_CARD = "delete card";
 export const UPDATE_CARD_FACE = "update card face";
-export const ADD_NEW_SET = "add new set";
 export const RESET_SESSION_STUDY_DATA = "reset session study data";
 export const UPDATE_CARD_STUDY_DATA = "update card study data";
 export const SWAP_CARD_FACES = "swap card faces";
 
 // Remote actions
+export const ADD_NEW_SET_BEGIN = "add new set begin";
+export const ADD_NEW_SET_COMPLETE = "add new set complete";
+
 export const ADD_NEW_CARD_BEGIN = "add new card begin";
 export const ADD_NEW_CARD_COMPLETE = "add new card complete";
 export const ADD_NEW_CARD_ERROR = "add new card error";
@@ -44,23 +46,25 @@ export const LOAD_SET_META_ALL_BEGIN = "load meta data for all sets begin";
 export const LOAD_SET_META_ALL_COMPLETE = "load meta data for all sets complete";
 export const LOAD_SET_META_ALL_ERROR = "load meta data for all sets error";
 
-export const Actions = {
+export const Action = {
     loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
     loadSetMetaAllComplete: (setMeta: {[id: string]: IFlashCardSetMeta}) =>
         createAction(LOAD_SET_META_ALL_COMPLETE, setMeta),
     loadSetMetaAllError: (message: string) => createAction(LOAD_SET_META_ALL_ERROR, { message }),
 
-    addNewCardBegin: (setId: string, afterCardId?: string, callback?: (id: string) => void) =>
-        createAction(ADD_NEW_CARD_BEGIN, { setId, callback, afterCardId, cardId: "" }),
+    addNewCardBegin: (cardId: string, setId: string, afterCardId?: string) =>
+        createAction(ADD_NEW_CARD_BEGIN, { cardId, setId, afterCardId }),
     addNewCardComplete: (setId: string, cardId: string) =>
         createAction(ADD_NEW_CARD_COMPLETE, { setId, cardId }),
+
+    addSetBegin: (set?: IFlashCardSet, callback?: (id: string) => void) =>
+        createAction(ADD_NEW_SET_BEGIN, { set, callback }),
+    addSetComplete: () => createAction(ADD_NEW_SET_COMPLETE),
 
     updateSetName: (setId: string, newName: string) => createAction(UPDATE_SET_NAME, { setId, name: newName }),
     deleteCard: (card: IFlashCard) => createAction(DELETE_CARD, card),
     updateCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
         createAction(UPDATE_CARD_FACE, { setId, cardId, face }),
-    addSet: (set?: IFlashCardSet, callback?: (id: string) => void) =>
-        createAction(ADD_NEW_SET, { set, callback }),
     updateCardStudyData: (studyData: ICardStudyData) => createAction(UPDATE_CARD_STUDY_DATA, studyData),
     swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),
 
@@ -70,4 +74,4 @@ export const Actions = {
     resetSessionStudyData: () => createAction(RESET_SESSION_STUDY_DATA),
 };
 
-export type Actions = ActionsUnion<typeof Actions>;
+export type Action = ActionsUnion<typeof Action>;

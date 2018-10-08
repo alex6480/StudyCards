@@ -1,6 +1,6 @@
 import * as React from "react";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
-import Remote from "../../lib/remote";
+import IRemote from "../../lib/remote";
 import IStorageProvider from "../../lib/storage/StorageProvider";
 import SetCardEditor from "../set-card-editor/SetCardEditor";
 import SetExporter from "../SetExporter";
@@ -14,7 +14,7 @@ interface ISetImporterProps {
 
 interface ISetImporterState {
     importedSet: IFlashCardSet | null;
-    mergingSet: Remote<IFlashCardSet | null>;
+    mergingSet: IRemote<IFlashCardSet | null>;
 }
 
 export default class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> {
@@ -23,7 +23,7 @@ export default class SetImporter extends React.Component<ISetImporterProps, ISet
         // Set initial state
         this.state = {
             importedSet: null,
-            mergingSet: new Remote<IFlashCardSet | null>(false),
+            mergingSet: { isFetching: false, lastUpdated: Date.now() },
         };
     }
 
@@ -81,8 +81,10 @@ export default class SetImporter extends React.Component<ISetImporterProps, ISet
             return <p>Fetching set to merge with.</p>;
         }
 
-        const mergingSet = this.state.mergingSet.value();
-        if (mergingSet === null) {
+        const mergingSet = this.state.mergingSet.value;
+        if (mergingSet === undefined) {
+            return <div>Loading</div>;
+        } else if (mergingSet === null) {
             return <div>
                 <h3 className="title is-3">Merge with preexisting set</h3>
                 <div className="box">The imported set will be imported as a new set as

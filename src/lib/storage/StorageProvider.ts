@@ -17,6 +17,13 @@ export default interface IStorageProvider {
 
     /**
      * Adds a new card to the deck
+     * Returns the id of the newly added card
      */
-    addCard: (dispatch: Dispatch, setId: string, afterCardId?: string) => void;
+    addCard: (dispatch: Dispatch, setId: string, afterCardId?: string) => string;
+
+    /**
+     * Adds the specified set. A set with the same id cannot exist
+     * Returns the id of the newly added set
+     */
+    addSet: (dispatch: Dispatch, set?: IFlashCardSet) => string;
 }

@@ -1,5 +1,5 @@
 import { ContentState, convertFromRaw, RawDraftContentState } from "draft-js";
-import Remote from "../../remote";
+import IRemote from "../../remote";
 import * as Utils from "../../utils";
 import IFlashCard, { ExportFlashCard } from "../flashcard";
 import { ExportFlashCardFace, ExportImageFlashCardFace, ExportRichTextFlashCardFace,
@@ -36,7 +36,7 @@ export class SetParser implements ISetParser {
         const result: IFlashCardSet = {
             id,
             name: this.SetName(set, onError),
-            cards: Utils.objectMapString(cards, (k, v) => new Remote(false, v)),
+            cards: Utils.objectMapString(cards, (k, v) => ({ isFetching: false, value: v, lastUpdated: Date.now() })),
             cardOrder: this.SetCardOrder(set, cards, onError),
         };
         return result;

@@ -2,10 +2,10 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
-import Remote from "../../lib/remote";
+import IRemote from "../../lib/remote";
 import IStorageProvider from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
-import { Actions } from "../../reducers/actions";
+import { Action } from "../../reducers/actions";
 import AddNewSetTile from "./AddNewSetTile";
 import SetTile from "./SetTile";
 
@@ -15,12 +15,12 @@ interface IDashboardOwnProps {
 }
 
 interface IDashboardStateProps {
-    sets: Remote<{ [id: string]: IFlashCardSet }>;
+    sets: IRemote<{ [id: string]: IFlashCardSet }>;
     storage: IStorageProvider;
 }
 
 interface IDashboardDispatchProps {
-    addSet: (set?: IFlashCardSet, callback?: (id: string) => void) => void;
+    addSet: (storage: IStorageProvider, set?: IFlashCardSet) => string;
     loadSetMetaAll: (storageProvider: IStorageProvider) => void;
 }
 
@@ -58,9 +58,9 @@ export class Dashboard extends React.Component<IDashboardProps> {
     }
 
     private renderContent() {
-        if (this.props.sets.isUpToDate) {
+        if (this.props.sets.isFetching === false && this.props.sets.value !== undefined) {
             return <div className="columns is-multiline">
-                { this.getSetTiles(this.props.sets.value()) }
+                { this.getSetTiles(this.props.sets.value) }
                 <AddNewSetTile addSet={this.handleAddSet.bind(this)} goToImport={this.props.goToImport}/>
             </div>;
         } else {
@@ -69,9 +69,8 @@ export class Dashboard extends React.Component<IDashboardProps> {
     }
 
     private handleAddSet() {
-        this.props.addSet(undefined, id => {
-            this.props.goToSet(id);
-        });
+        const newSetId = this.props.addSet(this.props.storage);
+        this.props.goToSet(newSetId);
     }
 
     private getSetTiles(sets: { [id: string]: IFlashCardSet }) {
@@ -93,7 +92,7 @@ function mapStateToProps(state: IAppState): IDashboardStateProps {
 
 function mapDispatchToProps(dispatch: Dispatch): IDashboardDispatchProps {
     return {
-        addSet: (set, callback) => dispatch(Actions.addSet(set, callback)),
+        addSet: (storage: IStorageProvider, set?: IFlashCardSet) => storage.addSet(dispatch, set),
         loadSetMetaAll: (storageProvider: IStorageProvider) => storageProvider.getSetMetaAll(dispatch),
     };
 }

@@ -8,7 +8,7 @@ import IFlashCardSet from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData } from "../lib/flashcard/StudyData";
 import IStorageProvider from "../lib/storage/StorageProvider";
 import { IAppState } from "../reducers";
-import { Actions } from "../reducers/actions";
+import { Action } from "../reducers/actions";
 import Dashboard from "./dashboard/Dashboard";
 import SetImporter from "./set-importer/ImportPage";
 
@@ -80,7 +80,7 @@ function mapStateToProps(state: IAppState) {
 
 function mapDispatchToProps(dispatch: Dispatch): IStudyCardsAppDispatchProps {
     return {
-        addSet: (set, callback) => dispatch(Actions.addSet(set, callback)),
+        addSet: (set, callback) => dispatch(Action.resetSessionStudyData()),
     };
 }
 

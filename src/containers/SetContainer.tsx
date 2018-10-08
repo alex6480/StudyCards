@@ -9,8 +9,9 @@ import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
+import IStorageProvider from "../lib/storage/StorageProvider";
 import { IAppState } from "../reducers";
-import { Actions } from "../reducers/actions";
+import { Action } from "../reducers/actions";
 
 interface ISetContainerOwnProps {
     goToDashboard: () => void;
@@ -18,12 +19,13 @@ interface ISetContainerOwnProps {
 }
 
 interface ISetContainerStateProps extends ISetContainerOwnProps {
+    storage: IStorageProvider;
     set?: IFlashCardSet;
     studyData: ISetStudyData;
 }
 
 interface ISetContainerDispatchProps {
-    addNewCard: (setId: string, afterCardId?: string) => void;
+    addNewCard: (store: IStorageProvider, setId: string, afterCardId?: string) => void;
     deleteCard: (card: IFlashCard) => void;
     updateSetName: (setId: string, newName: string) => void;
     resetStudySessionData: () => void;
@@ -61,7 +63,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
         switch (this.state.section) {
             case SetSection.Edit:
                 page = <SetCardEditor set={this.props.set}
-                            addNewCard={this.props.addNewCard}
+                            addNewCard={this.addNewCard.bind(this)}
                             deleteCard={this.props.deleteCard} />;
                 break;
             case SetSection.Export:
@@ -119,6 +121,10 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
         </div>;
     }
 
+    private addNewCard(afterCardId?: string) {
+        return this.props.addNewCard(this.props.storage, this.props.setId, afterCardId);
+    }
+
     private goToSection(newPage: SetSection) {
         this.setState({section: newPage});
     }
@@ -135,16 +141,18 @@ function mapStateToProps(state: IAppState, ownProps: ISetContainerOwnProps): ISe
     return {
         ...ownProps,
         studyData: state.studyData[ownProps.setId],
+        storage: state.storageProvider,
     };
 }
 
 function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
     return {
-        addNewCard: (setId: string, afterCardId?: string) => dispatch(Actions.addNewCardBegin(setId, afterCardId)),
-        deleteCard: (card: IFlashCard) => dispatch(Actions.deleteCard(card)),
-        updateSetName: (setId: string, newName: string) => dispatch(Actions.updateSetName(setId, newName)),
-        resetStudySessionData: () => dispatch(Actions.resetSessionStudyData()),
-        updateCardStudyData: (studyData: ICardStudyData) => dispatch(Actions.updateCardStudyData(studyData)),
+        addNewCard: (store: IStorageProvider, setId: string, afterCardId?: string) =>
+            store.addCard(dispatch, setId, afterCardId),
+        deleteCard: (card: IFlashCard) => dispatch(Action.deleteCard(card)),
+        updateSetName: (setId: string, newName: string) => dispatch(Action.updateSetName(setId, newName)),
+        resetStudySessionData: () => dispatch(Action.resetSessionStudyData()),
+        updateCardStudyData: (studyData: ICardStudyData) => dispatch(Action.updateCardStudyData(studyData)),
     };
 }
 

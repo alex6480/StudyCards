@@ -15,7 +15,7 @@ const initialCardStudyDataState: ICardStudyData = {
 };
 
 export default function studyData(state: ISetStudyData = initialSetStudyDataState,
-                                  action: fromActions.Actions): ISetStudyData {
+                                  action: fromActions.Action): ISetStudyData {
     switch (action.type) {
         case fromActions.RESET_SESSION_STUDY_DATA:
             return {
@@ -36,7 +36,7 @@ export default function studyData(state: ISetStudyData = initialSetStudyDataStat
 }
 
 function cardStudyData(state: ICardStudyData = initialCardStudyDataState,
-                       action: fromActions.Actions): ICardStudyData {
+                       action: fromActions.Action): ICardStudyData {
     switch (action.type) {
         case fromActions.RESET_SESSION_STUDY_DATA:
             return {
@@ -56,7 +56,7 @@ function cardStudyData(state: ICardStudyData = initialCardStudyDataState,
     }
 }
 
-function cardStudyDataCardId(state: string = initialCardStudyDataState.cardId, action: fromActions.Actions): string {
+function cardStudyDataCardId(state: string = initialCardStudyDataState.cardId, action: fromActions.Action): string {
     switch (action.type) {
         case fromActions.UPDATE_CARD_STUDY_DATA:
             return action.payload.cardId;
@@ -66,7 +66,7 @@ function cardStudyDataCardId(state: string = initialCardStudyDataState.cardId, a
 }
 
 function cardStudyDataCardRedrawTime(state: Date | null = initialCardStudyDataState.redrawTime,
-                                     action: fromActions.Actions): Date | null {
+                                     action: fromActions.Action): Date | null {
     switch (action.type) {
         case fromActions.RESET_SESSION_STUDY_DATA:
             return null;

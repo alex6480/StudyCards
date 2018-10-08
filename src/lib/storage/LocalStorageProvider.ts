@@ -2,8 +2,10 @@ import { Dispatch } from "redux";
 import { IAppState } from "../../reducers";
 import * as fromActions from "../../reducers/actions";
 import { initialCard } from "../../reducers/card";
+import * as fromSet from "../../reducers/set";
 import IFlashCard from "../flashcard/flashcard";
 import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
+import * as Utils from "../utils";
 import IStorageProvider from "./StorageProvider";
 
 /**
@@ -28,13 +30,18 @@ export class LocalStorageProvider implements IStorageProvider {
         if (setIsNew) {
             // Save the cards
             for (const cardId of set.cardOrder) {
-                this.saveCard(cards[cardId].value());
+                const cardValue = cards[cardId].value;
+                if (cardValue === undefined) {
+                    throw new Error("Card value cannot be undefined for a new set");
+                } else {
+                    this.saveCard(cardValue);
+                }
             }
         }
     }
 
     public getSetMetaAll(dispatch: Dispatch) {
-        dispatch(fromActions.Actions.loadSetMetaAllBegin());
+        dispatch(fromActions.Action.loadSetMetaAllBegin());
 
         const setIds = this.getSetIds();
         const meta = setIds.reduce((result: {[id: string]: IFlashCardSetMeta}, item, index, array) => {
@@ -42,19 +49,34 @@ export class LocalStorageProvider implements IStorageProvider {
             return result;
         }, {});
 
-        dispatch(fromActions.Actions.loadSetMetaAllComplete(meta));
+        dispatch(fromActions.Action.loadSetMetaAllComplete(meta));
     }
 
     public addCard(dispatch: Dispatch, setId: string, afterCardId?: string) {
-        dispatch(fromActions.Actions.addNewCardBegin(setId, afterCardId, (cardId => {
-            this.saveCard({
-                ...initialCard,
-                setId,
-                id: cardId,
-            });
+        const cardId = Utils.guid();
+        dispatch(fromActions.Action.addNewCardBegin(cardId, setId, afterCardId));
 
-            dispatch(fromActions.Actions.addNewCardComplete(setId, cardId));
-        })));
+        this.saveCard({
+            ...initialCard,
+            setId,
+            id: cardId,
+        });
+
+        dispatch(fromActions.Action.addNewCardComplete(setId, cardId));
+
+        return cardId;
+    }
+
+    public addSet(dispatch: Dispatch, set?: IFlashCardSet) {
+        if (set === undefined) {
+            set = {
+                ...fromSet.initialState,
+                id: Utils.guid(),
+            };
+        }
+
+        dispatch(fromActions.Action.addSetBegin(set));
+        return set.id;
     }
 
     private getSetMeta(setId: string): IFlashCardSetMeta {
