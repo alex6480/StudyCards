@@ -11,7 +11,7 @@ interface ISetTileProps {
 }
 
 export default class SetTile extends React.Component<ISetTileProps> {
-    private doTransition = false;
+    private transition: "slide" | "fade" = "fade";
     constructor(props: ISetTileProps) {
         super(props);
         // Set initial state
@@ -20,8 +20,8 @@ export default class SetTile extends React.Component<ISetTileProps> {
 
     public render() {
         if (this.props.set.isFetching || this.props.set.value === undefined) {
-            // Only do a transition if a card has been loading
-            this.doTransition = true;
+            // Do a slide transition if a loader was shown
+            this.transition = "slide";
             return <div className="column is-3">
                 <div className="card">
                     <div className="card-content">
@@ -70,7 +70,7 @@ export default class SetTile extends React.Component<ISetTileProps> {
             </footer>
         </>;
 
-        if (this.doTransition) {
+        if (this.transition === "slide") {
             return <div className="column is-3 set-tile">
                 <div className="card">
                     <SlideTransition targetState={"expanded"}>{cardContent}</SlideTransition>
@@ -79,7 +79,7 @@ export default class SetTile extends React.Component<ISetTileProps> {
         } else {
             return <div className="column is-3 set-tile">
                 <div className="card">
-                    {cardContent}
+                    <FadeTransition targetState={"visible"}>{cardContent}</FadeTransition>
                 </div>
             </div>;
         }
