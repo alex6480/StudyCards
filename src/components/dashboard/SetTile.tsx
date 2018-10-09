@@ -71,13 +71,13 @@ export default class SetTile extends React.Component<ISetTileProps> {
         </>;
 
         if (this.transition === "slide") {
-            return <div className="column is-3 set-tile">
+            return <div className="column is-3-desktop is-6-tablet set-tile">
                 <div className="card">
                     <SlideTransition targetState={"expanded"}>{cardContent}</SlideTransition>
                 </div>
             </div>;
         } else {
-            return <div className="column is-3 set-tile">
+            return <div className="column is-3-desktop is-6-tablet set-tile">
                 <div className="card">
                     <FadeTransition targetState={"visible"}>{cardContent}</FadeTransition>
                 </div>
