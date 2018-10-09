@@ -58,9 +58,9 @@ export class Dashboard extends React.Component<IDashboardProps> {
     }
 
     private renderContent() {
-        if (this.props.sets.isFetching === false && this.props.sets.value !== undefined) {
+        if (this.props.sets.value !== undefined) {
             return <div className="columns is-multiline">
-                { this.getSetTiles(this.props.sets.value) }
+                { this.getSetTiles(this.props.sets.isFetching, this.props.sets.value) }
                 <AddNewSetTile addSet={this.handleAddSet.bind(this)} goToImport={this.props.goToImport}/>
             </div>;
         } else {
@@ -73,10 +73,14 @@ export class Dashboard extends React.Component<IDashboardProps> {
         this.props.goToSet(newSetId);
     }
 
-    private getSetTiles(sets: { [id: string]: IRemote<IFlashCardSet> }) {
+    private getSetTiles(isFetching: boolean, sets: { [id: string]: IRemote<IFlashCardSet> }) {
         const result: React.ReactElement<SetTile>[] = [];
         for (const setId of Object.keys(sets)) {
-            result.push(<SetTile key={setId} set={sets[setId]} goToSet={this.props.goToSet} setId={setId}/>);
+            const set = {
+                isFetching,
+                value: sets[setId].value,
+            };
+            result.push(<SetTile key={setId} set={set} goToSet={this.props.goToSet} setId={setId}/>);
         }
 
         return result;
