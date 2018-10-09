@@ -2,6 +2,7 @@ import * as React from "react";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
 import FadeTransition from "../transition/FadeTransition";
+import SlideTransition from "../transition/SlideTransition";
 
 interface ISetTileProps {
     set: IRemote<IFlashCardSet>;
@@ -72,7 +73,7 @@ export default class SetTile extends React.Component<ISetTileProps> {
         if (this.doTransition) {
             return <div className="column is-3 set-tile">
                 <div className="card">
-                    <FadeTransition targetState={"visible"}>{cardContent}</FadeTransition>
+                    <SlideTransition targetState={"expanded"}>{cardContent}</SlideTransition>
                 </div>
             </div>;
         } else {
