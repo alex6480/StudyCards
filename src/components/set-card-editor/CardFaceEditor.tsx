@@ -1,7 +1,7 @@
 import { CompositeDecorator, ContentState, Editor, EditorState, RichUtils } from "draft-js";
 import * as React from "react";
 import "../../../node_modules/draft-js/dist/Draft.css";
-import { FlashCardFaceType, IBaseFlashCardFace, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
+import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import DropDown from "../rich-text-editor/DropDown";
 import { RevealDecorator, RevealEntity } from "../rich-text-editor/RevealEntity";
 import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
@@ -120,44 +120,10 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
     }
 
     private setType(newType: FlashCardFaceType) {
-        let base: IBaseFlashCardFace;
-        switch (this.props.face.type) {
-            case FlashCardFaceType.RichText:
-                const {richTextContent, ...baseRich} = this.props.face;
-                base = baseRich;
-                break;
-            case FlashCardFaceType.None:
-                const {...baseNone} = this.props.face;
-                base = baseNone;
-                break;
-            case FlashCardFaceType.Image:
-                const {...baseImage} = this.props.face;
-                base = baseImage;
-                break;
-            default:
-                throw new Error("Unkown face type");
-        }
-
-        switch (newType) {
-            case FlashCardFaceType.None:
-                this.props.saveCardFace({
-                    ...base,
-                    type: FlashCardFaceType.None,
-                });
-                break;
-            case FlashCardFaceType.RichText:
-                this.props.saveCardFace({
-                    ...base,
-                    type: FlashCardFaceType.RichText,
-                    richTextContent: ContentState.createFromText(""),
-                });
-                break;
-            case FlashCardFaceType.Image:
-                this.props.saveCardFace({
-                    ...base,
-                    type: FlashCardFaceType.Image,
-                });
-        }
+        this.props.saveCardFace({
+            ...this.props.face,
+            type: newType,
+        });
     }
 
     private onBlur() {

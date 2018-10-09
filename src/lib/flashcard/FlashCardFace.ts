@@ -8,25 +8,23 @@ export enum FlashCardFaceType {
     RichText,
 }
 
-export type IFlashCardFace = IRichTextFlashCardFace | INoFlashCardFace | IImageFlashCardFace;
-
-export interface IBaseFlashCardFace {
+export interface IFlashCardFace {
     id: FlashCardFaceId;
     setId: string;
     cardId: string;
     type: FlashCardFaceType;
-}
-
-export interface IRichTextFlashCardFace extends IBaseFlashCardFace {
-    type: FlashCardFaceType.RichText;
     richTextContent: ContentState;
 }
 
-export interface INoFlashCardFace extends IBaseFlashCardFace {
+export interface IRichTextFlashCardFace extends IFlashCardFace {
+    type: FlashCardFaceType.RichText;
+}
+
+export interface INoFlashCardFace extends IFlashCardFace {
     type: FlashCardFaceType.None;
 }
 
-export interface IImageFlashCardFace extends IBaseFlashCardFace {
+export interface IImageFlashCardFace extends IFlashCardFace {
     type: FlashCardFaceType.Image;
 }
 

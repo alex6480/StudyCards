@@ -1,5 +1,6 @@
 import { ExportFlashCardFace, ExportImageFlashCardFace, ExportNoFlashCardFace, ExportRichTextFlashCardFace,
-    FlashCardFaceType, IFlashCardFace } from "./FlashCardFace";
+    FlashCardFaceType, IFlashCardFace, IImageFlashCardFace, INoFlashCardFace,
+    IRichTextFlashCardFace } from "./FlashCardFace";
 
 export default interface IFlashCard {
     id: string;
@@ -12,13 +13,17 @@ export default interface IFlashCard {
 
 export class ExportFlashCard {
     private static getExportFace(face: IFlashCardFace): ExportFlashCardFace {
+        // Even though all information is kept in the base flashcard, on export only
+        // the information for the current type is saved.
+        // This prevents loss of information when user switches between card types until
+        // the user resets the session
         switch (face.type) {
             case FlashCardFaceType.RichText:
-                return new ExportRichTextFlashCardFace(face);
+                return new ExportRichTextFlashCardFace(face as IRichTextFlashCardFace);
             case FlashCardFaceType.None:
-                return new ExportNoFlashCardFace(face);
+                return new ExportNoFlashCardFace(face as INoFlashCardFace);
             case FlashCardFaceType.Image:
-                return new ExportImageFlashCardFace(face);
+                return new ExportImageFlashCardFace(face as IImageFlashCardFace);
         }
     }
 

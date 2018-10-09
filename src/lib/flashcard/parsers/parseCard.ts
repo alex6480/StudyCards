@@ -76,12 +76,21 @@ function parseFace(face: ExportFlashCardFace, faceId: FlashCardFaceId,
                 type: cardFaceType,
                 richTextContent: parseRichTextContent(face as ExportRichTextFlashCardFace, onError),
             };
+        case FlashCardFaceType.Image:
+            return {
+                id: faceId,
+                cardId,
+                setId,
+                type: FlashCardFaceType.None,
+                richTextContent: ContentState.createFromText(""),
+            };
         case FlashCardFaceType.None:
             return {
                 id: faceId,
                 cardId,
                 setId,
                 type: FlashCardFaceType.None,
+                richTextContent: ContentState.createFromText(""),
             };
         default:
             onError("Unknown face type");
@@ -90,6 +99,7 @@ function parseFace(face: ExportFlashCardFace, faceId: FlashCardFaceId,
                 cardId,
                 setId,
                 type: FlashCardFaceType.None,
+                richTextContent: ContentState.createFromText(""),
             };
     }
 }
