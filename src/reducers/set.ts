@@ -159,6 +159,7 @@ export default function sets(state: IRemote<{ [id: string]: IRemote<IFlashCardSe
             return {
                 ...state,
                 value: {
+                    ...state.value,
                     [setId]: set({ ...previousSet, value: { ...previousSet.value, id: setId } }, action),
                 },
             };
