@@ -76,6 +76,13 @@ function parseFace(face: ExportFlashCardFace, faceId: FlashCardFaceId,
                 type: cardFaceType,
                 richTextContent: parseRichTextContent(face as ExportRichTextFlashCardFace, onError),
             };
+        case FlashCardFaceType.None:
+            return {
+                id: faceId,
+                cardId,
+                setId,
+                type: FlashCardFaceType.None,
+            };
         default:
             onError("Unknown face type");
             return {

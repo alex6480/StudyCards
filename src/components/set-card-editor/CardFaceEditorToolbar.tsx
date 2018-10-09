@@ -1,6 +1,6 @@
 import { EditorState, RichUtils } from "draft-js";
 import * as React from "react";
-import { IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
+import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import DropDown from "../rich-text-editor/DropDown";
 import { RevealEntity } from "../rich-text-editor/RevealEntity";
 import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
@@ -11,6 +11,7 @@ export interface ICardFaceEditorToolbarProps {
     face: IFlashCardFace;
     swapFaces: () => void;
     onChange: (newState: EditorState) => void;
+    setType: (type: FlashCardFaceType) => void;
 }
 
 export class CardFaceEditorToolbar extends React.Component<ICardFaceEditorToolbarProps, {}> {
@@ -24,7 +25,7 @@ export class CardFaceEditorToolbar extends React.Component<ICardFaceEditorToolba
             </div>
             <div className="field has-addons">
                 <p className="control">
-                    <a className="button is-active">
+                    <a className="button is-active" onClick={() => this.props.setType(FlashCardFaceType.RichText)}>
                         <span className="icon">
                             <i className="fas fa-pen-square"></i>
                         </span>
@@ -32,7 +33,7 @@ export class CardFaceEditorToolbar extends React.Component<ICardFaceEditorToolba
                 </p>
 
                 <p className="control">
-                    <a className="button">
+                    <a className="button" onClick={() => this.props.setType(FlashCardFaceType.Image)}>
                         <span className="icon">
                             <i className="fas fa-image"></i>
                         </span>
@@ -40,7 +41,7 @@ export class CardFaceEditorToolbar extends React.Component<ICardFaceEditorToolba
                 </p>
 
                 <p className="control">
-                    <a className="button">
+                    <a className="button" onClick={() => this.props.setType(FlashCardFaceType.None)}>
                         <span className="icon is-danger">
                             <i className="fas fa-minus-circle"></i>
                         </span>

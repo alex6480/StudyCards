@@ -10,7 +10,7 @@ export enum FlashCardFaceType {
 
 export type IFlashCardFace = IRichTextFlashCardFace | INoFlashCardFace | IImageFlashCardFace;
 
-interface IBaseFlashCardFace {
+export interface IBaseFlashCardFace {
     id: FlashCardFaceId;
     setId: string;
     cardId: string;

@@ -85,6 +85,10 @@ $transition-medium: 0.5s;
                     &:not(:first-child) {
                         border-left: 1px solid $grey-lighter;
                     }
+
+                    &.no-content {
+                        background-color: #999;
+                    }
                 }
             }
         }
