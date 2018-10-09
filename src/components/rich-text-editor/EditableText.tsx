@@ -38,7 +38,7 @@ export default class EditableText extends React.Component<IEditableTextProps, IE
     }
 
     public render() {
-        return <input className="editable-text"
+        return <input className={"editable-text" + (this.props.readOnly ? " read-only " : "")}
                     readOnly={this.props.readOnly}
                     onChange={this.handleChange.bind(this)}
                     onBlur={this.handleBlur.bind(this)}

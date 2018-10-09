@@ -93,7 +93,9 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                     <div className="container">
                         <h1 className="title is-1">
                             { this.props.set.isFetching &&
-                                <span>SAVING</span>
+                                <span className="icon is-large">
+                                    <i className=" fas fa-spinner fa-pulse "></i>
+                                </span>
                             }
                             <EditableText maxLength={30}
                                 readOnly={this.props.set.isFetching}
@@ -147,7 +149,9 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
     }
 
     private updateSetName(newName: string) {
-        this.props.saveSetMeta(this.props.storage, { id: this.props.setId, name: newName });
+        if (newName !== this.props.set.value!.name) {
+            this.props.saveSetMeta(this.props.storage, { id: this.props.setId, name: newName });
+        }
     }
 }
 

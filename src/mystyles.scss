@@ -151,6 +151,9 @@ $transition-medium: 0.5s;
     &:hover, &:focus {
         background-color: rgba(black, $alpha: 0.2);
     }
+    &.read-only {
+        background-color: transparent;
+    }
 }
 
 .tooltip {
