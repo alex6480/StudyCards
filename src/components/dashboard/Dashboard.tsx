@@ -1,6 +1,7 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
+import { SetSection } from "../../containers/SetContainer";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
 import IStorageProvider from "../../lib/storage/StorageProvider";
@@ -11,7 +12,7 @@ import SetTile from "./SetTile";
 
 interface IDashboardOwnProps {
     goToImport: () => void;
-    goToSet: (setId: string) => void;
+    goToSet: (setId: string, section?: SetSection) => void;
 }
 
 interface IDashboardStateProps {
@@ -20,7 +21,7 @@ interface IDashboardStateProps {
 }
 
 interface IDashboardDispatchProps {
-    addSet: (storage: IStorageProvider, set?: IFlashCardSet) => string;
+    addSet: (storage: IStorageProvider, set?: IFlashCardSet, section?: SetSection) => string;
     loadSetMetaAll: (storageProvider: IStorageProvider) => void;
 }
 

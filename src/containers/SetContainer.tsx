@@ -16,6 +16,7 @@ import { Action } from "../reducers/actions";
 
 interface ISetContainerOwnProps {
     goToDashboard: () => void;
+    section?: SetSection;
     setId: string;
 }
 
@@ -54,7 +55,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
 
         // Set initial state
         this.state = {
-            section: SetSection.Study,
+            section: props.section !== undefined ? props.section : SetSection.Study,
         };
     }
 

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import SetContainer from "../containers/SetContainer";
+import SetContainer, { SetSection } from "../containers/SetContainer";
 import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
@@ -14,6 +14,7 @@ import SetImporter from "./set-importer/ImportPage";
 
 interface IStudyCardsAppState {
     currentSetId: string | null;
+    setSection?: SetSection;
     setBeingImported: boolean;
 }
 
@@ -34,7 +35,10 @@ export default class StudyCardsApp extends React.Component<{}, IStudyCardsAppSta
             return <Dashboard goToImport={this.goToImport.bind(this)}
                         goToSet={this.goToSet.bind(this)}/>;
         } else {
-            return <SetContainer setId={this.state.currentSetId} goToDashboard={this.goToDashboard.bind(this)} />;
+            return <SetContainer
+                        setId={this.state.currentSetId}
+                        goToDashboard={this.goToDashboard.bind(this)}
+                        section={this.state.setSection} />;
         }
     }
 
@@ -45,10 +49,11 @@ export default class StudyCardsApp extends React.Component<{}, IStudyCardsAppSta
         });
     }
 
-    private goToSet(setId: string) {
+    private goToSet(setId: string, section: SetSection = SetSection.Study) {
         this.setState({
             currentSetId: setId,
             setBeingImported: false,
+            setSection: section,
         });
     }
 

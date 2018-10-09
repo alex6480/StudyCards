@@ -1,4 +1,5 @@
 import * as React from "react";
+import { SetSection } from "../../containers/SetContainer";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
 import FadeTransition from "../transition/FadeTransition";
@@ -7,7 +8,7 @@ import SlideTransition from "../transition/SlideTransition";
 interface ISetTileProps {
     set: IRemote<IFlashCardSet>;
     setId: string;
-    goToSet: (setId: string) => void;
+    goToSet: (setId: string, section: SetSection) => void;
 }
 
 export default class SetTile extends React.Component<ISetTileProps> {
@@ -42,7 +43,7 @@ export default class SetTile extends React.Component<ISetTileProps> {
                 <div className="card-footer-item">
                     <div className="field has-addons">
                         <p className="control">
-                            <a href="#" className="button is-primary" onClick={this.goToSetDashboard.bind(this)}>
+                            <a href="#" className="button is-primary" onClick={this.goToStudy.bind(this)}>
                                 <span className="icon is-small">
                                     <i className="fas fa-book"></i>
                                 </span>&nbsp;
@@ -50,7 +51,7 @@ export default class SetTile extends React.Component<ISetTileProps> {
                             </a>
                         </p>
                         <p className="control">
-                            <a href="#" className="button" onClick={this.goToSetDashboard.bind(this)}>
+                            <a href="#" className="button" onClick={this.goToEdit.bind(this)}>
                                 <span className="icon is-small">
                                     <i className="fas fa-pen"></i>
                                 </span>&nbsp;
@@ -85,7 +86,11 @@ export default class SetTile extends React.Component<ISetTileProps> {
         }
     }
 
-    private goToSetDashboard() {
-        this.props.goToSet(this.props.setId);
+    private goToStudy() {
+        this.props.goToSet(this.props.setId, SetSection.Study);
+    }
+
+    private goToEdit() {
+        this.props.goToSet(this.props.setId, SetSection.Edit);
     }
 }
