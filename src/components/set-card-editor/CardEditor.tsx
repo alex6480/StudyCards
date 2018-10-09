@@ -88,15 +88,15 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
             const card = this.props.card.value;
             editor = <li className="listed-flashcard">
                 <div className={"card " + (fetching ? "saving " : "")}>
-                    <div className="columns is-gapless is-marginless">
-                        <div className="column is-half">
+                    <div className="columns is-gapless is-marginless flashcard-faces">
+                        <div className="column is-half flashcard-face">
                             <CardFaceEditor cardId={card.id}
                                 face={card.faces.front}
                                 saveCardFace={this.saveCardFace.bind(this)}
                                 swapCardFaces={this.swapCardFaces.bind(this)}
                                 readOnly={fetching} />
                         </div>
-                        <div className="column is-half">
+                        <div className="column is-half flashcard-face">
                             <CardFaceEditor cardId={card.id}
                                 face={card.faces.back}
                                 saveCardFace={this.saveCardFace.bind(this)}

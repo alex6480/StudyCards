@@ -66,7 +66,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
                 swapFaces={this.swapFaces.bind(this)}
                 onChange={this.onChange.bind(this)}
             />
-            <div className="flashcard-face card-content content" onClick={this.focusEditor.bind(this)}>
+            <div className="flashcard-face-content card-content content" onClick={this.focusEditor.bind(this)}>
                 <Editor
                     readOnly={this.props.readOnly}
                     editorState={this.state.editorState}

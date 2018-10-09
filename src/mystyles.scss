@@ -63,9 +63,6 @@ $transition-medium: 0.5s;
             margin: 0.25rem;
         }
     }
-    & .flashcard-face {
-        border-left: 1px solid $grey-lighter;
-    }
     & .tag-editor {
         padding: 0.5rem;
         .tag-input {
@@ -74,6 +71,24 @@ $transition-medium: 0.5s;
         }
     }
     & > .card {
+        & > .flashcard-faces {
+            justify-content: stretch;
+
+            & .flashcard-face {
+                // Make content take up entire height
+                display: flex;
+                justify-content: stretch;
+                flex-direction: column;
+
+                & .flashcard-face-content {
+                    flex-grow: 1;
+                    &:not(:first-child) {
+                        border-left: 1px solid $grey-lighter;
+                    }
+                }
+            }
+        }
+
         /* Show blue glow around saving card editors */
         transition: box-shadow $transition-short;
         &.saving {
