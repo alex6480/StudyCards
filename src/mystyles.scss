@@ -73,6 +73,13 @@ $transition-medium: 0.5s;
             border: 0;
         }
     }
+    & > .card {
+        /* Show blue glow around saving card editors */
+        transition: box-shadow $transition-short;
+        &.saving {
+            box-shadow: 0 0 5px $primary;
+        }
+    }
 }
 
 .editor-card-divider {

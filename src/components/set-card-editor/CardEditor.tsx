@@ -74,7 +74,8 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
 
     public render() {
         let editor: JSX.Element;
-        if (this.props.card.isFetching === true || this.props.card.value === undefined) {
+        const fetching = this.props.card.isFetching;
+        if (this.props.card.value === undefined) {
             // No up to date card is currently available
             editor = <li className="listed-flashcard">
                 <div className="card">
@@ -86,7 +87,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
         } else {
             const card = this.props.card.value;
             editor = <li className="listed-flashcard">
-                <div className="card">
+                <div className={"card " + (fetching ? "saving " : "")}>
                     <div className="columns is-gapless is-marginless">
                         <div className="column is-half">
                             <CardFaceEditor cardId={card.id}
