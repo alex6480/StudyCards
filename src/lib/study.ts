@@ -55,7 +55,7 @@ function selectNewCardsForStudy(newCards: string[] | {[id: string]: IFlashCard},
     // Create a list of the id's of all new cards
     const result: string[] = [];
     for (const cardId of newCards) {
-        if (studyData.cardData[cardId] !== undefined) {
+        if (studyData.cardData[cardId] !== undefined && studyData.cardData[cardId].understandingLevel !== 0) {
             throw new Error("Only cards that have not been studied can be passed to this function.");
         }
         result.push(cardId);
