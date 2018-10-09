@@ -93,13 +93,15 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                             <CardFaceEditor cardId={card.id}
                                 face={card.faces.front}
                                 saveCardFace={this.saveCardFace.bind(this)}
-                                swapCardFaces={this.swapCardFaces.bind(this)} />
+                                swapCardFaces={this.swapCardFaces.bind(this)}
+                                readOnly={fetching} />
                         </div>
                         <div className="column is-half">
                             <CardFaceEditor cardId={card.id}
                                 face={card.faces.back}
                                 saveCardFace={this.saveCardFace.bind(this)}
-                                swapCardFaces={this.swapCardFaces.bind(this)} />
+                                swapCardFaces={this.swapCardFaces.bind(this)}
+                                readOnly={fetching} />
                         </div>
                     </div>
                     <div className="card-footer">

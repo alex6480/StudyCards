@@ -18,6 +18,7 @@ interface IRichTextCardFaceEditorState {
 export interface ICardFaceEditorProps {
     face: IFlashCardFace;
     cardId: string;
+    readOnly: boolean;
     saveCardFace: (face: IFlashCardFace) => void;
     swapCardFaces: (cardId: string) => void;
 }
@@ -67,6 +68,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
             />
             <div className="flashcard-face card-content content" onClick={this.focusEditor.bind(this)}>
                 <Editor
+                    readOnly={this.props.readOnly}
                     editorState={this.state.editorState}
                     onChange={this.onChange.bind(this)}
                     ref={editor => this.editor = editor}
