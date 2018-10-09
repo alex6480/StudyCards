@@ -5,6 +5,7 @@ import DropDown from "../rich-text-editor/DropDown";
 import { RevealEntity } from "../rich-text-editor/RevealEntity";
 import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
 import { ToolbarButton, ToolbarButtonBlock, ToolbarButtonInline } from "../rich-text-editor/ToolbarButton";
+import CardFaceTypeSelect from "./CardFaceTypeSelect";
 
 export interface ICardFaceEditorToolbarProps {
     editorState: EditorState;
@@ -23,31 +24,7 @@ export class CardFaceEditorToolbar extends React.Component<ICardFaceEditorToolba
                     {this.props.face.id === "front" ? "F" : "B"}
                 </ToolbarButton>
             </div>
-            <div className="field has-addons">
-                <p className="control">
-                    <a className="button is-active" onClick={() => this.props.setType(FlashCardFaceType.RichText)}>
-                        <span className="icon">
-                            <i className="fas fa-pen-square"></i>
-                        </span>
-                    </a>
-                </p>
-
-                <p className="control">
-                    <a className="button" onClick={() => this.props.setType(FlashCardFaceType.Image)}>
-                        <span className="icon">
-                            <i className="fas fa-image"></i>
-                        </span>
-                    </a>
-                </p>
-
-                <p className="control">
-                    <a className="button" onClick={() => this.props.setType(FlashCardFaceType.None)}>
-                        <span className="icon is-danger">
-                            <i className="fas fa-minus-circle"></i>
-                        </span>
-                    </a>
-                </p>
-            </div>
+            <CardFaceTypeSelect currentType={this.props.face.type} setType={this.props.setType} />
             <div className="field has-addons">
                 <ToolbarButtonInline icon="bold" type={InlineStyle.BOLD}
                     editorState={this.props.editorState} toggleStyle={this.toggleInlineStyle.bind(this)} />
