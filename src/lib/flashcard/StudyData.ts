@@ -6,6 +6,12 @@ export interface ICardStudyData {
     dueDate: Date;
 
     /**
+     * A numeric score indicating how well the user understands this card
+     * New cards have understanding level 0
+     */
+    understandingLevel: number;
+
+    /**
      * The time when this card should be prioritized to be redrawn from the study deck during a study session
      * This is temporary and will be reset at the beginning of every study session
      */

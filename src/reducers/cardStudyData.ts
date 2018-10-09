@@ -2,12 +2,13 @@ import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 import * as Utils from "../lib/utils";
 import * as fromActions from "./actions";
 
-const initialState: ICardStudyData = {
+export const initialState: ICardStudyData = {
     setId: "",
     cardId: "",
     dueDate: new Date(),
     redrawTime: null,
     removeFromSession: false,
+    understandingLevel: 0,
 };
 
 export default function cardData(state: {[id: string]: ICardStudyData} = { },
@@ -41,6 +42,7 @@ function cardStudyData(state: ICardStudyData = initialState,
                 dueDate: state.dueDate !== undefined ? state.dueDate : new Date(),
                 redrawTime: cardStudyDataCardRedrawTime(state.redrawTime, action),
                 removeFromSession: state.removeFromSession !== undefined ? state.removeFromSession : false,
+                understandingLevel: cardStudyDataUnderstandingLevel(state.understandingLevel, action),
             };
         default:
             return state;
@@ -73,8 +75,16 @@ function cardStudyDataCardRedrawTime(state: Date | null = initialState.redrawTim
         case fromActions.UPDATE_CARD_STUDY_DATA:
             return action.payload.redrawTime !== undefined ? action.payload.redrawTime : null;
         default:
-            return state !== undefined ? state : null;
+            return state;
     }
 }
 
-
+function cardStudyDataUnderstandingLevel(state: number = initialState.understandingLevel,
+                                         action: fromActions.Action) {
+    switch (action.type) {
+        case fromActions.UPDATE_CARD_STUDY_DATA:
+            return action.payload.understandingLevel;
+        default:
+            return state;
+    }
+}

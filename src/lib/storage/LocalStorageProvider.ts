@@ -2,6 +2,7 @@ import { Dispatch } from "redux";
 import { IAppState } from "../../reducers";
 import * as fromActions from "../../reducers/actions";
 import { initialCard } from "../../reducers/card";
+import * as fromCardStudyData from "../../reducers/cardStudyData";
 import * as fromSet from "../../reducers/set";
 import IFlashCard, { ExportFlashCard } from "../flashcard/flashcard";
 import { IFlashCardFace, IRichTextFlashCardFace } from "../flashcard/FlashCardFace";
@@ -158,11 +159,9 @@ export class LocalStorageProvider implements IStorageProvider {
         if (data === null) {
             // Return an empty study data object instead
             return {
+                ...fromCardStudyData.initialState,
                 setId,
                 cardId,
-                dueDate: new Date(),
-                redrawTime: null,
-                removeFromSession: false,
             };
         }
         return JSON.parse(data);
@@ -200,11 +199,9 @@ export class LocalStorageProvider implements IStorageProvider {
                 if (cardValue === undefined) {
                     // Just save a generic cardstudydata
                     this.saveCardStudyData({
+                        ...fromCardStudyData.initialState,
                         setId: set.id,
                         cardId,
-                        dueDate: new Date(),
-                        redrawTime: null,
-                        removeFromSession: false,
                     });
                 } else {
                     this.saveCard(cardValue);

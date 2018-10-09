@@ -31,11 +31,13 @@ export function selectStudyDeck(studyData: ISetStudyData, maxNewCards: number, m
 }
 
 export function getKnownCardIds(cards: {[id: string]: IFlashCard} | string[], studyData: ISetStudyData) {
-    return Utils.selectKeys(cards, cardId => studyData.cardData[cardId] !== undefined);
+    return Utils.selectKeys(cards, cardId => studyData.cardData[cardId] !== undefined
+                                            && studyData.cardData[cardId].understandingLevel === 0);
 }
 
 export function getNewCardIds(cards: {[id: string]: IFlashCard} | string[], studyData: ISetStudyData) {
-    return Utils.selectKeys(cards, cardId => studyData.cardData[cardId] === undefined);
+    return Utils.selectKeys(cards, cardId => studyData.cardData[cardId] === undefined
+                                            || studyData.cardData[cardId].understandingLevel === 0);
 }
 
 /**
