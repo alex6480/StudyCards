@@ -76,6 +76,7 @@ export class Dashboard extends React.Component<IDashboardProps> {
     private getSetTiles(isFetching: boolean, sets: { [id: string]: IRemote<IFlashCardSet> }) {
         const result: React.ReactElement<SetTile>[] = [];
         for (const setId of Object.keys(sets)) {
+            // If the global metadata is being fetched, represent that the individual sets are as well
             const set = {
                 isFetching,
                 value: sets[setId].value,
