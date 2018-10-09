@@ -1,12 +1,13 @@
 import * as React from "react";
 import IFlashCard from "../../lib/flashcard/flashcard";
 import { ICardStudyData } from "../../lib/flashcard/StudyData";
+import IRemote from "../../lib/remote";
 import * as Study from "../../lib/study";
 import Tooltip from "../Tooltip";
 import PresentedCardFace from "./PresentedCardFace";
 
 interface IPresentedCardProps {
-    card: IFlashCard;
+    card: IRemote<IFlashCard>;
     studyData: ICardStudyData;
     updateStudyData: (data: ICardStudyData, nextCard: boolean) => void;
     nextCard: () => void;
@@ -26,15 +27,23 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
     }
 
     public render() {
+        if (this.props.card.value === undefined) {
+            return <div className="card">
+                <div className="card-content content">
+                    <p>Loading</p>
+                </div>
+            </div>;
+        }
+
         return <React.Fragment>
                 <div className="card">
-                <div className="card-content content">
-                    <PresentedCardFace face={this.props.card.faces.front}/>
-                </div>
-                { this.state.showBack && <hr className="is-marginless" />}
-                { this.state.showBack && <div className="card-content content">
-                    <PresentedCardFace face={this.props.card.faces.back}/>
-                </div> }
+                    <div className="card-content content">
+                        <PresentedCardFace face={this.props.card.value.faces.front}/>
+                    </div>
+                    { this.state.showBack && <hr className="is-marginless" />}
+                    { this.state.showBack && <div className="card-content content">
+                        <PresentedCardFace face={this.props.card.value.faces.back}/>
+                    </div> }
             </div>
 
             { /* Button below card */ }
@@ -78,7 +87,7 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
 
     private evaluateCard(evaluation: Study.CardEvaluation) {
         return (() => {
-            const newData = Study.updateCardStudyData(this.props.card.id, this.props.studyData, evaluation);
+            const newData = Study.updateCardStudyData(this.props.card.value!.id, this.props.studyData, evaluation);
             this.props.updateStudyData(newData, true);
 
             // Make sure only the front of the next card is showed

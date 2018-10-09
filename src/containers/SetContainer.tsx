@@ -80,6 +80,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                         updateCardStudyData={this.props.updateCardStudyData}
                         studyData={this.props.studyData}
                         goToSection={this.goToSection.bind(this)}
+                        loadCards={this.loadCards.bind(this)}
                         loadStudyData={() => this.props.getSetStudyData(this.props.storage, this.props.setId)}/>;
                 break;
             default:

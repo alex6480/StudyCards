@@ -15,6 +15,7 @@ interface IStudySectionProps {
     updateCardStudyData: (studyData: ICardStudyData) => void;
     goToSection: (section: SetSection) => void;
     loadStudyData: () => void;
+    loadCards: (cardIds: string[]) => void;
 }
 
 interface IStudySession {
@@ -57,7 +58,7 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
                     {Utils.plural("card", this.state.currentSession.deck.length)} left</p>
                 <PresentedCard
                         studyData={this.props.studyData.value.cardData[this.state.currentSession.currentCardId]}
-                        card={card.value!}
+                        card={card}
                         updateStudyData={this.updateCardStudyData.bind(this)}
                         nextCard={this.nextCard.bind(this)} />
             </div>;
@@ -76,6 +77,10 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
                 currentCardId,
             },
         });
+
+        // Fetch the deck from the remote source
+        this.props.loadCards(deck);
+
         // Make sure no temporary data is left from previous study session
         this.props.resetSessionStudyData();
     }
