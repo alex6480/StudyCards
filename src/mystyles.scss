@@ -196,3 +196,11 @@ $transition-medium: 0.5s;
         }
     }
 }
+
+.transition.fade {
+    opacity: 0;
+    transition: opacity 1s;
+    &.is-visible {
+        opacity: 1;
+    }
+}
