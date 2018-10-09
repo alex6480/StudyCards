@@ -41,7 +41,7 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
     public render() {
         if (this.props.studyData === undefined || this.props.studyData.isFetching
             || this.props.studyData.value === undefined) {
-            return <div>Loading</div>;
+            return <div className="container"><p>Loading</p></div>;
         } else if (this.state.currentSession === undefined) {
             return <div className="container">
                 <StudyOverview set={this.props.set}

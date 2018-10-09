@@ -60,7 +60,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
 
     public render() {
         let page: React.ReactElement<any>;
-        if (this.props.set.value === undefined) {
+        if (this.props.set.value === undefined || this.props.set === undefined) {
             return <p>Loading set</p>;
         }
 

@@ -83,6 +83,10 @@ export class LocalStorageProvider implements IStorageProvider {
         const setId = set.id!;
 
         this.saveSet(set, true);
+        this.saveSetStudyData({
+            setId,
+            cardData: {},
+        }, []);
 
         dispatch(fromActions.Action.addSetBegin(setId, set));
         this.result(() => dispatch(fromActions.Action.addSetComplete(setId)));

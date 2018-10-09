@@ -108,6 +108,7 @@ export function set(state: IRemote<Partial<IFlashCardSet>> = { isFetching: true,
     switch (action.type) {
         case fromActions.LOAD_SET_META_ALL_COMPLETE:
         case fromActions.SAVE_SET_META_COMPLETE:
+        case fromActions.ADD_NEW_SET_COMPLETE:
             return {
                 ...state,
                 isFetching: false,
@@ -155,7 +156,8 @@ export default function sets(state: IRemote<{ [id: string]: IRemote<IFlashCardSe
         case fromActions.SAVE_CARD_FACE_BEGIN:
         case fromActions.SAVE_CARD_FACE_COMPLETE:
             const setId = id(action.payload.setId, action);
-            const previousSet = state.value === undefined ? { isFetching: true, value: undefined } : state.value[setId];
+            const previousSet = state.value === undefined || state.value[setId] === undefined
+                                ? { isFetching: true, value: undefined } : state.value[setId];
             return {
                 ...state,
                 value: {
