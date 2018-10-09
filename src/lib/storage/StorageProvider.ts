@@ -46,4 +46,9 @@ export default interface IStorageProvider {
      * Returns a URI where an exported version of this set can be downloaded
      */
     getExportUri: (setId: string) => string;
+
+    /**
+     * Checks whether the specified set exists
+     */
+    setExists: (setId: string, callback: (setExists: boolean) => void) => void;
 }

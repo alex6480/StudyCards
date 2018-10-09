@@ -1,29 +1,41 @@
 import * as React from "react";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
 import IStorageProvider from "../../lib/storage/StorageProvider";
+import { IAppState } from "../../reducers";
 import SetCardEditor from "../set-card-editor/SetCardEditor";
 import SetExporter from "../SetExporter";
 import SetFilePicker from "./SetFilePicker";
 
-interface ISetImporterProps {
-    storageProvider: IStorageProvider;
+interface ISetImporterOwnProps {
     goToDashboard: () => void;
-    addSet: (set?: IFlashCardSet) => void;
 }
+
+interface ISetImporterStateProps {
+    storage: IStorageProvider;
+}
+
+interface ISetImporterDispatchProps {
+    addSet: (storage: IStorageProvider, set: IFlashCardSet) => void;
+    setExists: (stroage: IStorageProvider, setId: string, callback: (exists: boolean) => void) => void;
+}
+
+interface ISetImporterProps extends ISetImporterStateProps, ISetImporterDispatchProps, ISetImporterOwnProps { }
 
 interface ISetImporterState {
     importedSet: IFlashCardSet | null;
-    mergingSet: IRemote<IFlashCardSet | null>;
+    existingSetExists: boolean;
 }
 
-export default class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> {
+class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> {
     constructor(props: ISetImporterProps) {
         super(props);
         // Set initial state
         this.state = {
             importedSet: null,
-            mergingSet: { isFetching: false },
+            existingSetExists: false,
         };
     }
 
@@ -51,8 +63,8 @@ export default class SetImporter extends React.Component<ISetImporterProps, ISet
                         <SetFilePicker onChange={this.fileChanged.bind(this)}/>
                     </div>
 
-                    { /* Allow the user to decide whether or not the set can be merged */ }
-                    { this.state.importedSet && this.renderMergeBox() }
+                    { /* Allow the user to decide whether or not the set wille replace an existing set */ }
+                    { this.state.importedSet && this.renderReplaceBox() }
                     { this.state.importedSet && <a href="#" className="button is-primary"
                         onClick={this.import.bind(this)}>Import</a> }
                 </div>
@@ -61,46 +73,39 @@ export default class SetImporter extends React.Component<ISetImporterProps, ISet
     }
 
     private fileChanged(set: IFlashCardSet) {
-        this.setState({ importedSet: set });
+        this.props.setExists(this.props.storage, set.id, (exists) => {
+            this.setState({
+                importedSet: set,
+                existingSetExists: exists,
+            });
+        });
     }
 
     private import() {
         if (this.state.importedSet == null) {
             throw new Error("Imported set cannot be null when importing");
         }
-        this.props.addSet(this.state.importedSet);
+        this.props.addSet(this.props.storage, this.state.importedSet);
         this.props.goToDashboard();
     }
 
-    private renderMergeBox() {
+    private renderReplaceBox() {
         if (this.state.importedSet == null) {
             throw new Error("Set must have been imported in order to merge with it");
         }
 
-        if (this.state.mergingSet.isFetching) {
-            return <p>Fetching set to merge with.</p>;
-        }
-
-        const mergingSet = this.state.mergingSet.value;
-        if (mergingSet === undefined) {
-            return <div>Loading</div>;
-        } else if (mergingSet === null) {
-            return <div>
-                <h3 className="title is-3">Merge with preexisting set</h3>
-                <div className="box">The imported set will be imported as a new set as
-                    no suitable set was found to merge it with.</div>
-            </div>;
+        if (this.state.existingSetExists === false) {
+            return <></>;
         } else {
             return <div>
-                <h3 className="title is-3">Merge with preexisting set</h3>
+                <h3 className="title is-3">A version of this set already exists</h3>
                 <div className="box">
-                    <p>The imported set can be merged with the set '{mergingSet.name}'.
-                        Do you want to merge the sets or import it as a new set?</p>
+                    <p>Do you want to overwrite the existing set or import it as a new set?</p>
                     <div className="tabs is-toggle">
                         <ul>
                             <li className="is-active">
                                 <a className="button">
-                                    <span>Merge with existing set</span>
+                                    <span>Overwrite</span>
                                 </a>
                             </li>
                             <li>
@@ -115,3 +120,19 @@ export default class SetImporter extends React.Component<ISetImporterProps, ISet
         }
     }
 }
+
+function mapStateToProps(state: IAppState): ISetImporterStateProps {
+    return {
+        storage: state.storageProvider,
+    };
+}
+
+function mapDispatchToProps(dispatch: Dispatch): ISetImporterDispatchProps {
+    return {
+        addSet: (storage: IStorageProvider, set: IFlashCardSet) => storage.addSet(dispatch, set),
+        setExists: (storage: IStorageProvider, setId: string, callback: (exists: boolean) => void) =>
+            storage.setExists(setId, callback),
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SetImporter);

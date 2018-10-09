@@ -12,23 +12,13 @@ import { Action } from "../reducers/actions";
 import Dashboard from "./dashboard/Dashboard";
 import SetImporter from "./set-importer/ImportPage";
 
-interface IStudyCardsAppStateProps {
-    storageProvider: IStorageProvider;
-}
-
-interface IStudyCardsAppDispatchProps {
-    addSet: (set?: IFlashCardSet, callback?: (id: string) => void) => void;
-}
-
-interface IStudyCardsAppProps extends IStudyCardsAppStateProps, IStudyCardsAppDispatchProps {}
-
 interface IStudyCardsAppState {
     currentSetId: string | null;
     setBeingImported: boolean;
 }
 
-class StudyCardsApp extends React.Component<IStudyCardsAppProps, IStudyCardsAppState> {
-    constructor(props: IStudyCardsAppProps) {
+export default class StudyCardsApp extends React.Component<{}, IStudyCardsAppState> {
+    constructor(props: {}) {
         super(props);
 
         this.state = {
@@ -39,9 +29,7 @@ class StudyCardsApp extends React.Component<IStudyCardsAppProps, IStudyCardsAppS
 
     public render() {
         if (this.state.setBeingImported) {
-            return <SetImporter goToDashboard={this.goToDashboard.bind(this)}
-                        addSet={this.props.addSet}
-                        storageProvider={this.props.storageProvider}/>;
+            return <SetImporter goToDashboard={this.goToDashboard.bind(this)} />;
         } else if (this.state.currentSetId === null) {
             return <Dashboard goToImport={this.goToImport.bind(this)}
                         goToSet={this.goToSet.bind(this)}/>;
@@ -71,17 +59,3 @@ class StudyCardsApp extends React.Component<IStudyCardsAppProps, IStudyCardsAppS
         });
     }
 }
-
-function mapStateToProps(state: IAppState) {
-    return {
-        storageProvider: state.storageProvider,
-    };
-}
-
-function mapDispatchToProps(dispatch: Dispatch): IStudyCardsAppDispatchProps {
-    return {
-        addSet: (set, callback) => dispatch(Action.resetSessionStudyData()),
-    };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(StudyCardsApp);

@@ -1,7 +1,6 @@
 import * as React from "react";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
-import { ParseError } from "../../lib/flashcard/parsers/SetParser";
-import { SetParser } from "../../lib/flashcard/parsers/SetParserV1";
+import parseSet, { ParseError } from "../../lib/flashcard/parsers/parseSet";
 
 interface ISetFilePickerProps {
     onChange?: (set: IFlashCardSet | null) => void;
@@ -76,7 +75,7 @@ export default class SetFilePicker extends React.Component<ISetFilePickerProps, 
         // Verify the integrity of the set
         switch (set.exportVersion) {
             case "1":
-                new SetParser().parse(set, onSuccess, onError);
+                parseSet(set, onSuccess, onError);
             default:
                 onError(["Unknown set format"]);
         }
