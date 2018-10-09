@@ -3,6 +3,7 @@ import IFlashCardSet, { ExportFlashCardSet } from "../lib/flashcard/FlashCardSet
 
 interface ISetExporterProps {
     set: IFlashCardSet;
+    getExportUri: (setId: string) => string;
 }
 
 interface ISetExporterState {
@@ -10,6 +11,14 @@ interface ISetExporterState {
 }
 
 export default class SetExporter extends React.Component<ISetExporterProps, ISetExporterState> {
+    public constructor(props: ISetExporterProps) {
+        super(props);
+
+        this.state = {
+            filename: "",
+        };
+    }
+
     public render() {
         return <div className="container">
             <h3 className="title is-3">Export Set</h3>
@@ -37,10 +46,9 @@ export default class SetExporter extends React.Component<ISetExporterProps, ISet
     }
 
     private export() {
-        const dataStr = "data:text/json;charset=utf-8," +
-            encodeURIComponent(JSON.stringify(new ExportFlashCardSet(this.props.set)));
+        const downloadUri = this.props.getExportUri(this.props.set.id);
         const downloadAnchorNode = document.createElement("a");
-        downloadAnchorNode.setAttribute("href",     dataStr);
+        downloadAnchorNode.setAttribute("href",     downloadUri);
         downloadAnchorNode.setAttribute("download", this.state.filename + ".json");
         document.body.appendChild(downloadAnchorNode); // required for firefox
         downloadAnchorNode.click();

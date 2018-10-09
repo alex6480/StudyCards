@@ -72,7 +72,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                             loadCards={this.loadCards.bind(this)} />;
                 break;
             case SetSection.Export:
-                page = <SetExporter set={this.props.set.value}/>;
+                page = <SetExporter set={this.props.set.value} getExportUri={this.getSetExportUri.bind(this)}/>;
                 break;
             case SetSection.Study:
                 page = <StudySection set={this.props.set.value}
@@ -134,6 +134,10 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                 {page}
             </section>
         </div>;
+    }
+
+    private getSetExportUri(setId: string) {
+        return this.props.storage.getExportUri(setId);
     }
 
     private addNewCard(afterCardId?: string) {

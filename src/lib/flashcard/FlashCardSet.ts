@@ -19,8 +19,12 @@ export class ExportFlashCardSet {
     public readonly exportVersion: string = "1";
 
     constructor(set: IFlashCardSet) {
-        throw new Error("Cannot export at the moment");
-        // this.cards = objectMapString(set.cards, (k, v) => new ExportFlashCard(v));
+        this.cards = objectMapString(set.cards, (k, v) => {
+            if (v.value === undefined) {
+                throw new Error("Flashcards must be fetched from the server prior to creating an export set");
+            }
+            return new ExportFlashCard(v.value);
+        });
         this.name = set.name;
         this.id = set.id;
     }

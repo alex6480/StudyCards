@@ -6,7 +6,7 @@ import * as fromCardStudyData from "../../reducers/cardStudyData";
 import * as fromSet from "../../reducers/set";
 import IFlashCard, { ExportFlashCard } from "../flashcard/flashcard";
 import { IFlashCardFace, IRichTextFlashCardFace } from "../flashcard/FlashCardFace";
-import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
+import IFlashCardSet, { ExportFlashCardSet, IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 import { SetParser } from "../flashcard/parsers/SetParserV1";
 import { ICardStudyData, ISetStudyData, ISetStudyDataMeta } from "../flashcard/StudyData";
 import * as Utils from "../utils";
@@ -152,6 +152,25 @@ export class LocalStorageProvider implements IStorageProvider {
 
         const setId = setMeta.id;
         this.result(() => dispatch(fromActions.Action.saveSetMetaComplete(setId)));
+    }
+
+    public getExportUri(setId: string) {
+        // Load the appropriate data
+        const setMeta = this.getSetMeta(setId);
+        const cards = setMeta.cardOrder.map(cardId => this.getCard(setId, cardId));
+        const set: IFlashCardSet = {
+            ...setMeta,
+            cards: Utils.arrayToObject(cards, card =>
+            [card.id, {
+                isFetching: false,
+                value: card,
+            }]),
+        };
+        // Serialize the set correctly
+        const dataStr = "data:text/json;charset=utf-8," +
+            encodeURIComponent(JSON.stringify(new ExportFlashCardSet(set)));
+
+        return dataStr;
     }
 
     private getCardStudyData(setId: string, cardId: string): ICardStudyData {

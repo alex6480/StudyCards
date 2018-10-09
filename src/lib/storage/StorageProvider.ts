@@ -41,4 +41,9 @@ export default interface IStorageProvider {
      * Saves the card face on the remote host
      */
     saveCardFace: (dispatch: Dispatch, setId: string, cardId: string, face: IFlashCardFace) => void;
+
+    /**
+     * Returns a URI where an exported version of this set can be downloaded
+     */
+    getExportUri: (setId: string) => string;
 }
