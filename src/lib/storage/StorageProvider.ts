@@ -11,6 +11,11 @@ export default interface IStorageProvider {
     loadSetMetaAll: (dispatch: Dispatch) => void;
 
     /**
+     * Saves the metadata for the specified set on the remote source
+     */
+    saveSetMeta: (dispatch: Dispatch, setMeta: Partial<IFlashCardSetMeta>) => void;
+
+    /**
      * Fetches the studydata for the specified set
      */
     loadSetStudyData: (dispatch: Dispatch, setId: string) => void;
@@ -32,5 +37,8 @@ export default interface IStorageProvider {
      */
     addSet: (dispatch: Dispatch, set?: IFlashCardSet) => string;
 
+    /**
+     * Saves the card face on the remote host
+     */
     saveCardFace: (dispatch: Dispatch, setId: string, cardId: string, face: IFlashCardFace) => void;
 }

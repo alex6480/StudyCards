@@ -60,7 +60,7 @@ export class LocalStorageProvider implements IStorageProvider {
         } else {
             cardOrder = cardOrder.concat(cardId);
         }
-        this.saveSetMeta({ ...setMeta, cardOrder });
+        this.saveSetMetaLocal({ ...setMeta, cardOrder });
 
         this.result(() => dispatch(fromActions.Action.addNewCardComplete(setId, cardId)));
 
@@ -136,6 +136,23 @@ export class LocalStorageProvider implements IStorageProvider {
             dispatch(fromActions.Action.saveCardFaceComplete(setId, cardId)));
     }
 
+    public saveSetMeta(dispatch: Dispatch, setMeta: Partial<IFlashCardSetMeta>) {
+        if (setMeta.id === undefined) {
+            throw new Error("Set id must be provided");
+        }
+
+        dispatch(fromActions.Action.saveSetMetaBegin(setMeta));
+
+        const previousSetMeta = this.getSetMeta(setMeta.id);
+        this.saveSetMetaLocal({
+            ...previousSetMeta,
+            ...setMeta,
+        });
+
+        const setId = setMeta.id;
+        this.result(() => dispatch(fromActions.Action.saveSetMetaComplete(setId)));
+    }
+
     private getCardStudyData(setId: string, cardId: string): ICardStudyData {
         const data = localStorage.getItem(this.cardStudyDataKey(setId, cardId));
         if (data === null) {
@@ -174,7 +191,7 @@ export class LocalStorageProvider implements IStorageProvider {
         const {cards, ...rest} = set;
         const setMeta: IFlashCardSetMeta = rest;
 
-        this.saveSetMeta(setMeta);
+        this.saveSetMetaLocal(setMeta);
 
         if (saveCards) {
             // Save the cards
@@ -196,7 +213,7 @@ export class LocalStorageProvider implements IStorageProvider {
         }
     }
 
-    private saveSetMeta(setMeta: IFlashCardSetMeta) {
+    private saveSetMetaLocal(setMeta: IFlashCardSetMeta) {
         // Make sure the set index contains the specified set
         const setIds = this.getSetIds();
         if (setIds.indexOf(setMeta.id) === -1) {

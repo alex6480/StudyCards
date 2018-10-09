@@ -67,11 +67,8 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
 
 function name(state: string = initialState.name, setId: string, action: fromActions.Action): string {
     switch (action.type) {
-        case fromActions.UPDATE_SET_NAME:
-            if (action.payload.setId !== setId) {
-                return state;
-            }
-            return action.payload.name;
+        case fromActions.SAVE_SET_META_BEGIN:
+            return action.payload.setMeta.name !== undefined ? action.payload.setMeta.name : state;
         default:
             return state;
     }
@@ -110,9 +107,16 @@ export function set(state: IRemote<Partial<IFlashCardSet>> = { isFetching: true,
                     action: fromActions.Action): IRemote<IFlashCardSet> {
     switch (action.type) {
         case fromActions.LOAD_SET_META_ALL_COMPLETE:
+        case fromActions.SAVE_SET_META_COMPLETE:
             return {
                 ...state,
                 isFetching: false,
+                value: setValue(state.value, action),
+            };
+        case fromActions.SAVE_SET_META_BEGIN:
+            return {
+                ...state,
+                isFetching: true,
                 value: setValue(state.value, action),
             };
         default:
@@ -141,6 +145,8 @@ export default function sets(state: IRemote<{ [id: string]: IRemote<IFlashCardSe
                 ...state,
                 error: action.payload.message,
             };
+        case fromActions.SAVE_SET_META_BEGIN:
+        case fromActions.SAVE_SET_META_COMPLETE:
         case fromActions.ADD_NEW_CARD_BEGIN:
         case fromActions.ADD_NEW_SET_BEGIN:
         case fromActions.ADD_NEW_SET_COMPLETE:

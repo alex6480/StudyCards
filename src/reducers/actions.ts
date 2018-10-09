@@ -27,7 +27,6 @@ interface IActionsCreatorMapObject {
 
 export type ActionsUnion<A extends IActionsCreatorMapObject> = ReturnType<A[keyof A]>;
 
-export const UPDATE_SET_NAME = "update set name";
 export const DELETE_CARD = "delete card";
 export const RESET_SESSION_STUDY_DATA = "reset session study data";
 export const UPDATE_CARD_STUDY_DATA = "update card study data";
@@ -53,6 +52,9 @@ export const LOAD_SET_STUDY_DATA_COMPLETE = "load set study data complete";
 
 export const LOAD_CARDS_BEGIN = "load cards begin";
 export const LOAD_CARDS_COMPLETE = "load cards complete";
+
+export const SAVE_SET_META_BEGIN = "save set meta begin";
+export const SAVE_SET_META_COMPLETE = "save set meta complete";
 
 export const Action = {
     loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
@@ -82,7 +84,11 @@ export const Action = {
     saveCardFaceComplete: (setId: string, cardId: string) =>
         createAction(SAVE_CARD_FACE_COMPLETE, { setId, cardId }),
 
-    updateSetName: (setId: string, newName: string) => createAction(UPDATE_SET_NAME, { setId, name: newName }),
+    saveSetMetaBegin: (setMeta: Partial<IFlashCardSetMeta>) =>
+        createAction(SAVE_SET_META_BEGIN, { setId: setMeta.id, setMeta }),
+    saveSetMetaComplete: (setId: string) =>
+        createAction(SAVE_SET_META_COMPLETE, { setId }),
+
     deleteCard: (card: IFlashCard) => createAction(DELETE_CARD, card),
     updateCardStudyData: (studyData: ICardStudyData) => createAction(UPDATE_CARD_STUDY_DATA, studyData),
     swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),

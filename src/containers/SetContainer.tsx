@@ -7,7 +7,7 @@ import SetExporter from "../components/SetExporter";
 import StudySection from "../components/study/StudySection";
 import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
-import IFlashCardSet from "../lib/flashcard/FlashCardSet";
+import IFlashCardSet, { IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 import IRemote from "../lib/remote";
 import IStorageProvider from "../lib/storage/StorageProvider";
@@ -28,7 +28,7 @@ interface ISetContainerStateProps extends ISetContainerOwnProps {
 interface ISetContainerDispatchProps {
     addNewCard: (store: IStorageProvider, setId: string, afterCardId?: string) => void;
     deleteCard: (card: IFlashCard) => void;
-    updateSetName: (setId: string, newName: string) => void;
+    saveSetMeta: (storage: IStorageProvider, setMeta: Partial<IFlashCardSetMeta>) => void;
     resetStudySessionData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
     getSetStudyData: (storage: IStorageProvider, setId: string) => void;
@@ -91,9 +91,13 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                 <div className="hero-body">
                     <div className="container">
                         <h1 className="title is-1">
+                            { this.props.set.isFetching &&
+                                <span>SAVING</span>
+                            }
                             <EditableText maxLength={30}
+                                readOnly={this.props.set.isFetching}
                                 value={this.props.set.value.name}
-                                onChange={this.updateSetName.bind(this)}/>
+                                onBlur={this.updateSetName.bind(this)}/>
                         </h1>
                         <nav className="breadcrumb subtitle is-6" aria-label="breadcrumbs">
                             <ul>
@@ -142,7 +146,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
     }
 
     private updateSetName(newName: string) {
-        this.props.updateSetName(this.props.setId, newName);
+        this.props.saveSetMeta(this.props.storage, { id: this.props.setId, name: newName });
     }
 }
 
@@ -161,7 +165,8 @@ function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
             store.addCard(dispatch, setId, afterCardId),
         getSetStudyData: (storage: IStorageProvider, setId: string) => storage.loadSetStudyData(dispatch, setId),
         deleteCard: (card: IFlashCard) => dispatch(Action.deleteCard(card)),
-        updateSetName: (setId: string, newName: string) => dispatch(Action.updateSetName(setId, newName)),
+        saveSetMeta: (storage: IStorageProvider, setMeta: Partial<IFlashCardSetMeta>) =>
+            storage.saveSetMeta(dispatch, setMeta),
         resetStudySessionData: () => dispatch(Action.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Action.updateCardStudyData(studyData)),
         loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) =>
