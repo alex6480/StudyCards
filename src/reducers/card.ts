@@ -55,11 +55,16 @@ export default function card(state: IRemote<Partial<IFlashCard>> = initialState,
                              cardId: string,
                              action: fromActions.Action): IRemote<IFlashCard> {
     switch (action.type) {
-        case fromActions.SAVE_CARD_FACE_BEGIN:
         case fromActions.LOAD_CARDS_BEGIN:
             return {
                 ...state,
-                value: value(state.value, cardId, action),
+                value: undefined, // Don't show empty cards while the real cards are being loaded
+                isFetching: true,
+            };
+        case fromActions.SAVE_CARD_FACE_BEGIN:
+            return {
+                ...state,
+                value: value(state.value, cardId, action), // Show the previous value while saving
                 isFetching: true,
             };
         case fromActions.LOAD_CARDS_COMPLETE:
