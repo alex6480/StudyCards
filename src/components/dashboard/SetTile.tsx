@@ -58,14 +58,6 @@ export default class SetTile extends React.Component<ISetTileProps> {
                                 Edit
                             </a>
                         </p>
-                        <p className="control">
-                            <a href="#" className="button">
-                                <span className="icon is-small">
-                                    <i className="fas fa-trash"></i>
-                                </span>&nbsp;
-                                Delete
-                            </a>
-                        </p>
                     </div>
                 </div>
             </footer>
