@@ -18,7 +18,7 @@ interface IRichTextCardFaceEditorState {
 export interface ICardFaceEditorProps {
     face: IFlashCardFace;
     cardId: string;
-    readOnly: boolean;
+    readOnly?: boolean;
     saveCardFace: (face: IFlashCardFace) => void;
     swapCardFaces: (cardId: string) => void;
 }
