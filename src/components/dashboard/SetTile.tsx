@@ -1,8 +1,10 @@
 import * as React from "react";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
+import IRemote from "../../lib/remote";
 
 interface ISetTileProps {
-    set: IFlashCardSet;
+    set: IRemote<IFlashCardSet>;
+    setId: string;
     goToSet: (setId: string) => void;
 }
 
@@ -14,11 +16,21 @@ export default class SetTile extends React.Component<ISetTileProps> {
     }
 
     public render() {
-        const cardCount = this.props.set.cardOrder.length;
+        if (this.props.set.isFetching || this.props.set.value === undefined) {
+            return <div className="column is-3">
+                <div className="card">
+                    <div className="card-content">
+                        Loading
+                    </div>
+                </div>
+            </div>;
+        }
+
+        const cardCount = this.props.set.value.cardOrder.length;
         return <div className="column is-3">
             <div className="card">
                 <div className="card-content">
-                    <p className="title is-4">{this.props.set.name}</p>
+                    <p className="title is-4">{this.props.set.value.name}</p>
                     <p className="subtitle is-6">{cardCount} {cardCount === 1 ? "card" : "cards"} (26 due today)</p>
                     <p>Last studied <time>September 5th 2018</time></p>
                 </div>
@@ -57,6 +69,6 @@ export default class SetTile extends React.Component<ISetTileProps> {
     }
 
     private goToSetDashboard() {
-        this.props.goToSet(this.props.set.id);
+        this.props.goToSet(this.props.setId);
     }
 }

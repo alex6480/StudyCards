@@ -138,7 +138,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
 }
 
 function mapStateToProps(state: IAppState, ownProps: ICardEditorOwnProps): ICardEditorStateProps {
-    const card = state.sets.value![ownProps.setId].cards[ownProps.cardId];
+    const card = state.sets.value![ownProps.setId].value!.cards[ownProps.cardId];
     return {
         ...ownProps,
         card: card !== undefined ? card : {

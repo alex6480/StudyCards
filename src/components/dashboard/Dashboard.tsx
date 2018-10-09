@@ -15,7 +15,7 @@ interface IDashboardOwnProps {
 }
 
 interface IDashboardStateProps {
-    sets: IRemote<{ [id: string]: IFlashCardSet }>;
+    sets: IRemote<{ [id: string]: IRemote<IFlashCardSet> }>;
     storage: IStorageProvider;
 }
 
@@ -73,10 +73,10 @@ export class Dashboard extends React.Component<IDashboardProps> {
         this.props.goToSet(newSetId);
     }
 
-    private getSetTiles(sets: { [id: string]: IFlashCardSet }) {
+    private getSetTiles(sets: { [id: string]: IRemote<IFlashCardSet> }) {
         const result: React.ReactElement<SetTile>[] = [];
         for (const setId of Object.keys(sets)) {
-            result.push(<SetTile key={setId} set={sets[setId]} goToSet={this.props.goToSet}/>);
+            result.push(<SetTile key={setId} set={sets[setId]} goToSet={this.props.goToSet} setId={setId}/>);
         }
 
         return result;

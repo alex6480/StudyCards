@@ -24,6 +24,10 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
                setId: string,
                action: fromActions.Action): { [id: string]: IRemote<IFlashCard>; } {
     switch (action.type) {
+        case fromActions.LOAD_SET_META_ALL_COMPLETE:
+            return Utils.arrayToObject(action.payload[setId].cardOrder, v => {
+                return state[v] !== undefined ? [v, state[v]] : [v, { isFetching: true, value: undefined }];
+            });
         case fromActions.ADD_NEW_CARD_BEGIN:
             return {
                     ...state,
@@ -87,7 +91,7 @@ function cardOrder(state: string[] = initialState.cardOrder, action: fromActions
     }
 }
 
-export function set(state: Partial<IFlashCardSet> = initialState, action: fromActions.Action): IFlashCardSet {
+export function setValue(state: Partial<IFlashCardSet> = initialState, action: fromActions.Action): IFlashCardSet {
     // Generate a new id if none has been supplied
     const stateId = id(state.id, action);
 
@@ -102,9 +106,26 @@ export function set(state: Partial<IFlashCardSet> = initialState, action: fromAc
     }
 }
 
-export default function sets(state: IRemote<{ [id: string]: IFlashCardSet }>,
-                             action: fromActions.Action): IRemote<{ [id: string]: IFlashCardSet }> {
+export function set(state: IRemote<Partial<IFlashCardSet>> = { isFetching: true, value: initialState },
+                    action: fromActions.Action): IRemote<IFlashCardSet> {
+    switch (action.type) {
+        case fromActions.LOAD_SET_META_ALL_COMPLETE:
+            return {
+                ...state,
+                isFetching: false,
+                value: setValue(state.value, action),
+            };
+        default:
+            return {
+                ...state,
+                isFetching: state.isFetching !== undefined ? state.isFetching : true,
+                value: setValue(state.value, action),
+            };
+    }
+}
 
+export default function sets(state: IRemote<{ [id: string]: IRemote<IFlashCardSet> }>,
+                             action: fromActions.Action): IRemote<{ [id: string]: IRemote<IFlashCardSet> }> {
     switch (action.type) {
         case fromActions.LOAD_SET_META_ALL_BEGIN:
             return { ...state, isFetching: true };
@@ -112,13 +133,8 @@ export default function sets(state: IRemote<{ [id: string]: IFlashCardSet }>,
             return {
                 ...state,
                 isFetching: false,
-                value: Utils.objectMapString(action.payload, (k, loadedSet) => ({
-                    ...loadedSet,
-                    cards: state.value !== undefined
-                        && state.value[loadedSet.id] !== undefined
-                        ? state.value[loadedSet.id].cards
-                        : { },
-                })),
+                value: Utils.objectMapString(action.payload, (k, remoteSet) =>
+                    set({ isFetching: false, value: remoteSet }, action)),
             };
         case fromActions.LOAD_SET_META_ALL_ERROR:
             return {
@@ -133,11 +149,11 @@ export default function sets(state: IRemote<{ [id: string]: IFlashCardSet }>,
         case fromActions.SAVE_CARD_FACE_BEGIN:
         case fromActions.SAVE_CARD_FACE_COMPLETE:
             const setId = id(action.payload.setId, action);
-            const previousSet = state.value === undefined ? undefined : state.value[setId];
+            const previousSet = state.value === undefined ? { isFetching: true, value: undefined } : state.value[setId];
             return {
                 ...state,
                 value: {
-                    [setId]: set({ ...previousSet, id: setId }, action),
+                    [setId]: set({ ...previousSet, value: { ...previousSet.value, id: setId } }, action),
                 },
             };
         default:

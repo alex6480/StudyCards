@@ -10,7 +10,7 @@ import studyData from "./setStudyData";
 
 export interface IAppState {
     storageProvider: IStorageProvider;
-    sets: IRemote<{ [id: string]: IFlashCardSet }>;
+    sets: IRemote<{ [id: string]: IRemote<IFlashCardSet> }>;
     studyData: { [id: string]: IRemote<ISetStudyData> };
 }
 

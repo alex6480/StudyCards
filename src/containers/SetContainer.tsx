@@ -21,7 +21,7 @@ interface ISetContainerOwnProps {
 
 interface ISetContainerStateProps extends ISetContainerOwnProps {
     storage: IStorageProvider;
-    set?: IFlashCardSet;
+    set: IRemote<IFlashCardSet>;
     studyData: IRemote<ISetStudyData>;
 }
 
@@ -60,22 +60,22 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
 
     public render() {
         let page: React.ReactElement<any>;
-        if (this.props.set === undefined) {
+        if (this.props.set.value === undefined) {
             return <p>Loading set</p>;
         }
 
         switch (this.state.section) {
             case SetSection.Edit:
-                page = <SetCardEditor set={this.props.set}
+                page = <SetCardEditor set={this.props.set.value}
                             addNewCard={this.addNewCard.bind(this)}
                             deleteCard={this.props.deleteCard}
                             loadCards={this.loadCards.bind(this)} />;
                 break;
             case SetSection.Export:
-                page = <SetExporter set={this.props.set}/>;
+                page = <SetExporter set={this.props.set.value}/>;
                 break;
             case SetSection.Study:
-                page = <StudySection set={this.props.set}
+                page = <StudySection set={this.props.set.value}
                         resetSessionStudyData={this.props.resetStudySessionData}
                         updateCardStudyData={this.props.updateCardStudyData}
                         studyData={this.props.studyData}
@@ -92,13 +92,15 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                     <div className="container">
                         <h1 className="title is-1">
                             <EditableText maxLength={30}
-                                value={this.props.set.name}
+                                value={this.props.set.value.name}
                                 onChange={this.updateSetName.bind(this)}/>
                         </h1>
                         <nav className="breadcrumb subtitle is-6" aria-label="breadcrumbs">
                             <ul>
                                 <li><a href="#" onClick={this.props.goToDashboard}>My Sets</a></li>
-                                <li className="is-active"><a href="#" aria-current="page">{this.props.set.name}</a></li>
+                                <li className="is-active"><a href="#" aria-current="page">
+                                    {this.props.set.value.name}
+                                </a></li>
                             </ul>
                         </nav>
                     </div>
