@@ -199,7 +199,7 @@ $transition-medium: 0.5s;
 
 .transition.fade {
     opacity: 0;
-    transition: opacity 1s;
+    transition: opacity $transition-short;
     &.is-visible {
         opacity: 1;
     }
