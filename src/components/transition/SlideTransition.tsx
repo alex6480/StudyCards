@@ -19,16 +19,24 @@ export default class SlideTransition extends React.Component<ISlideTransitionPro
 
     constructor(props: ISlideTransitionProps) {
         super(props);
+        let targetHeight: number | undefined;
+        if (props.targetState === "collapsed") {
+            // The initial height is not set and will be fetched from the object itself
+            targetHeight = undefined;
+        } else {
+            // If the element expanding, the initial height will be 0
+            targetHeight = 0;
+        }
         this.state = {
-            targetHeight: undefined,
+            targetHeight,
             isCollapsed: props.targetState !== "collapsed",
         };
     }
 
     public render() {
-        return <div className={"transition slide" + (this.state.isCollapsed ? " collapsed" : "")}
+        return <div className={"transition slide"}
             ref={this.updateTransitionElement.bind(this)}
-            style={{ height: this.state.targetHeight }}
+            style={{ height: this.state.targetHeight, opacity: this.state.isCollapsed ? 0 : 1 }}
             onTransitionEnd={this.handleTransitionEnd.bind(this)}>
             {this.props.children}
         </div>;

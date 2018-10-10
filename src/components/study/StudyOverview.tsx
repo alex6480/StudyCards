@@ -5,6 +5,8 @@ import IRemote from "../../lib/remote";
 import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
 import Tooltip from "../Tooltip";
+import FadeTransition from "../transition/FadeTransition";
+import ResizeTransition from "../transition/ResizeTransition";
 
 interface IStudyOverviewProps {
     set: IRemote<IFlashCardSet>;
@@ -24,16 +26,20 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
             return <div className="columns">
                 <div className="column">
                     <div className="card">
+                    {this.animateCardContent(true,
                         <div className="card-content">
                             Loading
-                        </div>
+                        </div>,
+                    )}
                     </div>
                 </div>
                 <div className="column">
                     <div className="card">
+                    {this.animateCardContent(true,
                         <div className="card-content">
                             Loading
-                        </div>
+                        </div>,
+                    )}
                     </div>
                 </div>
             </div>;
@@ -48,6 +54,7 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
         return <div className="columns same-height">
             <div className="column">
                 <div className="card">
+                {this.animateCardContent(false,
                     <div className="card-content">
                         <p className="title is-4">Begin Study</p>
                         {this.props.set.value.cardOrder.length === 0  ? <>
@@ -72,12 +79,14 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
                                 Study Now
                             </a>
                         </> }
-                    </div>
+                    </div>,
+                )}
                 </div>
             </div>
 
             <div className="column">
                 <div className="card">
+                {this.animateCardContent(false,
                     <div className="card-content">
                         <h2 className="title is-4">Current progress:</h2>
                         <p>{newCardIds.length} cards are&#32;
@@ -90,10 +99,20 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
                                 <span className="tag">review</span>
                             </Tooltip>
                         </p>
-                    </div>
+                    </div>,
+                )}
                 </div>
             </div>
         </div>;
+    }
+
+    private animateCardContent(isPlaceholder: boolean, content: JSX.Element) {
+        // Placeholders just pop into place, while the real content animates
+        return <ResizeTransition doTransition={! isPlaceholder}>
+            <FadeTransition from={isPlaceholder ? "visible" : "hidden"} to={"visible"}>
+                {content}
+            </FadeTransition>
+        </ResizeTransition>;
     }
 
     private handleStartClick() {

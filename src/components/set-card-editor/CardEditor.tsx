@@ -7,6 +7,8 @@ import IRemote from "../../lib/remote";
 import IStorageProvider from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
+import FadeTransition from "../transition/FadeTransition";
+import ResizeTransition from "../transition/ResizeTransition";
 import SlideTransition from "../transition/SlideTransition";
 import CardFaceEditor from "./CardFaceEditor";
 import { CardFaceEditorToolbar } from "./CardFaceEditorToolbar";
@@ -74,8 +76,9 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
 
     public render() {
         let editor: JSX.Element;
-        const fetching = this.props.card.isFetching;
-        if (this.props.card.value === undefined) {
+        const isFetching = this.props.card.isFetching;
+        const isPlaceholder = this.props.card.value === undefined;
+        if (isPlaceholder) {
             // No up to date card is currently available
             editor = <li className="listed-flashcard">
                 <div className="card">
@@ -85,23 +88,23 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                 </div>
             </li>;
         } else {
-            const card = this.props.card.value;
+            const card = this.props.card.value!;
             editor = <li className="listed-flashcard">
-                <div className={"card " + (fetching ? "saving " : "")}>
+                <div className={"card " + (isFetching ? "saving " : "")}>
                     <div className="columns is-gapless is-marginless flashcard-faces same-height">
                         <div className="column is-half flashcard-face">
                             <CardFaceEditor cardId={card.id}
                                 face={card.faces.front}
                                 saveCardFace={this.saveCardFace.bind(this)}
                                 swapCardFaces={this.swapCardFaces.bind(this)}
-                                readOnly={fetching} />
+                                readOnly={isFetching} />
                         </div>
                         <div className="column is-half flashcard-face">
                             <CardFaceEditor cardId={card.id}
                                 face={card.faces.back}
                                 saveCardFace={this.saveCardFace.bind(this)}
                                 swapCardFaces={this.swapCardFaces.bind(this)}
-                                readOnly={fetching} />
+                                readOnly={isFetching} />
                         </div>
                     </div>
                     <div className="card-footer">
@@ -117,7 +120,12 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                     {editor}
                 </SlideTransition>;
             case (CardEditorTransitionState.None):
-                return editor;
+                // Placeholders just pop into place, while the real content animates
+                return <ResizeTransition doTransition={! isPlaceholder}>
+                        <FadeTransition from={isPlaceholder ? "visible" : "hidden"} to={"visible"}>
+                            {editor}
+                        </FadeTransition>
+                    </ResizeTransition>;
             case (CardEditorTransitionState.Collapsing):
                 return <SlideTransition targetState="collapsed">{editor}</SlideTransition>;
         }
