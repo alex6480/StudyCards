@@ -25,7 +25,35 @@ export default class SetTile extends React.Component<ISetTileProps> {
         let isPlaceholder: boolean;
         if (this.props.set.isFetching || this.props.set.value === undefined) {
             isPlaceholder = true;
-            content = <div className="card-content" style={{height: "170px"}}>Loading</div>;
+            content = <>
+                <div className="card-content">
+                    <p className="title is-4">Loading</p>
+                    <p className="subtitle is-6">Please wait</p>
+                    <p>&nbsp;</p>
+                </div>
+                <footer className="card-footer">
+                    <div className="card-footer-item">
+                        <div className="field has-addons">
+                            <p className="control">
+                                <a href="#" className="button is-primary" onClick={this.goToStudy.bind(this)}>
+                                    <span className="icon is-small">
+                                        <i className="fas fa-book"></i>
+                                    </span>&nbsp;
+                                    Study
+                                </a>
+                            </p>
+                            <p className="control">
+                                <a href="#" className="button" onClick={this.goToEdit.bind(this)}>
+                                    <span className="icon is-small">
+                                        <i className="fas fa-pen"></i>
+                                    </span>&nbsp;
+                                    Edit
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </footer>
+            </>;
         } else {
             const cardCount = this.props.set.value.cardOrder.length;
             isPlaceholder = false;
