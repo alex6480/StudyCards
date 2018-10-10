@@ -49,7 +49,8 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
             { /* Button below card */ }
             { this.state.showBack
             ? <div>
-                <p>How good is your memory of this card?</p>
+                <br />
+                <p className="title is-5">How good is your memory of this card?</p>
                 <div className="buttons">
                     <a className="button" onClick={this.evaluateCard(Study.CardEvaluation.Poor).bind(this)}>
                         Poor
@@ -61,7 +62,6 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
                         Good
                     </a>
                 </div>
-                <p className="title is-5">Explanation</p>
                 <p>
                     <strong>Poor:</strong> You did not remember this card at all,
                     or missed important details of the card. You will be shown the card again this session.
