@@ -10,6 +10,7 @@ interface IResizeTransitionProps {
 
 interface IResizeTransitionState {
     targetHeight?: number;
+    transitionComplete: boolean;
 }
 
 export default class ResizeTransition extends React.Component<IResizeTransitionProps, IResizeTransitionState> {
@@ -23,13 +24,14 @@ export default class ResizeTransition extends React.Component<IResizeTransitionP
         super(props);
         this.state = {
             targetHeight: undefined,
+            transitionComplete: false,
         };
     }
 
     public render() {
         return <div className={this.props.doTransition === false ? "" : "transition slide"}
             ref={this.updateTransitionElement.bind(this)}
-            style={{ height: this.state.targetHeight }}
+            style={{ height: this.state.transitionComplete ? undefined : this.state.targetHeight }}
             onTransitionEnd={this.handleTransitionEnd.bind(this)}>
             {this.props.children}
         </div>;
@@ -45,6 +47,9 @@ export default class ResizeTransition extends React.Component<IResizeTransitionP
                 return;
             }
         }
+
+        // Allow auto height in the future
+        this.setState({ transitionComplete: true });
 
         if (this.props.onResizeComplete !== undefined) {
             this.props.onResizeComplete();
@@ -62,6 +67,7 @@ export default class ResizeTransition extends React.Component<IResizeTransitionP
             if (targetHeight !== this.state.targetHeight) {
                 this.setState({
                     targetHeight,
+                    transitionComplete: false,
                 });
             }
         }
