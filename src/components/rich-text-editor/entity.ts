@@ -1,7 +1,6 @@
 import { ContentBlock, ContentState, EditorState, Modifier, SelectionState } from "draft-js";
 import * as React from "react";
 import "react-dom";
-import { RevealEntity } from "./RevealEntity";
 
 export enum EntityType {
     Reveal = "reveal",

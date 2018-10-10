@@ -3,7 +3,7 @@ import * as React from "react";
 import "../../../node_modules/draft-js/dist/Draft.css";
 import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import DropDown from "../rich-text-editor/DropDown";
-import { RevealDecorator, RevealEntity } from "../rich-text-editor/RevealEntity";
+import { RevealEditorDecorator } from "../rich-text-editor/RevealEntity";
 import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
 import { ToolbarButton, ToolbarButtonBlock, ToolbarButtonInline } from "../rich-text-editor/ToolbarButton";
 import { CardFaceEditorToolbar } from "./CardFaceEditorToolbar";
@@ -32,7 +32,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
         if (props.face.type === FlashCardFaceType.RichText) {
             const editorState = props.face.richTextContent != null
             ? EditorState.createWithContent(props.face.richTextContent, new CompositeDecorator([
-                RevealDecorator,
+                RevealEditorDecorator,
             ]))
             : EditorState.createEmpty();
 
@@ -50,11 +50,10 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
 
     public componentWillReceiveProps(newProps: ICardFaceEditorProps) {
         if (newProps.face.type === FlashCardFaceType.RichText) {
+            const decorator = new CompositeDecorator([ RevealEditorDecorator ]);
             const editorState = newProps.face.richTextContent != null
-            ? EditorState.createWithContent(newProps.face.richTextContent, new CompositeDecorator([
-                RevealDecorator,
-            ]))
-            : EditorState.createEmpty();
+                                ? EditorState.createWithContent(newProps.face.richTextContent, decorator)
+                                : EditorState.createEmpty(decorator);
 
             this.setState({
                 faceType: newProps.face.type,

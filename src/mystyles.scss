@@ -140,7 +140,7 @@ $transition-medium: 0.5s;
     }
 }
 
-.reveal-editor-field {
+.reveal-field {
     cursor: pointer;
     color: #AAA;
     &:before {
@@ -150,6 +150,12 @@ $transition-medium: 0.5s;
     &:after {
         content: "]";
         color: black;
+    }
+    &.editor {
+        cursor: inherit;
+    }
+    &.is-revealed {
+        color: lighten($text, 10%);
     }
 }
 
