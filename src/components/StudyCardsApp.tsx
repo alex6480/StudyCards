@@ -1,7 +1,6 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import SetContainer, { SetSection } from "../containers/SetContainer";
 import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
@@ -11,6 +10,7 @@ import { IAppState } from "../reducers";
 import { Action } from "../reducers/actions";
 import Dashboard from "./dashboard/Dashboard";
 import SetImporter from "./set-importer/ImportPage";
+import SetContainer, { SetSection } from "./SetContainer";
 
 interface IStudyCardsAppState {
     currentSetId: string | null;

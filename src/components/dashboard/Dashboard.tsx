@@ -1,12 +1,12 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { SetSection } from "../../containers/SetContainer";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
 import IStorageProvider from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
+import { SetSection } from "../SetContainer";
 import AddNewSetTile from "./AddNewSetTile";
 import SetTile from "./SetTile";
 

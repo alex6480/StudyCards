@@ -1,7 +1,7 @@
 import * as React from "react";
-import { SetSection } from "../../containers/SetContainer";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
+import { SetSection } from "../SetContainer";
 import FadeTransition from "../transition/FadeTransition";
 import SlideTransition from "../transition/SlideTransition";
 

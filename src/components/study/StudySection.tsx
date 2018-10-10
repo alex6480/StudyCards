@@ -1,10 +1,10 @@
 import * as React from "react";
-import { SetSection } from "../../containers/SetContainer";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../../lib/flashcard/StudyData";
 import IRemote from "../../lib/remote";
 import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
+import { SetSection } from "../SetContainer";
 import PresentedCard from "./PresentedCard";
 import StudyOverview from "./StudyOverview";
 

@@ -1,10 +1,6 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import EditableText from "../components/rich-text-editor/EditableText";
-import SetCardEditor from "../components/set-card-editor/SetCardEditor";
-import SetExporter from "../components/SetExporter";
-import StudySection from "../components/study/StudySection";
 import IFlashCard from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
@@ -13,6 +9,11 @@ import IRemote from "../lib/remote";
 import IStorageProvider from "../lib/storage/StorageProvider";
 import { IAppState } from "../reducers";
 import { Action } from "../reducers/actions";
+import EditableText from "./rich-text-editor/EditableText";
+import SetCardEditor from "./set-card-editor/SetCardEditor";
+import SetExporter from "./SetExporter";
+import SetHeader from "./SetHeader";
+import StudySection from "./study/StudySection";
 
 interface ISetContainerOwnProps {
     goToDashboard: () => void;
@@ -89,31 +90,9 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
         }
 
         return <div>
-            <section className="hero is-primary">
-                <div className="hero-body">
-                    <div className="container">
-                        <h1 className="title is-1">
-                            { this.props.set.isFetching &&
-                                <span className="icon is-large">
-                                    <i className=" fas fa-spinner fa-pulse "></i>
-                                </span>
-                            }
-                            <EditableText maxLength={30}
-                                readOnly={this.props.set.isFetching}
-                                value={this.props.set.value.name}
-                                onBlur={this.updateSetName.bind(this)}/>
-                        </h1>
-                        <nav className="breadcrumb subtitle is-6" aria-label="breadcrumbs">
-                            <ul>
-                                <li><a href="#" onClick={this.props.goToDashboard}>My Sets</a></li>
-                                <li className="is-active"><a href="#" aria-current="page">
-                                    {this.props.set.value.name}
-                                </a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </section>
+            <SetHeader set={this.props.set}
+                updateSetName={this.updateSetName.bind(this)}
+                goToDashboard={this.props.goToDashboard.bind(this)} />
             <nav className="navbar" role="navigation" aria-label="main navigation">
                 <div className="navbar-menu container">
                     <div className="navbar-start">
