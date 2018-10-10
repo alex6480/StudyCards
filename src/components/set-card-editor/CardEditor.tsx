@@ -83,7 +83,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
             editor = <li className="listed-flashcard">
                 <div className="card">
                     { /* Show empty div instead of toolbar */ }
-                    <div style={{height: "56px"}}></div>
+                    <div style={{height: "56px", borderBottom: "2px solid #dbdbdb"}}></div>
                     <div className="columns is-gapless is-marginless flashcard-faces same-height">
                         <div className="column is-half flashcard-face">
                             <div className="card-content">
