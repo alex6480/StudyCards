@@ -45,7 +45,7 @@ export default class SetHeader extends React.Component<ISetHeaderProps> {
         } else {
             // Show a normal editable text
             return <EditableText maxLength={30}
-                readOnly={true}
+                readOnly={false}
                 value={this.props.set.value.name}
                 onBlur={this.props.updateSetName.bind(this)}/>;
         }
