@@ -77,7 +77,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                 page = <SetExporter set={this.props.set.value} getExportUri={this.getSetExportUri.bind(this)}/>;
                 break;
             case SetSection.Study:
-                page = <StudySection set={this.props.set.value}
+                page = <StudySection set={this.props.set}
                         resetSessionStudyData={this.props.resetStudySessionData}
                         updateCardStudyData={this.props.updateCardStudyData}
                         studyData={this.props.studyData}

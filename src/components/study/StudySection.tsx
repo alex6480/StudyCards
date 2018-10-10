@@ -9,7 +9,7 @@ import PresentedCard from "./PresentedCard";
 import StudyOverview from "./StudyOverview";
 
 interface IStudySectionProps {
-    set: IFlashCardSet;
+    set: IRemote<IFlashCardSet>;
     studyData: IRemote<ISetStudyData>;
     resetSessionStudyData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
@@ -39,20 +39,21 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
     }
 
     public render() {
-        if (this.props.studyData === undefined || this.props.studyData.isFetching
+        if (this.state.currentSession === undefined
+            || this.props.set.value === undefined
             || this.props.studyData.value === undefined) {
-            return <div className="container"><p>Loading</p></div>;
-        } else if (this.state.currentSession === undefined) {
+            // A session can never be started when set or studydata is unavailable
+            // The extra parts to the if statement are just to satisfy the type checker
             return <div className="container">
                 <StudyOverview set={this.props.set}
-                    studyData={this.props.studyData.value}
+                    studyData={this.props.studyData}
                     maxNewCards={this.StudyMaxNewCards}
                     maxTotalCards={this.StudyMaxTotalCards}
                     startStudy={this.startStudy.bind(this)}
                     goToSetEditor={() => this.props.goToSection(SetSection.Edit)}/>
             </div>;
         } else {
-            const card = this.props.set.cards[this.state.currentSession.currentCardId];
+            const card = this.props.set.value.cards[this.state.currentSession.currentCardId];
             return <div className="container">
                 <p>{this.state.currentSession.deck.length}&#32;
                     {Utils.plural("card", this.state.currentSession.deck.length)} left</p>
