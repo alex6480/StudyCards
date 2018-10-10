@@ -239,7 +239,9 @@ $transition-medium: 0.5s;
         }
     }
 
+    display: block;
     overflow: hidden;
+    
     &::before {
         content: " ";
         border-radius: $radius-small;

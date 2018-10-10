@@ -82,9 +82,26 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
             // No up to date card is currently available
             editor = <li className="listed-flashcard">
                 <div className="card">
-                    <div className="card-content">
-                        <p>Loading</p>
+                    { /* Show empty div instead of toolbar */ }
+                    <div style={{height: "56px"}}></div>
+                    <div className="columns is-gapless is-marginless flashcard-faces same-height">
+                        <div className="column is-half flashcard-face">
+                            <div className="card-content">
+                                <p><span className="placeholder-text" style={{width: "64%"}}></span></p>
+                                <p><span className="placeholder-text"></span></p>
+                                <p><span className="placeholder-text" style={{width: "32%"}}></span></p>
+                            </div>
+                        </div>
+                        <div className="column is-half flashcard-face">
+                            <div className="card-content">
+                                <p><span className="placeholder-text"></span></p>
+                                <p><span className="placeholder-text" style={{width: "70%"}}></span></p>
+                                <p><span className="placeholder-text" style={{width: "54%"}}></span></p>
+                            </div>
+                        </div>
                     </div>
+                    { /* Show empty div instead of footer */ }
+                    <div style={{height: "41px"}}></div>
                 </div>
             </li>;
         } else {
