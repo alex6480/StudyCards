@@ -45,7 +45,7 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
         const knownCardsInStudy = Math.min(knownCardIds.length, this.props.maxTotalCards - newCardsInStudy);
         const p = Utils.plural;
 
-        return <div className="columns">
+        return <div className="columns same-height">
             <div className="column">
                 <div className="card">
                     <div className="card-content">

@@ -88,7 +88,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
             const card = this.props.card.value;
             editor = <li className="listed-flashcard">
                 <div className={"card " + (fetching ? "saving " : "")}>
-                    <div className="columns is-gapless is-marginless flashcard-faces">
+                    <div className="columns is-gapless is-marginless flashcard-faces same-height">
                         <div className="column is-half flashcard-face">
                             <CardFaceEditor cardId={card.id}
                                 face={card.faces.front}

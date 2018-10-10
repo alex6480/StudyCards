@@ -17,7 +17,7 @@ export interface ICardFaceEditorToolbarProps {
 
 export class CardFaceEditorToolbar extends React.Component<ICardFaceEditorToolbarProps, {}> {
     public render() {
-        return <div className="card-header flashcard-toolbar">
+        return <div className="card-header flashcard-face-toolbar">
             <div className="field">
                 <ToolbarButton editorState={this.props.editorState}
                     onClick={this.props.swapFaces.bind(this)}>

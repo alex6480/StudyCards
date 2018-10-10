@@ -54,15 +54,6 @@ $transition-medium: 0.5s;
 // These should be moved to appropriate locations
 // Used by the RichFieldEditor
 .listed-flashcard {
-    & .flashcard-toolbar {
-        display: flex;
-        padding: 0.25rem;
-        flex-wrap: wrap;
-
-        > .field {
-            margin: 0.25rem;
-        }
-    }
     & .tag-editor {
         padding: 0.5rem;
         .tag-input {
@@ -72,16 +63,18 @@ $transition-medium: 0.5s;
     }
     & > .card {
         & > .flashcard-faces {
-            justify-content: stretch;
-
             & .flashcard-face {
-                // Make content take up entire height
-                display: flex;
-                justify-content: stretch;
-                flex-direction: column;
+                & .flashcard-face-toolbar {
+                    display: flex;
+                    padding: 0.25rem;
+                    flex-wrap: wrap;
+                    flex-grow: 0;
 
+                    > .field {
+                        margin: 0.25rem;
+                    }
+                }
                 & .flashcard-face-content {
-                    flex-grow: 1;
                     &:not(:first-child) {
                         border-left: 1px solid $grey-lighter;
                     }
@@ -97,6 +90,22 @@ $transition-medium: 0.5s;
         transition: box-shadow $transition-short;
         &.saving {
             box-shadow: 0 0 5px $primary;
+        }
+    }
+}
+
+/**
+ * Class can be added to bulma columns and child column and their children will all have the same height
+ */
+.columns.same-height {
+    justify-content: stretch;
+    & > .column {
+        display: flex;
+        justify-content: stretch;
+        flex-direction: column;
+
+        & > * {
+            flex-grow: 1;
         }
     }
 }
