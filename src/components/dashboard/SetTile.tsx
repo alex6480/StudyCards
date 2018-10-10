@@ -27,9 +27,12 @@ export default class SetTile extends React.Component<ISetTileProps> {
             isPlaceholder = true;
             content = <>
                 <div className="card-content">
-                    <p className="title is-4">&nbsp;</p>
-                    <p className="subtitle is-6">&nbsp;</p>
-                    <p>&nbsp;</p>
+                    <p className="title is-4"><div className="placeholder-text" style={{width: "60%"}}></div></p>
+                    <p className="subtitle is-6"><div className="placeholder-text"></div></p>
+                    <p>
+                        <div className="placeholder-text"></div>
+                        <div className="placeholder-text"></div>
+                    </p>
                     <div style={{height: "61px"}}></div>
                 </div>
             </>;

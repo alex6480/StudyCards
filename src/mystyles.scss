@@ -228,3 +228,31 @@ $transition-medium: 0.5s;
     transition: opacity $transition-short;
     transition-timing-function: ease-in-out;
 }
+
+.placeholder-text {
+    @keyframes placeHolderShimmer{
+        0%{
+            background-position: -468px 0
+        }
+        100%{
+            background-position: 468px 0
+        }
+    }
+
+    overflow: hidden;
+    &::before {
+        content: " ";
+        $placeholder-color: $grey-lighter;
+        display: block;
+        height: 0.8em;
+        margin: 0.1em 0;
+        animation-duration: 1.5s;
+        animation-fill-mode: forwards;
+        animation-iteration-count: infinite;
+        animation-name: placeHolderShimmer;
+        animation-timing-function: linear;
+        background: $placeholder-color;
+        background: linear-gradient(to right, $placeholder-color 8%, darken($placeholder-color, 8%) 18%, $placeholder-color 33%);
+        background-size: 800px 104px;
+    }
+}
