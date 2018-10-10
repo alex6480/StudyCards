@@ -242,6 +242,7 @@ $transition-medium: 0.5s;
     overflow: hidden;
     &::before {
         content: " ";
+        border-radius: $radius-small;
         $placeholder-color: $grey-lighter;
         display: block;
         height: 0.8em;
