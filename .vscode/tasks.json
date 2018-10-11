@@ -31,7 +31,7 @@
             "args": [
                 "--display-modules",
                 "--progress",
-                "-d"
+                "-p"
             ]
         },
         {
