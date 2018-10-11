@@ -1,4 +1,5 @@
 import { ContentState, convertFromRaw, RawDraftContentState } from "draft-js";
+import { markdownToDraft } from "markdown-draft-js";
 import * as Utils from "../../utils";
 import IFlashCard, { ExportFlashCard } from "../flashcard";
 import { ExportFlashCardFace, ExportRichTextFlashCardFace, FlashCardFaceId,
@@ -119,8 +120,8 @@ function parseFaceType(face: ExportFlashCardFace, onError: onErrorHandler) {
 }
 
 function parseRichTextContent(face: ExportRichTextFlashCardFace, onError: onErrorHandler) {
-    const raw = JSON.parse(face.richTextContent) as RawDraftContentState;
     try {
+        const raw = markdownToDraft(face.richTextContent, {});
         return convertFromRaw(raw);
     } catch (e) {
         onError("Unable to parse richTextContent for a face");
