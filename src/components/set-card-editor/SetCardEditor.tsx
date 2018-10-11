@@ -70,7 +70,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
                 const card = this.props.set.cards[id];
                 // Add the actual card editor
                 cardsWithDividers.push(
-                    <CardEditor key={id} setId={this.props.set.id} cardId={id} doTransition={!this.isFirstRender}/>,
+                    <CardEditor key={id} setId={this.props.set.id} cardId={id} slideIn={!this.isFirstRender}/>,
                 );
 
                 // Add a divider / add card button as long as the card is not the last

@@ -28,7 +28,7 @@ interface ICardEditorOwnProps {
      * Whether or not this card should have an animated transition when it is added to the DOM
      * Default: true
      */
-    doTransition?: boolean;
+    slideIn?: boolean;
 }
 
 interface ICardEditorStateProps extends ICardEditorOwnProps {
@@ -46,9 +46,10 @@ interface ICardEditorDispatchProps {
 interface ICardEditorProps extends ICardEditorStateProps, ICardEditorDispatchProps { }
 
 enum CardEditorTransitionState {
-    Expanding,
+    SlideIn,
     None,
     Collapsing,
+    PlaceholderLoad,
 }
 
 /**
@@ -66,11 +67,11 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     constructor(props: ICardEditorProps) {
         super(props);
 
-        const doTransition = props.doTransition === undefined || props.doTransition === true;
+        const slideIn = props.slideIn === undefined || props.slideIn === true;
         this.state = {
             activeFace: "front",
             tags: [],
-            transitionState: doTransition ? CardEditorTransitionState.Expanding : CardEditorTransitionState.None,
+            transitionState: slideIn ? CardEditorTransitionState.SlideIn : CardEditorTransitionState.PlaceholderLoad,
         };
     }
 
@@ -132,17 +133,20 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
         }
 
         switch (this.state.transitionState) {
-            case (CardEditorTransitionState.Expanding):
+            case (CardEditorTransitionState.SlideIn):
                 return <SlideTransition targetState="expanded" onSlideComplete={this.introComplete.bind(this)}>
                     {editor}
                 </SlideTransition>;
             case (CardEditorTransitionState.None):
+                return editor;
+            case (CardEditorTransitionState.PlaceholderLoad):
                 // Placeholders just pop into place, while the real content animates
                 return <ResizeTransition doTransition={! isPlaceholder}>
-                        <FadeTransition from={isPlaceholder ? "visible" : "hidden"} to={"visible"}>
-                            {editor}
-                        </FadeTransition>
-                    </ResizeTransition>;
+                    <FadeTransition from={isPlaceholder ? "visible" : "hidden"} to={"visible"}
+                                    onFadeComplete={this.introComplete.bind(this)}>
+                        {editor}
+                    </FadeTransition>
+                </ResizeTransition>;
             case (CardEditorTransitionState.Collapsing):
                 return <SlideTransition targetState="collapsed">{editor}</SlideTransition>;
         }

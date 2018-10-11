@@ -33,7 +33,7 @@ export default class FadeTransition extends React.Component<IFadeTransitionProps
     }
 
     public render() {
-        const className = this.state.doTransition ? "transition fade" : "";
+        const className = this.state.doTransition ? "transition fade" : "transition";
         return <div className={className}
             onTransitionEnd={this.handleTransitionEnd.bind(this)}
             ref={this.updateTransitionElement.bind(this)}

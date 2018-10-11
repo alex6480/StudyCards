@@ -212,6 +212,10 @@ $transition-medium: 0.5s;
     }
 }
 
+.transition {
+    will-change: transform;
+}
+
 .transition.slide {
     overflow: hidden;
     transition: height $transition-short, opacity $transition-short;
@@ -241,7 +245,7 @@ $transition-medium: 0.5s;
 
     display: block;
     overflow: hidden;
-    
+
     &::before {
         content: " ";
         border-radius: $radius-small;
