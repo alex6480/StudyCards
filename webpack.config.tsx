@@ -1,10 +1,10 @@
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+import ExtractTextPlugin from "extract-text-webpack-plugin";
 
 module.exports = {
     entry: "./src/index.tsx",
     output: {
         filename: "bundle.js",
-        path: __dirname + "/dist"
+        path: __dirname + "/dist",
     },
 
     // Enable sourcemaps for debugging webpack's output.
@@ -12,7 +12,7 @@ module.exports = {
 
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".ts", ".d.ts", ".tsx", ".js", ".json"]
+        extensions: [".ts", ".d.ts", ".tsx", ".js", ".json"],
     },
 
     module: {
@@ -27,20 +27,20 @@ module.exports = {
                 loader: "source-map-loader",
                 exclude: [
                     // These modules have broken source maps
-                    /react-rte/
-                ]
+                    /react-rte/,
+                ],
             },
 
             // Compile scss files
             {
                 test: /\.scss$/,
                 use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
+                    fallback: "style-loader",
                     use: [
-                        'css-loader',
-                        'sass-loader'
-                    ]
-                })
+                        "css-loader",
+                        "sass-loader",
+                    ],
+                }),
             },
 
             // Compile less files
@@ -48,15 +48,15 @@ module.exports = {
                 test: /\.less$/,
                 use: [
                     {
-                        loader: "style-loader"
+                        loader: "style-loader",
                     },
                     {
-                        loader: "css-loader"
+                        loader: "css-loader",
                     },
                     {
-                        loader: "less-loader"
-                    }
-                ]
+                        loader: "less-loader",
+                    },
+                ],
             },
 
             // Load plain css
@@ -64,18 +64,18 @@ module.exports = {
                 test: /\.css$/,
                 use: [
                     {
-                        loader: "style-loader"
+                        loader: "style-loader",
                     },
                     {
-                        loader: "css-loader"
-                    }
-                ]   
+                        loader: "css-loader",
+                    },
+                ],
             },
-        ]
+        ],
     },
 
     plugins: [
-        new ExtractTextPlugin('bundle.css'),
+        new ExtractTextPlugin("bundle.css"),
     ],
 
     // When importing a module whose path matches one of the following, just
@@ -84,6 +84,6 @@ module.exports = {
     // dependencies, which allows browsers to cache those libraries between builds.
     externals: {
         "react": "React",
-        "react-dom": "ReactDOM"
-    }
+        "react-dom": "ReactDOM",
+    },
 };
