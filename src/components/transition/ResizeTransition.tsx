@@ -29,7 +29,7 @@ export default class ResizeTransition extends React.Component<IResizeTransitionP
     }
 
     public render() {
-        return <div className={this.props.doTransition === false ? "transition" : "transition slide"}
+        return <div className={this.props.doTransition === false ? "transition" : "transition resize"}
             ref={this.updateTransitionElement.bind(this)}
             style={{ height: this.state.transitionComplete ? undefined : this.state.targetHeight }}
             onTransitionEnd={this.handleTransitionEnd.bind(this)}>

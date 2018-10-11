@@ -214,23 +214,25 @@ $transition-medium: 0.5s;
 
 .transition {
     will-change: transform;
-}
 
-.transition.slide {
-    overflow: hidden;
-    transition: height $transition-short, opacity $transition-short;
-    transition-timing-function: ease-in-out;
-    background-color: white;
+    &.slide {
+        overflow: hidden;
+        transition: height $transition-short, opacity $transition-short;
+        transition-timing-function: ease-out;
+        background-color: white;
 
-    &.collapsed {
-        height: 0px;
-        opacity: 0;
     }
-}
 
-.transition.fade {
-    transition: opacity $transition-short;
-    transition-timing-function: ease-in-out;
+    &.resize {
+        overflow: hidden;
+        transition: height $transition-short, opacity $transition-short;
+        transition-timing-function: ease-in-out;
+    }
+
+    &.fade {
+        transition: opacity $transition-short;
+        transition-timing-function: ease-in-out;
+    }
 }
 
 .placeholder-text {
