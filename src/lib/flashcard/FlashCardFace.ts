@@ -1,5 +1,4 @@
 import { ContentState, convertToRaw } from "draft-js";
-import { draftToMarkdown } from "markdown-draft-js";
 
 export type FlashCardFaceId = "back" | "front";
 
@@ -41,18 +40,7 @@ export class ExportRichTextFlashCardFace {
         this.type = face.type;
         const rawContent = face.richTextContent != null ? convertToRaw(face.richTextContent) : null;
         if (rawContent !== null) {
-            this.richTextContent = draftToMarkdown(rawContent, {
-                entityItems: {
-                    reveal: {
-                        open(entity: Draft.Entity) {
-                          return '<span class="reveal">';
-                        },
-                        close(entity: Draft.Entity) {
-                          return "</span>";
-                        },
-                    },
-                },
-            });
+            this.richTextContent = JSON.stringify(rawContent);
         } else {
             this.richTextContent = "";
         }

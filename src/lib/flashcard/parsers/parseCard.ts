@@ -1,11 +1,10 @@
 import { ContentState, convertFromRaw, RawDraftContentState } from "draft-js";
-import { markdownToDraft } from "markdown-draft-js";
 import * as Utils from "../../utils";
 import IFlashCard, { ExportFlashCard } from "../flashcard";
 import { ExportFlashCardFace, ExportRichTextFlashCardFace, FlashCardFaceId,
     FlashCardFaceType, IFlashCardFace } from "../FlashCardFace";
 import { onErrorHandler, ParseError } from "./parseSet";
-import remarkableRevealPlugin from "./remarkableRevealPlugin";
+// import remarkableRevealPlugin from "./remarkableRevealPlugin";
 
 export default function parse(card: ExportFlashCard, setId: string): IFlashCard | ParseError[] {
     const errors: ParseError[] = [];
@@ -122,9 +121,7 @@ function parseFaceType(face: ExportFlashCardFace, onError: onErrorHandler) {
 
 function parseRichTextContent(face: ExportRichTextFlashCardFace, onError: onErrorHandler) {
     try {
-        const raw = markdownToDraft(face.richTextContent, {
-            remarkablePlugins: [remarkableRevealPlugin],
-        });
+        const raw = JSON.parse(face.richTextContent) as RawDraftContentState;
         return convertFromRaw(raw);
     } catch (e) {
         onError("Unable to parse richTextContent for a face");
