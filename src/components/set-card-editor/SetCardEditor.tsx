@@ -7,7 +7,7 @@ import CardEditor from "./CardEditor";
 
 interface ISetCardEditorProps {
     onChange?: (newSet: IFlashCardSet) => void;
-    addNewCard: (afterCardId?: string) => void;
+    addNewCard: (afterCardId?: string) => string;
     deleteCard: (card: IFlashCard) => void;
     loadCards: (cardIds: string[]) => void;
     set: IFlashCardSet;
@@ -25,14 +25,14 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
     /**
      * The number of pixels from the bottom of the screen until more cards are loaded
      */
-    private loadNextCardsAt = 500;
+    private loadNextCardsAt = 1500;
     private scrollListener = this.onScroll.bind(this);
 
     /**
      * Indicates whether the current render is the first one taking place
      * Used to prevent card animations when they are first added in
      */
-    private isFirstRender: boolean = true;
+    private newlyAddedCards: {[id: string]: boolean} = {};
 
     constructor(props: ISetCardEditorProps) {
         super(props);
@@ -42,7 +42,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
         };
 
         // Load the cards to be edited
-        props.loadCards(props.set.cardOrder);
+        props.loadCards(props.set.cardOrder.slice(0, this.cardsToLoadAtOnce));
     }
 
     public render() {
@@ -59,12 +59,9 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
             { /* Button for adding new card to the set*/ }
             <CardDivider
                 isSubtle={false}
-                addCard={this.props.addNewCard}
+                addCard={this.addNewCard.bind(this)}
             />
         </div>;
-
-        // Make sure future card transitions will be shown
-        this.isFirstRender = false;
 
         return content;
     }
@@ -88,12 +85,15 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
             // This deck contains cards and they should be rendered
             const cardsWithDividers: JSX.Element[] = [];
             let index = 0;
-            for (let i = 0; i < this.state.loadedCards; i++) {
+            for (let i = 0; i < Math.min(this.state.loadedCards, this.props.set.cardOrder.length); i++) {
                 const cardId = this.props.set.cardOrder[i];
                 const card = this.props.set.cards[cardId];
                 // Add the actual card editor
                 cardsWithDividers.push(
-                    <CardEditor key={cardId} setId={this.props.set.id} cardId={cardId} slideIn={!this.isFirstRender}/>,
+                    <CardEditor key={cardId}
+                                setId={this.props.set.id}
+                                cardId={cardId}
+                                slideIn={this.newlyAddedCards[cardId] === true}/>,
                 );
 
                 // Add a divider / add card button as long as the card is not the last
@@ -102,9 +102,12 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
                         afterCardId={cardId}
                         key={"divider-" + cardId}
                         isSubtle={true}
-                        addCard={this.props.addNewCard}
+                        addCard={this.addNewCard.bind(this)}
                     />);
                 }
+
+                // Make sure the card doesn't show a slide transition in the future
+                delete this.newlyAddedCards[cardId];
 
                 index++;
             }
@@ -121,8 +124,32 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
         const screenHeight = window.innerHeight;
 
         if (docHeight - (scrollPos + screenHeight) < this.loadNextCardsAt) {
-            const newLoadedCards = Math.min(this.state.loadedCards + this.cardsToLoadAtOnce,
-                                            this.props.set.cardOrder.length);
+            this.showMoreCards(this.cardsToLoadAtOnce);
+        }
+    }
+
+    private addNewCard(afterCardId?: string) {
+        const newCardId = this.props.addNewCard(afterCardId);
+        // Load one extra card to ensure that the newly added card can be shown
+        this.setState({ loadedCards: this.state.loadedCards + 1 });
+        this.newlyAddedCards[newCardId] = true;
+    }
+
+    /**
+     * Renders more cards
+     * @param cardNumber The number of new cards to show
+     * @param loadCards Whether or not to syncronize the latest cards with the remote server
+     */
+    private showMoreCards(cardNumber: number, loadCards: boolean = true) {
+        const loadingCards = this.props.set.cardOrder.filter(c => this.props.set.cards[c].isFetching === true);
+        // Only load more cards if the cards from the last loading have actually been loaded
+        if (loadCards === false || loadingCards.length < this.cardsToLoadAtOnce) {
+            const newLoadedCards = Math.min(this.state.loadedCards + cardNumber,
+            this.props.set.cardOrder.length);
+
+            if (loadCards) {
+                this.props.loadCards(this.props.set.cardOrder.slice(this.state.loadedCards, newLoadedCards));
+            }
             this.setState({ loadedCards:  newLoadedCards});
         }
     }

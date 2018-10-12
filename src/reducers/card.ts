@@ -25,13 +25,13 @@ export const initialCard: IFlashCard = {
         },
     },
 };
-export const initialState = { isFetching: true, lastUpdated: Date.now(), value: initialCard };
+export const initialState = { isFetching: false, lastUpdated: Date.now(), value: undefined };
 
-function value(state: Partial<IFlashCard> = initialState.value,
-               cardId: string, action: fromActions.Action): IFlashCard {
+function value(state: Partial<IFlashCard> | undefined,
+               cardId: string, action: fromActions.Action): IFlashCard | undefined {
     switch (action.type) {
         default:
-            return {
+            return state === undefined ? undefined : {
                 id: cardId,
                 setId: state.setId as string,
                 faces: faces(state.faces, action),
@@ -56,11 +56,13 @@ export default function card(state: IRemote<Partial<IFlashCard>> = initialState,
                              action: fromActions.Action): IRemote<IFlashCard> {
     switch (action.type) {
         case fromActions.LOAD_CARDS_BEGIN:
-            return {
-                ...state,
-                value: undefined, // Don't show default cards while the real cards are being loaded
-                isFetching: true,
-            };
+            if (cardId in action.payload.cardIds) {
+                return {
+                    ...state,
+                    value: undefined, // Don't show default cards while the real cards are being loaded
+                    isFetching: true,
+                };
+            }
         case fromActions.SAVE_CARD_FACE_BEGIN:
             return {
                 ...state,

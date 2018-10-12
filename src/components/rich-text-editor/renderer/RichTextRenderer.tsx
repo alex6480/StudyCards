@@ -71,7 +71,6 @@ const RichTextBlockRenderer: React.SFC<IRichTextBlockRendererProps> = (props) =>
         case "unordered-list-item":
             return <li>{ props.block.getText() }</li>;
         default:
-            console.log(props.block.getType());
             return <div style={{color: "red"}}>test</div>;
     }
 };

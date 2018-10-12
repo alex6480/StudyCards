@@ -26,7 +26,7 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
     switch (action.type) {
         case fromActions.LOAD_SET_META_ALL_COMPLETE:
             return Utils.arrayToObject(action.payload[setId].cardOrder, v => {
-                return state[v] !== undefined ? [v, state[v]] : [v, { isFetching: true, value: undefined }];
+                return state[v] !== undefined ? [v, state[v]] : [v, { isFetching: false, value: undefined }];
             });
         case fromActions.ADD_NEW_CARD_BEGIN:
             return {

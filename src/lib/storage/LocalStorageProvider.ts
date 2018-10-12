@@ -127,7 +127,7 @@ export class LocalStorageProvider implements IStorageProvider {
         if (setMeta === null) {
             throw new Error("Set " + setId + " does not exist");
         }
-        for (const cardId of setMeta.cardOrder) {
+        for (const cardId of cardIds) {
             cards.push(this.getCard(setId, cardId));
         }
 
