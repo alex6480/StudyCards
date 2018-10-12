@@ -75,6 +75,10 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
         };
     }
 
+    public shouldComponentUpdate(newProps: ICardEditorProps) {
+        return newProps.card !== this.props.card;
+    }
+
     public render() {
         let editor: JSX.Element;
         const isFetching = this.props.card.isFetching;
