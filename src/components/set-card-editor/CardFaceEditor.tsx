@@ -3,6 +3,7 @@ import * as React from "react";
 import "../../../node_modules/draft-js/dist/Draft.css";
 import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import DropDown from "../rich-text-editor/DropDown";
+import RichTextRenderer from "../rich-text-editor/renderer/RichTextRenderer";
 import { RevealEditorDecorator } from "../rich-text-editor/RevealEntity";
 import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
 import { ToolbarButton, ToolbarButtonBlock, ToolbarButtonInline } from "../rich-text-editor/ToolbarButton";
@@ -12,7 +13,7 @@ type ICardFaceEditorState = IRichTextCardFaceEditorState;
 
 interface IRichTextCardFaceEditorState {
     faceType: FlashCardFaceType;
-    editorState: EditorState;
+    editorState?: EditorState;
 }
 
 export interface ICardFaceEditorProps {
@@ -23,13 +24,15 @@ export interface ICardFaceEditorProps {
     swapCardFaces: (cardId: string) => void;
 }
 
-export default class CardFaceEditor extends React.Component<ICardFaceEditorProps, ICardFaceEditorState> {
+export default class CardFaceEditor extends React.PureComponent<ICardFaceEditorProps, ICardFaceEditorState> {
     private editor: Editor | null = null;
 
     constructor(props: ICardFaceEditorProps) {
         super(props);
 
-        if (props.face.type === FlashCardFaceType.RichText) {
+        this.state = { faceType: props.face.type };
+
+        /* if (props.face.type === FlashCardFaceType.RichText) {
             const editorState = props.face.richTextContent != null
             ? EditorState.createWithContent(props.face.richTextContent, new CompositeDecorator([
                 RevealEditorDecorator,
@@ -45,7 +48,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
                 faceType: props.face.type,
                 editorState: EditorState.createEmpty(),
             };
-        }
+        } */
     }
 
     public componentWillReceiveProps(newProps: ICardFaceEditorProps) {
@@ -57,7 +60,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
 
             this.setState({
                 faceType: newProps.face.type,
-                editorState,
+                // editorState,
             });
         }
     }
@@ -76,14 +79,15 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
             case FlashCardFaceType.RichText:
                 content = <div className="flashcard-face-content card-content content"
                             onClick={this.focusEditor.bind(this)}>
-                    <Editor
+                    { /* <Editor
                         readOnly={this.props.readOnly}
                         editorState={this.state.editorState}
                         onChange={this.onChange.bind(this)}
                         ref={editor => this.editor = editor}
                         onBlur={this.onBlur.bind(this)}
                         placeholder={this.props.face.id === "front" ? "Front" : "Back"}
-                    />
+                    /> */ }
+                    <RichTextRenderer content={this.props.face.richTextContent} />
                 </div>;
                 break;
             case FlashCardFaceType.None:
@@ -110,7 +114,7 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
     }
 
     private onChange(editorState: EditorState) {
-        this.setState({ editorState });
+        // this.setState({ editorState });
     }
 
     private swapFaces() {
@@ -130,11 +134,11 @@ export default class CardFaceEditor extends React.Component<ICardFaceEditorProps
     }
 
     private updateGlobalState() {
-        if (this.props.face.type === FlashCardFaceType.RichText) {
+        /* if (this.props.face.type === FlashCardFaceType.RichText) {
             this.props.saveCardFace({
                 ...this.props.face,
                 richTextContent: this.state.editorState.getCurrentContent(),
             });
-        }
+        } */
     }
 }

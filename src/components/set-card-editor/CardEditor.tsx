@@ -55,15 +55,7 @@ enum CardEditorTransitionState {
 /**
  * A card that is part of a cardlist
  */
-class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
-    private faceEditors: {
-        front: CardFaceEditor | null,
-        back: CardFaceEditor | null,
-    } = {
-        front: null,
-        back: null,
-    };
-
+class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState> {
     constructor(props: ICardEditorProps) {
         super(props);
 
@@ -73,10 +65,6 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
             tags: [],
             transitionState: slideIn ? CardEditorTransitionState.SlideIn : CardEditorTransitionState.PlaceholderLoad,
         };
-    }
-
-    public shouldComponentUpdate(newProps: ICardEditorProps) {
-        return newProps.card !== this.props.card;
     }
 
     public render() {
@@ -115,18 +103,18 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                 <div className={"card " + (isFetching ? "saving " : "")}>
                     <div className="columns is-gapless is-marginless flashcard-faces same-height">
                         <div className="column is-half flashcard-face">
-                            <CardFaceEditor cardId={card.id}
+                            { <CardFaceEditor cardId={card.id}
                                 face={card.faces.front}
                                 saveCardFace={this.saveCardFace.bind(this)}
                                 swapCardFaces={this.swapCardFaces.bind(this)}
-                                readOnly={isFetching} />
+                                readOnly={isFetching} /> }
                         </div>
                         <div className="column is-half flashcard-face">
-                            <CardFaceEditor cardId={card.id}
+                        { <CardFaceEditor cardId={card.id}
                                 face={card.faces.back}
                                 saveCardFace={this.saveCardFace.bind(this)}
                                 swapCardFaces={this.swapCardFaces.bind(this)}
-                                readOnly={isFetching} />
+                            readOnly={isFetching} /> }
                         </div>
                     </div>
                     <div className="card-footer">

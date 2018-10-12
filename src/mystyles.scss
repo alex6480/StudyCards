@@ -213,9 +213,8 @@ $transition-medium: 0.5s;
 }
 
 .transition {
-    will-change: transform;
-
     &.slide {
+        will-change: height;
         overflow: hidden;
         transition: height $transition-short, opacity $transition-short;
         transition-timing-function: ease-out;

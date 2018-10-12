@@ -13,7 +13,21 @@ interface ISetCardEditorProps {
     set: IFlashCardSet;
 }
 
-export default class SetCardEditor extends React.Component<ISetCardEditorProps> {
+interface ISetCardEditorState {
+    loadedCards: number;
+}
+
+export default class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorState> {
+    /**
+     * How many cards to load every time more cards are loaded
+     */
+    private cardsToLoadAtOnce = 10;
+    /**
+     * The number of pixels from the bottom of the screen until more cards are loaded
+     */
+    private loadNextCardsAt = 500;
+    private scrollListener = this.onScroll.bind(this);
+
     /**
      * Indicates whether the current render is the first one taking place
      * Used to prevent card animations when they are first added in
@@ -24,7 +38,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
         super(props);
         // Set initial state
         this.state = {
-            cardBeingEdited: undefined,
+            loadedCards: this.cardsToLoadAtOnce,
         };
 
         // Load the cards to be edited
@@ -55,6 +69,14 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
         return content;
     }
 
+    public componentWillMount() {
+        window.addEventListener("scroll", this.scrollListener);
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener("scroll", this.scrollListener);
+    }
+
     private get cardCount(): number {
         return this.props.set.cardOrder.length;
     }
@@ -66,18 +88,19 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
             // This deck contains cards and they should be rendered
             const cardsWithDividers: JSX.Element[] = [];
             let index = 0;
-            for (const id of this.props.set.cardOrder) {
-                const card = this.props.set.cards[id];
+            for (let i = 0; i < this.state.loadedCards; i++) {
+                const cardId = this.props.set.cardOrder[i];
+                const card = this.props.set.cards[cardId];
                 // Add the actual card editor
                 cardsWithDividers.push(
-                    <CardEditor key={id} setId={this.props.set.id} cardId={id} slideIn={!this.isFirstRender}/>,
+                    <CardEditor key={cardId} setId={this.props.set.id} cardId={cardId} slideIn={!this.isFirstRender}/>,
                 );
 
                 // Add a divider / add card button as long as the card is not the last
                 if (index !== this.props.set.cardOrder.length - 1) {
                     cardsWithDividers.push(<CardDivider
-                        afterCardId={id}
-                        key={"divider-" + id}
+                        afterCardId={cardId}
+                        key={"divider-" + cardId}
                         isSubtle={true}
                         addCard={this.props.addNewCard}
                     />);
@@ -89,6 +112,18 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps> 
             return <ul>
                 { cardsWithDividers }
             </ul>;
+        }
+    }
+
+    private onScroll() {
+        const scrollPos = window.scrollY;
+        const docHeight = document.body.scrollHeight;
+        const screenHeight = window.innerHeight;
+
+        if (docHeight - (scrollPos + screenHeight) < this.loadNextCardsAt) {
+            const newLoadedCards = Math.min(this.state.loadedCards + this.cardsToLoadAtOnce,
+                                            this.props.set.cardOrder.length);
+            this.setState({ loadedCards:  newLoadedCards});
         }
     }
 }

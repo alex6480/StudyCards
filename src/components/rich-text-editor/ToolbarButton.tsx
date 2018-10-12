@@ -4,7 +4,7 @@ import { BlockStyle, InlineStyle } from "./styles";
 
 interface IToolbarButtonProps {
     onClick?: (e: React.MouseEvent) => void;
-    editorState: EditorState;
+    editorState?: EditorState;
     icon?: string;
 }
 
@@ -82,6 +82,9 @@ export class ToolbarButtonInline extends ToolbarButton<IToolbarButtonInlineProps
     }
 
     private isActive(props: IToolbarButtonInlineProps) {
+        if (props.editorState === undefined) {
+            return false;
+        }
         const currentStyle = props.editorState.getCurrentInlineStyle();
         return currentStyle.has(this.props.type);
     }
@@ -117,6 +120,10 @@ export class ToolbarButtonBlock extends ToolbarButton<IToolbarButtonBlockProps> 
     }
 
     private isActive(props: IToolbarButtonProps) {
+        if (props.editorState === undefined) {
+            return false;
+        }
+
         const selection = props.editorState.getSelection();
         const content = props.editorState.getCurrentContent();
         const selectionStartBlockKey = selection.getStartKey();

@@ -8,7 +8,10 @@ import { ToolbarButton, ToolbarButtonBlock, ToolbarButtonInline } from "../rich-
 import CardFaceTypeSelect from "./CardFaceTypeSelect";
 
 export interface ICardFaceEditorToolbarProps {
-    editorState: EditorState;
+    /**
+     * When editorstate is undefined, a non-functional toolbar will be rendered
+     */
+    editorState?: EditorState;
     face: IFlashCardFace;
     swapFaces: () => void;
     onChange: (newState: EditorState) => void;
@@ -65,16 +68,22 @@ export class CardFaceEditorToolbar extends React.Component<ICardFaceEditorToolba
     }
 
     private toggleReveal() {
-        new RevealEntity().toggle(this.props.editorState, (newEditorState: EditorState) => {
-            this.props.onChange(newEditorState);
-        });
+        if (this.props.editorState !== undefined) {
+            new RevealEntity().toggle(this.props.editorState, (newEditorState: EditorState) => {
+                this.props.onChange(newEditorState);
+            });
+        }
     }
 
     private toggleInlineStyle(style: InlineStyle) {
-        this.props.onChange(RichUtils.toggleInlineStyle(this.props.editorState, style));
+        if (this.props.editorState !== undefined) {
+            this.props.onChange(RichUtils.toggleInlineStyle(this.props.editorState, style));
+        }
     }
 
     private toggleBlockStyle(style: BlockStyle) {
-        this.props.onChange(RichUtils.toggleBlockType(this.props.editorState, style));
+        if (this.props.editorState !== undefined) {
+            this.props.onChange(RichUtils.toggleBlockType(this.props.editorState, style));
+        }
     }
 }

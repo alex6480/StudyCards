@@ -15,7 +15,7 @@ export interface IAppState {
 }
 
 const initialState: IAppState = {
-    storageProvider: new LocalStorageProvider(1000),
+    storageProvider: new LocalStorageProvider(0),
     sets: { isFetching: false, value: undefined },
     studyData: { },
 };
