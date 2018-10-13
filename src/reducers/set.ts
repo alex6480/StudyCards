@@ -54,6 +54,11 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
                 ...Utils.objectMapString(action.payload.cards,
                     (cardId, value) => card(state[cardId], cardId, action)),
             };
+        case fromActions.DELETE_CARD_COMPLETE:
+            const {[action.payload.cardId]: deletedCard, ...rest} = state;
+            return {
+                ...rest,
+            };
         case fromActions.SAVE_CARD_FACE_BEGIN:
         case fromActions.SAVE_CARD_FACE_COMPLETE:
             return {
@@ -83,6 +88,8 @@ function cardOrder(state: string[] = initialState.cardOrder, action: fromActions
             } else {
                 return state.concat(action.payload.cardId);
             }
+        case fromActions.DELETE_CARD_COMPLETE:
+            return state.filter(cardId => cardId !== action.payload.cardId);
         default:
             return state;
     }
@@ -155,6 +162,7 @@ export default function sets(state: IRemote<{ [id: string]: IRemote<IFlashCardSe
         case fromActions.LOAD_CARDS_COMPLETE:
         case fromActions.SAVE_CARD_FACE_BEGIN:
         case fromActions.SAVE_CARD_FACE_COMPLETE:
+        case fromActions.DELETE_CARD_COMPLETE:
             const setId = id(action.payload.setId, action);
             const previousSet = state.value === undefined || state.value[setId] === undefined
                                 ? { isFetching: true, value: undefined } : state.value[setId];

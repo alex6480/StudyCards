@@ -73,6 +73,25 @@ export class LocalStorageProvider implements IStorageProvider {
         return cardId;
     }
 
+    public deleteCard(dispatch: Dispatch, setId: string, cardId: string) {
+        dispatch(fromActions.Action.deleteCardBegin(setId, cardId));
+
+        // Remove it from the card order
+        const setMeta = this.getSetMeta(setId);
+        if (setMeta !== null) {
+            this.saveSetMetaLocal({
+                ...setMeta,
+                cardOrder: setMeta.cardOrder.filter(c => c !== cardId),
+            });
+        }
+        // Remove the card data
+        localStorage.removeItem(this.cardKey(setId, cardId));
+
+        console.log("DELETE STUDY DATA AS WELL");
+
+        this.result(() => dispatch(fromActions.Action.deleteCardComplete(setId, cardId)));
+    }
+
     public addSet(dispatch: Dispatch, set?: IFlashCardSet) {
         if (set === undefined || set.id === undefined) {
             set = {

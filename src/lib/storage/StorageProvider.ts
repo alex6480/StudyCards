@@ -32,6 +32,11 @@ export default interface IStorageProvider {
     addCard: (dispatch: Dispatch, setId: string, afterCardId?: string) => string;
 
     /**
+     * Deletes the specified card
+     */
+    deleteCard: (dispatch: Dispatch, setId: string, cardId: string) => void;
+
+    /**
      * Adds the specified set. A set with the same id cannot exist
      * Returns the id of the newly added set
      */

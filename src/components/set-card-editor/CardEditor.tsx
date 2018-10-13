@@ -38,7 +38,7 @@ interface ICardEditorStateProps extends ICardEditorOwnProps {
 }
 
 interface ICardEditorDispatchProps {
-    deleteCard: (card: IFlashCard) => void;
+    deleteCard: (storage: IStorageProvider, setId: string, cardId: string) => void;
     saveCardFace: (storage: IStorageProvider, setId: string, cardId: string, face: IFlashCardFace) => void;
     swapCardFaces: (setId: string, cardId: string) => void;
     loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) => void;
@@ -123,7 +123,7 @@ class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState>
                             <TagEditor tags={this.state.tags} onChange={this.updateTags.bind(this)} />
                         </div>
                     </div>
-                    <CardSidebar />
+                    <CardSidebar onDelete={this.delete.bind(this)}/>
                 </div>
             </li>;
         }
@@ -144,7 +144,9 @@ class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState>
                     </FadeTransition>
                 </ResizeTransition>;
             case (CardEditorTransitionState.Collapsing):
-                return <SlideTransition targetState="collapsed">{editor}</SlideTransition>;
+                return <SlideTransition targetState="collapsed" onSlideComplete={this.deleteFinal.bind(this)}>
+                    {editor}
+                </SlideTransition>;
         }
     }
 
@@ -163,6 +165,14 @@ class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState>
     private updateTags(newTags: string[]) {
         this.setState({tags: newTags});
     }
+
+    private delete() {
+        this.setState({ transitionState: CardEditorTransitionState.Collapsing });
+    }
+
+    private deleteFinal() {
+        this.props.deleteCard(this.props.storage, this.props.setId, this.props.cardId);
+    }
 }
 
 function mapStateToProps(state: IAppState, ownProps: ICardEditorOwnProps): ICardEditorStateProps {
@@ -179,7 +189,8 @@ function mapStateToProps(state: IAppState, ownProps: ICardEditorOwnProps): ICard
 
 function mapDispatchToProps(dispatch: Dispatch): ICardEditorDispatchProps {
     return {
-        deleteCard: (card: IFlashCard) => dispatch(Action.deleteCard(card)),
+        deleteCard: (storage: IStorageProvider, setId: string, cardId: string) =>
+            storage.deleteCard(dispatch, setId, cardId),
         saveCardFace: (storage: IStorageProvider, setId: string, cardId: string, face: IFlashCardFace) =>
             storage.saveCardFace(dispatch, setId, cardId, face),
         swapCardFaces: (setId: string, cardId: string) => dispatch(Action.swapCardFaces(setId, cardId)),

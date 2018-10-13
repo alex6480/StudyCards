@@ -61,21 +61,29 @@ export default class SlideTransition extends React.Component<ISlideTransitionPro
     private updateTransitionElement(e: HTMLDivElement) {
         this.transitionElement = e;
         if (this.transitionElement !== null) {
-            let targetHeight = 0;
+            let elementHeight = 0;
             for (const child of this.transitionElement.children) {
-                targetHeight += (child as HTMLElement).offsetHeight;
+                elementHeight += (child as HTMLElement).offsetHeight;
             }
 
-            if (targetHeight !== this.state.targetHeight) {
-                if (this.props.targetState === "expanded") {
-                    // Begin expanding straight away
+            if (this.props.targetState === "expanded" && elementHeight !== this.state.targetHeight) {
+                // Begin expanding straight away
+                this.setState({
+                    targetHeight: elementHeight,
+                    isCollapsed: false,
+                });
+            } else if (this.props.targetState === "collapsed" && this.state.targetHeight !== 0) {
+                // First set target height to the full height of the element
+                if (this.state.targetHeight !== elementHeight) {
                     this.setState({
-                        targetHeight,
+                        targetHeight: elementHeight,
                         isCollapsed: false,
                     });
                 } else {
-                    // We need to update the height first before we begin collapsing
-                    this.setState({ targetHeight });
+                    this.setState({
+                        targetHeight: 0,
+                        isCollapsed: true,
+                    });
                 }
             }
         }

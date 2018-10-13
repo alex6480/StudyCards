@@ -8,7 +8,6 @@ import CardEditor from "./CardEditor";
 interface ISetCardEditorProps {
     onChange?: (newSet: IFlashCardSet) => void;
     addNewCard: (afterCardId?: string) => string;
-    deleteCard: (card: IFlashCard) => void;
     loadCards: (cardIds: string[]) => void;
     set: IFlashCardSet;
 }

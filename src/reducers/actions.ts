@@ -27,12 +27,14 @@ interface IActionsCreatorMapObject {
 
 export type ActionsUnion<A extends IActionsCreatorMapObject> = ReturnType<A[keyof A]>;
 
-export const DELETE_CARD = "delete card";
 export const RESET_SESSION_STUDY_DATA = "reset session study data";
 export const UPDATE_CARD_STUDY_DATA = "update card study data";
 export const SWAP_CARD_FACES = "swap card faces";
 
 // Remote actions
+export const DELETE_CARD_BEGIN = "delete card begin";
+export const DELETE_CARD_COMPLETE = "delete card complete";
+
 export const SAVE_CARD_FACE_BEGIN = "save card face begin";
 export const SAVE_CARD_FACE_COMPLETE = "save card face complete";
 
@@ -89,7 +91,9 @@ export const Action = {
     saveSetMetaComplete: (setId: string) =>
         createAction(SAVE_SET_META_COMPLETE, { setId }),
 
-    deleteCard: (card: IFlashCard) => createAction(DELETE_CARD, card),
+    deleteCardBegin: (setId: string, cardId: string) => createAction(DELETE_CARD_BEGIN, { cardId, setId }),
+    deleteCardComplete: (setId: string, cardId: string) => createAction(DELETE_CARD_COMPLETE, { cardId, setId }),
+
     updateCardStudyData: (studyData: ICardStudyData) => createAction(UPDATE_CARD_STUDY_DATA, studyData),
     swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),
 

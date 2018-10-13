@@ -29,7 +29,6 @@ interface ISetContainerStateProps extends ISetContainerOwnProps {
 
 interface ISetContainerDispatchProps {
     addNewCard: (store: IStorageProvider, setId: string, afterCardId?: string) => void;
-    deleteCard: (card: IFlashCard) => void;
     saveSetMeta: (storage: IStorageProvider, setMeta: Partial<IFlashCardSetMeta>) => void;
     resetStudySessionData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
@@ -70,7 +69,6 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
             case SetSection.Edit:
                 page = <SetCardEditor set={this.props.set.value}
                             addNewCard={this.addNewCard.bind(this)}
-                            deleteCard={this.props.deleteCard}
                             loadCards={this.loadCards.bind(this)} />;
                 break;
             case SetSection.Export:
@@ -153,7 +151,6 @@ function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
         addNewCard: (store: IStorageProvider, setId: string, afterCardId?: string) =>
             store.addCard(dispatch, setId, afterCardId),
         getSetStudyData: (storage: IStorageProvider, setId: string) => storage.loadSetStudyData(dispatch, setId),
-        deleteCard: (card: IFlashCard) => dispatch(Action.deleteCard(card)),
         saveSetMeta: (storage: IStorageProvider, setMeta: Partial<IFlashCardSetMeta>) =>
             storage.saveSetMeta(dispatch, setMeta),
         resetStudySessionData: () => dispatch(Action.resetSessionStudyData()),
