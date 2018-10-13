@@ -62,7 +62,24 @@ $transition-medium: 0.5s;
         }
     }
     & > .card {
-        & > .flashcard-faces {
+        display: flex;
+
+        & .flashcard-sidebar {
+            display: flex;
+            padding: 0.25rem;
+            justify-content: center;
+            flex-direction: column;
+            border-left: 1px solid $grey-lighter;
+            & > a {
+                color: $text;
+                margin: 0.25rem;
+            }
+        }
+        & > .main {
+            flex-grow: 1;
+        }
+        
+        & .flashcard-faces {
             & .flashcard-face {
                 & .flashcard-face-toolbar {
                     display: flex;
@@ -76,7 +93,7 @@ $transition-medium: 0.5s;
                 }
                 & .flashcard-face-content {
                     &:not(:first-child) {
-                        border-left: 1px solid $grey-lighter;
+                        /* border-left: 1px solid $grey-lighter; */
                     }
 
                     &.no-content {

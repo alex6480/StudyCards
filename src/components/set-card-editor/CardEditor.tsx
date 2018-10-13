@@ -12,6 +12,7 @@ import ResizeTransition from "../transition/ResizeTransition";
 import SlideTransition from "../transition/SlideTransition";
 import CardFaceEditor from "./CardFaceEditor";
 import { CardFaceEditorToolbar } from "./CardFaceEditorToolbar";
+import { CardSidebar } from "./CardSidebar";
 import { TagEditor } from "./TagEditor";
 
 interface ICardEditorState {
@@ -73,7 +74,7 @@ class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState>
         const isPlaceholder = this.props.card.value === undefined;
         if (isPlaceholder) {
             // No up to date card is currently available
-            editor = <li className="listed-flashcard">
+            editor = <li>
                 <div className="card">
                     { /* Show empty div instead of toolbar */ }
                     <div style={{height: "56px", borderBottom: "2px solid #dbdbdb"}}></div>
@@ -101,25 +102,28 @@ class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState>
             const card = this.props.card.value!;
             editor = <li className="listed-flashcard">
                 <div className={"card " + (isFetching ? "saving " : "")}>
-                    <div className="columns is-gapless is-marginless flashcard-faces same-height">
-                        <div className="column is-half flashcard-face">
+                    <div className="main">
+                        <div className="columns is-gapless is-marginless flashcard-faces same-height">
+                            <div className="column is-half flashcard-face">
+                                { <CardFaceEditor cardId={card.id}
+                                    face={card.faces.front}
+                                    saveCardFace={this.saveCardFace.bind(this)}
+                                    swapCardFaces={this.swapCardFaces.bind(this)}
+                                    readOnly={isFetching} /> }
+                            </div>
+                            <div className="column is-half flashcard-face">
                             { <CardFaceEditor cardId={card.id}
-                                face={card.faces.front}
-                                saveCardFace={this.saveCardFace.bind(this)}
-                                swapCardFaces={this.swapCardFaces.bind(this)}
-                                readOnly={isFetching} /> }
+                                    face={card.faces.back}
+                                    saveCardFace={this.saveCardFace.bind(this)}
+                                    swapCardFaces={this.swapCardFaces.bind(this)}
+                                    readOnly={isFetching} /> }
+                            </div>
                         </div>
-                        <div className="column is-half flashcard-face">
-                        { <CardFaceEditor cardId={card.id}
-                                face={card.faces.back}
-                                saveCardFace={this.saveCardFace.bind(this)}
-                                swapCardFaces={this.swapCardFaces.bind(this)}
-                            readOnly={isFetching} /> }
+                        <div className="card-footer">
+                            <TagEditor tags={this.state.tags} onChange={this.updateTags.bind(this)} />
                         </div>
                     </div>
-                    <div className="card-footer">
-                        <TagEditor tags={this.state.tags} onChange={this.updateTags.bind(this)} />
-                    </div>
+                    <CardSidebar />
                 </div>
             </li>;
         }
