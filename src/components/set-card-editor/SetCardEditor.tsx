@@ -87,8 +87,8 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
             const unloadedCards = this.props.set.cardOrder.filter(c => this.props.set.cards[c].isFetching === false
                                                                         && this.props.set.cards[c].value !== undefined);
             const maxCards = Math.min(this.state.shownCards, // Don't show more of the set than the limit
-                                      this.props.set.cardOrder.length, // Don't attemp to show more cards than there are
-                                      unloadedCards.length + 2); // Only show at the most 2 unloaded cards
+                                      this.props.set.cardOrder.length, // Don't attempt to show more cards than there are
+                                      unloadedCards.length + 2); // Never show more than 2 placeholders
             let index = 0;
             for (let i = 0; i < maxCards; i++) {
                 const cardId = this.props.set.cardOrder[i];
