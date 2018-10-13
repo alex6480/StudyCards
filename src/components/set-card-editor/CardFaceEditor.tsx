@@ -2,11 +2,7 @@ import { CompositeDecorator, ContentState, Editor, EditorState, RichUtils } from
 import * as React from "react";
 import "../../../node_modules/draft-js/dist/Draft.css";
 import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
-import DropDown from "../rich-text-editor/DropDown";
-import RichTextRenderer from "../rich-text-editor/renderer/RichTextRenderer";
 import { RevealEditorDecorator } from "../rich-text-editor/RevealEntity";
-import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
-import { ToolbarButton, ToolbarButtonBlock, ToolbarButtonInline } from "../rich-text-editor/ToolbarButton";
 import { CardFaceEditorToolbar } from "./CardFaceEditorToolbar";
 
 type ICardFaceEditorState = IRichTextCardFaceEditorState;

@@ -2,7 +2,7 @@ import { EditorState, RichUtils } from "draft-js";
 import * as React from "react";
 import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import * as Utils from "../../lib/utils";
-import DropDown, { DropDownItem } from "../rich-text-editor/DropDown";
+import { DropDown, DropDownItem } from "../rich-text-editor/DropDown";
 import { RevealEntity } from "../rich-text-editor/RevealEntity";
 import { BlockStyle, InlineStyle } from "../rich-text-editor/styles";
 import { ToolbarButton, ToolbarButtonBlock, ToolbarButtonInline } from "../rich-text-editor/ToolbarButton";
