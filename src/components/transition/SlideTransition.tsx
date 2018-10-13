@@ -34,7 +34,7 @@ export default class SlideTransition extends React.Component<ISlideTransitionPro
     }
 
     public render() {
-        return <div className={"transition slide"}
+        return <div className={"transition slide is-clearfix"}
             ref={this.updateTransitionElement.bind(this)}
             style={{ height: this.state.targetHeight, opacity: this.state.isCollapsed ? 0 : 1 }}
             onTransitionEnd={this.handleTransitionEnd.bind(this)}>
@@ -63,7 +63,7 @@ export default class SlideTransition extends React.Component<ISlideTransitionPro
         if (this.transitionElement !== null) {
             let elementHeight = 0;
             for (const child of this.transitionElement.children) {
-                elementHeight += (child as HTMLElement).offsetHeight;
+                elementHeight += (child as HTMLElement).scrollHeight;
             }
 
             if (this.props.targetState === "expanded" && elementHeight !== this.state.targetHeight) {

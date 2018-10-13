@@ -52,14 +52,14 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
                 ? "This set contains no cards."
                 : "This set contains " + this.cardCount + " card" + (this.cardCount === 1 ? "" : "s") + "." }</h3>
 
-            { /* Set content */ }
-            {this.renderCards()}
-
             { /* Button for adding new card to the set*/ }
             <CardDivider
-                isSubtle={false}
+                isSubtle={this.props.set.cardOrder.length !== 0}
                 addCard={this.addNewCard.bind(this)}
             />
+
+            { /* Set content */ }
+            {this.renderCards()}
         </div>;
 
         return content;
@@ -82,42 +82,29 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
             // In case no cards currently exist
         } else {
             // This deck contains cards and they should be rendered
-            const cardsWithDividers: JSX.Element[] = [];
+            const cards: JSX.Element[] = [];
             const unloadedCards = this.props.set.cardOrder.filter(c => this.props.set.cards[c].isFetching === false
                                                                         && this.props.set.cards[c].value !== undefined);
             const maxCards = Math.min(this.state.shownCards, // Don't show more of the set than the limit
                                       this.props.set.cardOrder.length, // Cap at deck size
                                       unloadedCards.length + 2); // Never show more than 2 placeholders
-            let index = 0;
             for (let i = 0; i < maxCards; i++) {
                 const cardId = this.props.set.cardOrder[i];
-                const card = this.props.set.cards[cardId];
                 // Add the actual card editor
-                cardsWithDividers.push(
+                cards.push(
                     <CardEditor key={cardId}
                                 setId={this.props.set.id}
                                 cardId={cardId}
-                                slideIn={this.newlyAddedCards[cardId] === true}/>,
+                                slideIn={this.newlyAddedCards[cardId] === true}
+                                addNewCard={this.addNewCard.bind(this) }/>,
                 );
-
-                // Add a divider / add card button as long as the card is not the last
-                if (index !== this.props.set.cardOrder.length - 1) {
-                    cardsWithDividers.push(<CardDivider
-                        afterCardId={cardId}
-                        key={"divider-" + cardId}
-                        isSubtle={true}
-                        addCard={this.addNewCard.bind(this)}
-                    />);
-                }
 
                 // Make sure the card doesn't show a slide transition in the future
                 delete this.newlyAddedCards[cardId];
-
-                index++;
             }
 
             return <ul>
-                { cardsWithDividers }
+                { cards }
             </ul>;
         }
     }

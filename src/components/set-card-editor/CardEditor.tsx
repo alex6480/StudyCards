@@ -10,6 +10,7 @@ import { Action } from "../../reducers/actions";
 import FadeTransition from "../transition/FadeTransition";
 import ResizeTransition from "../transition/ResizeTransition";
 import SlideTransition from "../transition/SlideTransition";
+import { CardDivider } from "./CardDivider";
 import CardFaceEditor from "./CardFaceEditor";
 import { CardFaceEditorToolbar } from "./CardFaceEditorToolbar";
 import { CardSidebar } from "./CardSidebar";
@@ -30,6 +31,8 @@ interface ICardEditorOwnProps {
      * Default: true
      */
     slideIn?: boolean;
+
+    addNewCard: (afterCardId?: string) => string;
 }
 
 interface ICardEditorStateProps extends ICardEditorOwnProps {
@@ -70,12 +73,12 @@ class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState>
 
     public render() {
         let editor: JSX.Element;
+        let divider: JSX.Element;
         const isFetching = this.props.card.isFetching;
         const isPlaceholder = this.props.card.value === undefined;
         if (isPlaceholder) {
             // No up to date card is currently available
-            editor = <li>
-                <div className="card">
+            editor = <div className="card">
                     { /* Show empty div instead of toolbar */ }
                     <div style={{height: "56px", borderBottom: "2px solid #dbdbdb"}}></div>
                     <div className="columns is-gapless is-marginless flashcard-faces same-height">
@@ -96,12 +99,13 @@ class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState>
                     </div>
                     { /* Show empty div instead of footer */ }
                     <div style={{height: "41px"}}></div>
-                </div>
-            </li>;
+                </div>;
+            divider = <CardDivider
+                    isSubtle={true}
+                />;
         } else {
             const card = this.props.card.value!;
-            editor = <li className="listed-flashcard">
-                <div className={"card " + (isFetching ? "saving " : "")}>
+            editor = <div className={"card " + (isFetching ? "saving " : "")}>
                     <div className="main">
                         <div className="columns is-gapless is-marginless flashcard-faces same-height">
                             <div className="column is-half flashcard-face">
@@ -124,28 +128,46 @@ class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState>
                         </div>
                     </div>
                     <CardSidebar onDelete={this.delete.bind(this)}/>
-                </div>
-            </li>;
+                </div>;
+            divider = <CardDivider
+                afterCardId={this.props.cardId}
+                isSubtle={true}
+                addCard={() => this.props.addNewCard(this.props.cardId)}
+            />;
         }
 
         switch (this.state.transitionState) {
             case (CardEditorTransitionState.SlideIn):
                 return <SlideTransition targetState="expanded" onSlideComplete={this.introComplete.bind(this)}>
-                    {editor}
+                    <li className="listed-flashcard is-clearfix">
+                        {editor}
+                        {divider}
+                    </li>
                 </SlideTransition>;
             case (CardEditorTransitionState.None):
-                return editor;
+                return <li className="listed-flashcard is-clearfix">
+                    {editor}
+                    {divider}
+                </li>;
             case (CardEditorTransitionState.PlaceholderLoad):
                 // Placeholders just pop into place, while the real content animates
-                return <ResizeTransition doTransition={! isPlaceholder}>
-                    <FadeTransition from={isPlaceholder ? "visible" : "hidden"} to={"visible"}
-                                    onFadeComplete={this.introComplete.bind(this)}>
-                        {editor}
-                    </FadeTransition>
-                </ResizeTransition>;
+                return <li className={"is-clearfix" + (isPlaceholder ? "" : " listed-flashcard")}>
+                    <ResizeTransition doTransition={! isPlaceholder}>
+                        <div style={{ background: "white" }} >
+                            <FadeTransition from={isPlaceholder ? "visible" : "hidden"} to={"visible"}
+                                            onFadeComplete={this.introComplete.bind(this)}>
+                                {editor}
+                            </FadeTransition>
+                        </div>
+                    </ResizeTransition>
+                    {divider}
+                </li>;
             case (CardEditorTransitionState.Collapsing):
                 return <SlideTransition targetState="collapsed" onSlideComplete={this.deleteFinal.bind(this)}>
-                    {editor}
+                    <li className="listed-flashcard is-clearfix">
+                        {editor}
+                        {divider}
+                    </li>
                 </SlideTransition>;
         }
     }

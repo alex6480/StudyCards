@@ -24,7 +24,7 @@ $input-shadow: none;
 $modal-content-width: 900px;
 
 // Used for css transitions
-$transition-short: 0.3s;
+$transition-short: 0.2s;
 $transition-medium: 0.5s;
 
 // Import only what you need from Bulma
@@ -61,7 +61,7 @@ $transition-medium: 0.5s;
             border: 0;
         }
     }
-    & > .card {
+    & .card {
         display: flex;
 
         & .flashcard-sidebar {
@@ -235,8 +235,6 @@ $transition-medium: 0.5s;
         overflow: hidden;
         transition: height $transition-short, opacity $transition-short;
         transition-timing-function: ease-out;
-        background-color: white;
-
     }
 
     &.resize {
