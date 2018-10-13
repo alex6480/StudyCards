@@ -14,7 +14,7 @@ interface ISetCardEditorProps {
 }
 
 interface ISetCardEditorState {
-    loadedCards: number;
+    shownCards: number;
 }
 
 export default class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorState> {
@@ -38,7 +38,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
         super(props);
         // Set initial state
         this.state = {
-            loadedCards: this.cardsToLoadAtOnce,
+            shownCards: this.cardsToLoadAtOnce,
         };
 
         // Load the cards to be edited
@@ -84,8 +84,13 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
         } else {
             // This deck contains cards and they should be rendered
             const cardsWithDividers: JSX.Element[] = [];
+            const unloadedCards = this.props.set.cardOrder.filter(c => this.props.set.cards[c].isFetching === false
+                                                                        && this.props.set.cards[c].value !== undefined);
+            const maxCards = Math.min(this.state.shownCards, // Don't show more of the set than the limit
+                                      this.props.set.cardOrder.length, // Don't attemp to show more cards than there are
+                                      unloadedCards.length + 2); // Only show at the most 2 unloaded cards
             let index = 0;
-            for (let i = 0; i < Math.min(this.state.loadedCards, this.props.set.cardOrder.length); i++) {
+            for (let i = 0; i < maxCards; i++) {
                 const cardId = this.props.set.cardOrder[i];
                 const card = this.props.set.cards[cardId];
                 // Add the actual card editor
@@ -131,7 +136,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
     private addNewCard(afterCardId?: string) {
         const newCardId = this.props.addNewCard(afterCardId);
         // Load one extra card to ensure that the newly added card can be shown
-        this.setState({ loadedCards: this.state.loadedCards + 1 });
+        this.setState({ shownCards: this.state.shownCards + 1 });
         this.newlyAddedCards[newCardId] = true;
     }
 
@@ -144,13 +149,13 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
         const loadingCards = this.props.set.cardOrder.filter(c => this.props.set.cards[c].isFetching === true);
         // Only load more cards if the cards from the last loading have actually been loaded
         if (loadCards === false || loadingCards.length < this.cardsToLoadAtOnce) {
-            const newLoadedCards = Math.min(this.state.loadedCards + cardNumber,
+            const newLoadedCards = Math.min(this.state.shownCards + cardNumber,
             this.props.set.cardOrder.length);
 
             if (loadCards) {
-                this.props.loadCards(this.props.set.cardOrder.slice(this.state.loadedCards, newLoadedCards));
+                this.props.loadCards(this.props.set.cardOrder.slice(this.state.shownCards, newLoadedCards));
             }
-            this.setState({ loadedCards:  newLoadedCards});
+            this.setState({ shownCards:  newLoadedCards});
         }
     }
 }
