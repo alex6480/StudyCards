@@ -32,7 +32,7 @@ export default class CardFaceEditor extends React.PureComponent<ICardFaceEditorP
 
         this.state = { faceType: props.face.type };
 
-        /* if (props.face.type === FlashCardFaceType.RichText) {
+        if (props.face.type === FlashCardFaceType.RichText) {
             const editorState = props.face.richTextContent != null
             ? EditorState.createWithContent(props.face.richTextContent, new CompositeDecorator([
                 RevealEditorDecorator,
@@ -46,9 +46,9 @@ export default class CardFaceEditor extends React.PureComponent<ICardFaceEditorP
         } else {
             this.state = {
                 faceType: props.face.type,
-                editorState: EditorState.createEmpty(),
+                editorState: undefined,
             };
-        } */
+        }
     }
 
     public componentWillReceiveProps(newProps: ICardFaceEditorProps) {
@@ -71,7 +71,7 @@ export default class CardFaceEditor extends React.PureComponent<ICardFaceEditorP
             face={this.props.face}
             swapFaces={this.swapFaces.bind(this)}
             setType={this.setType.bind(this)}
-            onChange={this.onChange.bind(this)}
+            onChange={this.onRichTextChange.bind(this)}
         />;
 
         let content: JSX.Element;
@@ -79,15 +79,14 @@ export default class CardFaceEditor extends React.PureComponent<ICardFaceEditorP
             case FlashCardFaceType.RichText:
                 content = <div className="flashcard-face-content card-content content"
                             onClick={this.focusEditor.bind(this)}>
-                    { /* <Editor
+                    <Editor
                         readOnly={this.props.readOnly}
-                        editorState={this.state.editorState}
-                        onChange={this.onChange.bind(this)}
+                        editorState={this.state.editorState!}
+                        onChange={this.onRichTextChange.bind(this)}
                         ref={editor => this.editor = editor}
                         onBlur={this.onBlur.bind(this)}
                         placeholder={this.props.face.id === "front" ? "Front" : "Back"}
-                    /> */ }
-                    <RichTextRenderer content={this.props.face.richTextContent} />
+                    />
                 </div>;
                 break;
             case FlashCardFaceType.None:
@@ -113,8 +112,8 @@ export default class CardFaceEditor extends React.PureComponent<ICardFaceEditorP
         }
     }
 
-    private onChange(editorState: EditorState) {
-        // this.setState({ editorState });
+    private onRichTextChange(editorState: EditorState) {
+        this.setState({ editorState });
     }
 
     private swapFaces() {
@@ -134,11 +133,11 @@ export default class CardFaceEditor extends React.PureComponent<ICardFaceEditorP
     }
 
     private updateGlobalState() {
-        /* if (this.props.face.type === FlashCardFaceType.RichText) {
+        if (this.props.face.type === FlashCardFaceType.RichText && this.state.editorState !== undefined) {
             this.props.saveCardFace({
                 ...this.props.face,
                 richTextContent: this.state.editorState.getCurrentContent(),
             });
-        } */
+        }
     }
 }
