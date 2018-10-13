@@ -60,12 +60,8 @@ export class LocalStorageProvider implements IStorageProvider {
         }
 
         let cardOrder = setMeta.cardOrder;
-        if (afterCardId !== undefined) {
-            const afterIndex = cardOrder.indexOf(afterCardId);
-            cardOrder = [...cardOrder.slice(0, afterIndex + 1), cardId, ...cardOrder.slice(afterIndex + 1)];
-        } else {
-            cardOrder = cardOrder.concat(cardId);
-        }
+        const afterIndex = afterCardId !== undefined ? cardOrder.indexOf(afterCardId) : -1;
+        cardOrder = [...cardOrder.slice(0, afterIndex + 1), cardId, ...cardOrder.slice(afterIndex + 1)];
         this.saveSetMetaLocal({ ...setMeta, cardOrder });
 
         this.result(() => dispatch(fromActions.Action.addNewCardComplete(setId, cardId)));

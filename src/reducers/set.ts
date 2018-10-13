@@ -82,13 +82,11 @@ function name(state: string = initialState.name, setId: string, action: fromActi
 function cardOrder(state: string[] = initialState.cardOrder, action: fromActions.Action) {
     switch (action.type) {
         case fromActions.ADD_NEW_CARD_BEGIN:
-            if (action.payload.afterCardId !== undefined) {
-                const afterIndex = state.indexOf(action.payload.afterCardId);
-                return [...state.slice(0, afterIndex + 1), action.payload.cardId, ...state.slice(afterIndex + 1)];
-            } else {
-                return state.concat(action.payload.cardId);
-            }
+            const afterIndex = action.payload.afterCardId !== undefined
+                               ? state.indexOf(action.payload.afterCardId) : -1;
+            return [...state.slice(0, afterIndex + 1), action.payload.cardId, ...state.slice(afterIndex + 1)];
         case fromActions.DELETE_CARD_COMPLETE:
+        case fromActions.DELETE_CARD_BEGIN:
             return state.filter(cardId => cardId !== action.payload.cardId);
         default:
             return state;
@@ -163,6 +161,7 @@ export default function sets(state: IRemote<{ [id: string]: IRemote<IFlashCardSe
         case fromActions.SAVE_CARD_FACE_BEGIN:
         case fromActions.SAVE_CARD_FACE_COMPLETE:
         case fromActions.DELETE_CARD_COMPLETE:
+        case fromActions.DELETE_CARD_BEGIN:
             const setId = id(action.payload.setId, action);
             const previousSet = state.value === undefined || state.value[setId] === undefined
                                 ? { isFetching: true, value: undefined } : state.value[setId];

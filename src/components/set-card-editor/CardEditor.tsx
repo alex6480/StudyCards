@@ -17,7 +17,6 @@ import { CardSidebar } from "./CardSidebar";
 import { TagEditor } from "./TagEditor";
 
 interface ICardEditorState {
-    activeFace: FlashCardFaceId;
     tags: string[];
     transitionState: CardEditorTransitionState;
 }
@@ -33,6 +32,7 @@ interface ICardEditorOwnProps {
     slideIn?: boolean;
 
     addNewCard: (afterCardId?: string) => string;
+    onDeleted: (cardId: string) => void;
 }
 
 interface ICardEditorStateProps extends ICardEditorOwnProps {
@@ -59,16 +59,19 @@ enum CardEditorTransitionState {
 /**
  * A card that is part of a cardlist
  */
-class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState> {
+class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     constructor(props: ICardEditorProps) {
         super(props);
 
         const slideIn = props.slideIn === undefined || props.slideIn === true;
         this.state = {
-            activeFace: "front",
             tags: [],
             transitionState: slideIn ? CardEditorTransitionState.SlideIn : CardEditorTransitionState.PlaceholderLoad,
         };
+    }
+
+    public shouldComponentUpdate(newProps: ICardEditorProps, newState: ICardEditorState) {
+        return newProps.card !== this.props.card || newState.transitionState !== this.state.transitionState;
     }
 
     public render() {
@@ -194,6 +197,7 @@ class CardEditor extends React.PureComponent<ICardEditorProps, ICardEditorState>
 
     private deleteFinal() {
         this.props.deleteCard(this.props.storage, this.props.setId, this.props.cardId);
+        this.props.onDeleted(this.props.cardId);
     }
 }
 

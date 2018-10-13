@@ -13,7 +13,7 @@ interface ISetCardEditorProps {
 }
 
 interface ISetCardEditorState {
-    shownCards: number;
+    shownCards: string[];
 }
 
 export default class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorState> {
@@ -37,7 +37,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
         super(props);
         // Set initial state
         this.state = {
-            shownCards: this.cardsToLoadAtOnce,
+            shownCards: props.set.cardOrder.slice(0, this.cardsToLoadAtOnce),
         };
 
         // Load the cards to be edited
@@ -83,20 +83,28 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
         } else {
             // This deck contains cards and they should be rendered
             const cards: JSX.Element[] = [];
-            const unloadedCards = this.props.set.cardOrder.filter(c => this.props.set.cards[c].isFetching === false
-                                                                        && this.props.set.cards[c].value !== undefined);
-            const maxCards = Math.min(this.state.shownCards, // Don't show more of the set than the limit
-                                      this.props.set.cardOrder.length, // Cap at deck size
-                                      unloadedCards.length + 2); // Never show more than 2 placeholders
-            for (let i = 0; i < maxCards; i++) {
-                const cardId = this.props.set.cardOrder[i];
+            let loadingCards: number = 0;
+            for (const cardId of this.state.shownCards) {
+                const card = this.props.set.cards[cardId];
+                if (card === undefined) {
+                    continue;
+                }
+
+                // Never show more than two cards loading at once
+                if (card.isFetching) {
+                    loadingCards++;
+                    if (loadingCards > 2) {
+                        break;
+                    }
+                }
                 // Add the actual card editor
                 cards.push(
                     <CardEditor key={cardId}
                                 setId={this.props.set.id}
                                 cardId={cardId}
                                 slideIn={this.newlyAddedCards[cardId] === true}
-                                addNewCard={this.addNewCard.bind(this) }/>,
+                                addNewCard={this.addNewCard.bind(this)}
+                                onDeleted={this.cardDeleted.bind(this)}/>,
                 );
 
                 // Make sure the card doesn't show a slide transition in the future
@@ -115,33 +123,54 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
         const screenHeight = window.innerHeight;
 
         if (docHeight - (scrollPos + screenHeight) < this.loadNextCardsAt) {
-            this.showMoreCards(this.cardsToLoadAtOnce);
+            this.loadMoreCards(this.cardsToLoadAtOnce);
         }
     }
 
     private addNewCard(afterCardId?: string) {
         const newCardId = this.props.addNewCard(afterCardId);
         // Load one extra card to ensure that the newly added card can be shown
-        this.setState({ shownCards: this.state.shownCards + 1 });
+        const afterIndex = afterCardId !== undefined ? this.state.shownCards.indexOf(afterCardId) : -1;
+        const newShownCards = [
+            ...this.state.shownCards.slice(0, afterIndex + 1),
+            newCardId,
+            ...this.state.shownCards.slice(afterIndex + 1)];
+        this.setState({ shownCards: newShownCards });
         this.newlyAddedCards[newCardId] = true;
     }
 
-    /**
-     * Renders more cards
-     * @param cardNumber The number of new cards to show
-     * @param loadCards Whether or not to syncronize the latest cards with the remote server
-     */
-    private showMoreCards(cardNumber: number, loadCards: boolean = true) {
-        const loadingCards = this.props.set.cardOrder.filter(c => this.props.set.cards[c].isFetching === true);
-        // Only load more cards if the cards from the last loading have actually been loaded
-        if (loadCards === false || loadingCards.length < this.cardsToLoadAtOnce) {
-            const newLoadedCards = Math.min(this.state.shownCards + cardNumber,
-            this.props.set.cardOrder.length);
+    private cardDeleted(cardId: string) {
+        this.setState({ shownCards: this.state.shownCards.filter(c => c !== cardId) });
+        // Run the scroll listener in case more cards need to be loaded
+        this.onScroll();
+    }
 
-            if (loadCards) {
-                this.props.loadCards(this.props.set.cardOrder.slice(this.state.shownCards, newLoadedCards));
+    /**
+     * Loads more cards
+     */
+    private loadMoreCards(count: number) {
+        const loadingCards = this.state.shownCards
+                                .filter(c => this.props.set.cards[c] !== undefined
+                                          && this.props.set.cards[c].isFetching === true);
+        // Only load more cards if the cards from the last loading have actually been loaded
+        if (loadingCards.length < this.cardsToLoadAtOnce) {
+            let addedCards: number = 0;
+            const cardsToLoad: string[] = [];
+            for (const cardId of this.props.set.cardOrder) {
+                // Only add the specified amount of cards
+                if (addedCards === count) { break; }
+
+                if (this.state.shownCards.indexOf(cardId) === -1) {
+                    cardsToLoad.push(cardId);
+                    addedCards++;
+                }
             }
-            this.setState({ shownCards:  newLoadedCards});
+
+            if (cardsToLoad.length === 0) {
+                return;
+            }
+            this.props.loadCards(cardsToLoad);
+            this.setState({ shownCards:  this.state.shownCards.concat(cardsToLoad)});
         }
     }
 }
