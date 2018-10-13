@@ -1,5 +1,6 @@
 import { EditorState } from "draft-js";
 import * as React from "react";
+import * as Utils from "../../lib/utils";
 import { BlockStyle, InlineStyle } from "./styles";
 
 interface IToolbarButtonProps {
@@ -120,17 +121,6 @@ export class ToolbarButtonBlock extends ToolbarButton<IToolbarButtonBlockProps> 
     }
 
     private isActive(props: IToolbarButtonProps) {
-        if (props.editorState === undefined) {
-            return false;
-        }
-
-        const selection = props.editorState.getSelection();
-        const content = props.editorState.getCurrentContent();
-        const selectionStartBlockKey = selection.getStartKey();
-        if (selectionStartBlockKey == null) {
-            return false;
-        }
-        const block = content.getBlockForKey(selectionStartBlockKey);
-        return block.getType() === this.props.type;
+        return Utils.isBlockTypeAtCursor(props.editorState, (props as IToolbarButtonBlockProps).type);
     }
 }

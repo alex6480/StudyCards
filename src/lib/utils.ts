@@ -1,3 +1,5 @@
+import { EditorState } from "draft-js";
+
 /**
  * Go through every key/value-pair of the object and return a new object
  * where the values are determined by the mapping function.
@@ -91,3 +93,24 @@ export function selectKeys<T>(keys: string[] | {[key: string]: T}, filter: (key:
     const result: string[] = keys.filter(filter);
     return result;
 }
+
+/**
+ * Returns true if the block that the cursor is in has the specified block style
+ * @param state The state of the editor
+ * @param type The block type to check for
+ */
+export function isBlockTypeAtCursor(editorState: EditorState | undefined, type: string) {
+    if (editorState === undefined) {
+        return false;
+    }
+
+    const selection = editorState.getSelection();
+    const content = editorState.getCurrentContent();
+    const selectionStartBlockKey = selection.getStartKey();
+    if (selectionStartBlockKey == null) {
+        return false;
+    }
+    const block = content.getBlockForKey(selectionStartBlockKey);
+    return block.getType() === type;
+}
+

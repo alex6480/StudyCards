@@ -9,7 +9,7 @@ export enum InlineStyle {
 export enum BlockStyle {
     HEADER_ONE = "header-one",
     HEADER_TWO = "header-two",
-    PARAGRAPH = "paragraph",
+    PARAGRAPH = "unstyled", // "paragraph",
     UNORDERED_LIST_ITEM = "unordered-list-item",
     ORDERED_LIST_ITEM = "ordered-list-item",
 }

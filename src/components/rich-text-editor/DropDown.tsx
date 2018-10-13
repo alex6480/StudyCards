@@ -5,11 +5,15 @@ interface IDropDownState {
     toggleBlockStyle?: () => void;
 }
 
-export default class DropDown extends React.Component<{}, IDropDownState> {
+interface IDropDownProps {
+    children: React.ReactElement<DropDownItem>[];
+}
+
+export default class DropDown extends React.Component<IDropDownProps, IDropDownState> {
     private rootElement: HTMLElement | null = null;
     private clickHandler = this.handleClick.bind(this);
 
-    constructor(props: {}) {
+    constructor(props: IDropDownProps) {
         super(props);
         this.state = {
             isDown: false,
@@ -34,11 +38,17 @@ export default class DropDown extends React.Component<{}, IDropDownState> {
             </div>
         </div>;
 
+        // Any is used because for some reason the typings are incorrect here
+        const activeChild: any = this.props.children.find((c: any) => c.props !== undefined && c.props.isActive);
+        const activeChildChildren = activeChild === undefined
+            ? undefined
+            : activeChild.props.children;
+
         return <div className={"dropdown " + (this.state.isDown ? "is-active " : "")}
                     onMouseDown={e => e.preventDefault()} onClick={this.toggle.bind(this)}>
                 <div className="dropdown-trigger">
                     <button className="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                        <span>Body</span>
+                        <span>{activeChildChildren}</span>
                         <span className="icon is-small">
                             <i className="fas fa-angle-down" aria-hidden="true"></i>
                         </span>
@@ -67,5 +77,17 @@ export default class DropDown extends React.Component<{}, IDropDownState> {
             // Clicked outside of the dropdown
             this.collapse();
         }
+    }
+}
+
+interface IDropDownItemProps {
+    onClick?: () => void;
+    isActive: boolean;
+}
+
+export class DropDownItem extends React.Component<IDropDownItemProps> {
+    public render() {
+        const className = this.props.isActive ? "dropdown-item is-active" : "dropdown-item";
+        return <a className={className} onClick={this.props.onClick}>{this.props.children}</a>;
     }
 }
