@@ -9,7 +9,7 @@ interface IDropDownProps {
     children: React.ReactElement<DropDownItem>[];
 }
 
-export default class DropDown extends React.Component<IDropDownProps, IDropDownState> {
+export class DropDown extends React.Component<IDropDownProps, IDropDownState> {
     private rootElement: HTMLElement | null = null;
     private clickHandler = this.handleClick.bind(this);
 
