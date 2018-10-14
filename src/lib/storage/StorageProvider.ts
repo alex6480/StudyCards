@@ -1,6 +1,7 @@
 import { Dispatch } from "redux";
 import { IAppState } from "../../reducers";
 import * as fromActions from "../../reducers/actions";
+import { IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace } from "../flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 
@@ -35,6 +36,11 @@ export default interface IStorageProvider {
      * Deletes the specified card
      */
     deleteCard: (dispatch: Dispatch, setId: string, cardId: string) => void;
+
+    /**
+     * Saves everything about a card except for its faces
+     */
+    saveCardMeta: (dispatch: Dispatch, setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) => void;
 
     /**
      * Adds the specified set. A set with the same id cannot exist

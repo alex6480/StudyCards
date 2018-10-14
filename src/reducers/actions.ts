@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import IFlashCard from "../lib/flashcard/flashcard";
+import IFlashCard, { IFlashCardMeta } from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
@@ -55,6 +55,9 @@ export const LOAD_SET_STUDY_DATA_COMPLETE = "load set study data complete";
 export const LOAD_CARDS_BEGIN = "load cards begin";
 export const LOAD_CARDS_COMPLETE = "load cards complete";
 
+export const SAVE_CARD_META_BEGIN = "save card meta begin";
+export const SAVE_CARD_META_COMPLETE = "save card meta complete";
+
 export const SAVE_SET_META_BEGIN = "save set meta begin";
 export const SAVE_SET_META_COMPLETE = "save set meta complete";
 
@@ -85,6 +88,11 @@ export const Action = {
         createAction(SAVE_CARD_FACE_BEGIN, { setId, cardId, face }),
     saveCardFaceComplete: (setId: string, cardId: string) =>
         createAction(SAVE_CARD_FACE_COMPLETE, { setId, cardId }),
+
+    saveCardMetaBegin: (setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) =>
+        createAction(SAVE_CARD_META_BEGIN, { setId, cardId, cardMeta }),
+    saveCardMetaComplete: (setId: string, cardId: string, cardMeta: IFlashCardMeta) =>
+        createAction(SAVE_CARD_META_COMPLETE, { setId, cardId, cardMeta }),
 
     saveSetMetaBegin: (setMeta: Partial<IFlashCardSetMeta>) =>
         createAction(SAVE_SET_META_BEGIN, { setId: setMeta.id, setMeta }),

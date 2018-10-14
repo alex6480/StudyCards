@@ -61,6 +61,8 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
             };
         case fromActions.SAVE_CARD_FACE_BEGIN:
         case fromActions.SAVE_CARD_FACE_COMPLETE:
+        case fromActions.SAVE_CARD_META_BEGIN:
+        case fromActions.SAVE_CARD_META_COMPLETE:
             return {
                 ...state,
                 [action.payload.cardId]: card(state[action.payload.cardId], setId, action),
@@ -162,6 +164,8 @@ export default function sets(state: IRemote<{ [id: string]: IRemote<IFlashCardSe
         case fromActions.SAVE_CARD_FACE_COMPLETE:
         case fromActions.DELETE_CARD_COMPLETE:
         case fromActions.DELETE_CARD_BEGIN:
+        case fromActions.SAVE_CARD_META_BEGIN:
+        case fromActions.SAVE_CARD_META_COMPLETE:
             const setId = id(action.payload.setId, action);
             const previousSet = state.value === undefined || state.value[setId] === undefined
                                 ? { isFetching: true, value: undefined } : state.value[setId];

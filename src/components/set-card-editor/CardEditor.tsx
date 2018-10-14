@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import IFlashCard from "../../lib/flashcard/flashcard";
+import IFlashCard, { IFlashCardMeta } from "../../lib/flashcard/flashcard";
 import { FlashCardFaceId, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import IRemote from "../../lib/remote";
 import IStorageProvider from "../../lib/storage/StorageProvider";
@@ -17,7 +17,6 @@ import { CardSidebar } from "./CardSidebar";
 import { TagEditor } from "./TagEditor";
 
 interface ICardEditorState {
-    tags: string[];
     transitionState: CardEditorTransitionState;
 }
 
@@ -45,6 +44,7 @@ interface ICardEditorDispatchProps {
     saveCardFace: (storage: IStorageProvider, setId: string, cardId: string, face: IFlashCardFace) => void;
     swapCardFaces: (setId: string, cardId: string) => void;
     loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) => void;
+    saveCardMeta: (storage: IStorageProvider, setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) => void;
 }
 
 interface ICardEditorProps extends ICardEditorStateProps, ICardEditorDispatchProps { }
@@ -65,7 +65,6 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
 
         const slideIn = props.slideIn === undefined || props.slideIn === true;
         this.state = {
-            tags: [],
             transitionState: slideIn ? CardEditorTransitionState.SlideIn : CardEditorTransitionState.PlaceholderLoad,
         };
     }
@@ -127,7 +126,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                             </div>
                         </div>
                         <div className="card-footer">
-                            <TagEditor tags={this.state.tags} onChange={this.updateTags.bind(this)} />
+                            <TagEditor tags={card.tags} onChange={this.updateTags.bind(this)} />
                         </div>
                     </div>
                     <CardSidebar onDelete={this.delete.bind(this)}/>
@@ -188,7 +187,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     }
 
     private updateTags(newTags: string[]) {
-        this.setState({tags: newTags});
+        this.props.saveCardMeta(this.props.storage, this.props.setId, this.props.cardId, { tags: newTags });
     }
 
     private delete() {
@@ -222,6 +221,8 @@ function mapDispatchToProps(dispatch: Dispatch): ICardEditorDispatchProps {
         swapCardFaces: (setId: string, cardId: string) => dispatch(Action.swapCardFaces(setId, cardId)),
         loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) =>
             storage.loadCards(dispatch, setId, cardIds),
+        saveCardMeta: (storage: IStorageProvider, setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) =>
+            storage.saveCardMeta(dispatch, setId, cardId, cardMeta),
     };
 }
 

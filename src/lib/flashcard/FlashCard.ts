@@ -2,13 +2,18 @@ import { ExportFlashCardFace, ExportImageFlashCardFace, ExportNoFlashCardFace, E
     FlashCardFaceType, IFlashCardFace, IImageFlashCardFace, INoFlashCardFace,
     IRichTextFlashCardFace } from "./FlashCardFace";
 
-export default interface IFlashCard {
-    id: string;
-    setId: string;
+export default interface IFlashCard extends IFlashCardMeta {
+    tags: string[];
     faces: {
         front: IFlashCardFace,
         back: IFlashCardFace,
     };
+}
+
+export interface IFlashCardMeta {
+    id: string;
+    setId: string;
+    tags: string[];
 }
 
 export class ExportFlashCard {
@@ -29,6 +34,7 @@ export class ExportFlashCard {
 
     public readonly id: string;
     public readonly exportVersion: string = "1";
+    public readonly tags: string[];
     public readonly faces: {
         front: ExportFlashCardFace,
         back: ExportFlashCardFace,
@@ -36,6 +42,7 @@ export class ExportFlashCard {
 
     constructor(flashcard: IFlashCard) {
         this.id = flashcard.id;
+        this.tags = flashcard.tags;
         this.faces = {
             front: ExportFlashCard.getExportFace(flashcard.faces.front),
             back: ExportFlashCard.getExportFace(flashcard.faces.back),

@@ -8,6 +8,7 @@ import * as fromActions from "./actions";
 export const initialCard: IFlashCard = {
     id: "",
     setId: "",
+    tags: [],
     faces: {
         front: {
             id: "front",
@@ -33,7 +34,8 @@ function value(state: Partial<IFlashCard> | undefined,
         default:
             return state === undefined ? undefined : {
                 id: cardId,
-                setId: state.setId as string,
+                setId: state.setId!,
+                tags: tags(state.tags, action),
                 faces: faces(state.faces, action),
             };
     }
@@ -51,6 +53,15 @@ function faces(state: {front: IFlashCardFace, back: IFlashCardFace} = initialCar
     }
 }
 
+function tags(state: string[] = initialCard.tags, action: fromActions.Action) {
+    switch (action.type) {
+        case fromActions.SAVE_CARD_META_BEGIN:
+            return action.payload.cardMeta.tags !== undefined ? action.payload.cardMeta.tags : state;
+        default:
+            return state;
+    }
+}
+
 export default function card(state: IRemote<Partial<IFlashCard>> = initialState,
                              cardId: string,
                              action: fromActions.Action): IRemote<IFlashCard> {
@@ -63,19 +74,15 @@ export default function card(state: IRemote<Partial<IFlashCard>> = initialState,
                     isFetching: true,
                 };
             }
-        case fromActions.SAVE_CARD_FACE_BEGIN:
-            return {
-                ...state,
-                value: value(state.value, cardId, action), // Show the previous value while saving
-                isFetching: true,
-            };
+            return { ...state, value: value(state.value, cardId, action) };
         case fromActions.LOAD_CARDS_COMPLETE:
             return {
                 ...state,
                 value: action.payload.cards[cardId],
                 isFetching: false,
             };
-        case fromActions.SAVE_CARD_FACE_COMPLETE:
+        case fromActions.SAVE_CARD_FACE_BEGIN:
+        case fromActions.SAVE_CARD_META_BEGIN:
             return {
                 ...state,
                 value: value(state.value, cardId, action),

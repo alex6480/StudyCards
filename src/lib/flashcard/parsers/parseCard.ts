@@ -19,11 +19,12 @@ export default function parse(card: ExportFlashCard, setId: string): IFlashCard 
 }
 
 export function parseCard(card: ExportFlashCard, setId: string, onError: onErrorHandler): IFlashCard {
-    const id = parseId(card, onerror);
+    const id = parseId(card, onError);
     const result: IFlashCard = {
         id,
         setId,
-        faces: parseFaces(card, id, setId, onerror),
+        tags: parseTags(card, onError),
+        faces: parseFaces(card, id, setId, onError),
     };
     return result;
 }
@@ -102,6 +103,14 @@ function parseFace(face: ExportFlashCardFace, faceId: FlashCardFaceId,
                 type: FlashCardFaceType.None,
                 richTextContent: ContentState.createFromText(""),
             };
+    }
+}
+
+function parseTags(card: ExportFlashCard, onError: onErrorHandler): string[] {
+    if (card.tags === undefined) {
+        return [];
+    } else {
+        return card.tags;
     }
 }
 

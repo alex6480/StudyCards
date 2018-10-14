@@ -4,7 +4,7 @@ import * as fromActions from "../../reducers/actions";
 import { initialCard } from "../../reducers/card";
 import * as fromCardStudyData from "../../reducers/cardStudyData";
 import * as fromSet from "../../reducers/set";
-import IFlashCard, { ExportFlashCard } from "../flashcard/flashcard";
+import IFlashCard, { ExportFlashCard, IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace, IRichTextFlashCardFace } from "../flashcard/FlashCardFace";
 import IFlashCardSet, { ExportFlashCardSet, IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 import parseCard from "../flashcard/parsers/parseCard";
@@ -157,6 +157,8 @@ export class LocalStorageProvider implements IStorageProvider {
         const card = this.getCard(setId, cardId);
         this.saveCard({
             ...card,
+            setId,
+            id: cardId,
             faces: {
                 ...card.faces,
                 [face.id]: face,
@@ -165,6 +167,21 @@ export class LocalStorageProvider implements IStorageProvider {
 
         this.result(() =>
             dispatch(fromActions.Action.saveCardFaceComplete(setId, cardId)));
+    }
+
+    public saveCardMeta(dispatch: Dispatch, setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) {
+        dispatch(fromActions.Action.saveCardMetaBegin(setId, cardId, cardMeta));
+
+        const card = this.getCard(setId, cardId);
+        const newMeta = {
+            ...card,
+            setId,
+            id: cardId,
+            ...cardMeta,
+        };
+        this.saveCard(newMeta);
+
+        dispatch(fromActions.Action.saveCardMetaComplete(setId, cardId, newMeta));
     }
 
     public saveSetMeta(dispatch: Dispatch, setMeta: Partial<IFlashCardSetMeta>) {
