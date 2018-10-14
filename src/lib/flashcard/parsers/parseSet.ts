@@ -31,12 +31,15 @@ export default function parse(set: ExportFlashCardSet,
 function parseSet(set: ExportFlashCardSet, onError: onErrorHandler): IFlashCardSet {
     const id = parseId(set, onError);
     const cards = parseCards(set, id, onError);
+
     const result: IFlashCardSet = {
         id,
         name: parseName(set, onError),
         cards: Utils.objectMapString(cards, (k, v) => ({ isFetching: false, value: v, lastUpdated: Date.now() })),
         cardOrder: parseCardOrder(set, cards, onError),
+        availableTags: Utils.countTags(cards),
     };
+
     return result;
 }
 

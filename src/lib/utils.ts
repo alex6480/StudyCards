@@ -1,4 +1,6 @@
 import { EditorState } from "draft-js";
+import IFlashCard from "./flashcard/flashcard";
+import IRemote from "./remote";
 
 /**
  * Go through every key/value-pair of the object and return a new object
@@ -114,3 +116,63 @@ export function isBlockTypeAtCursor(editorState: EditorState | undefined, type: 
     return block.getType() === type;
 }
 
+/**
+ * Counts the occurences for every single tag in the set of cards
+ */
+export function countTags(cards: { [id: string]: IFlashCard }) {
+    // Create an array containing all tags in the set
+    const cardTags = Object.keys(cards)
+        .map(card => cards[card].tags)
+        .reduce((acc, val) => acc.concat(val), []);
+
+    // Count the tags
+    const cardTagCounts: { [tag: string]: number } = { };
+    for (const tag of cardTags) {
+        if (cardTagCounts[tag] === undefined) {
+            cardTagCounts[tag] = 1;
+        } else {
+            cardTagCounts[tag]++;
+        }
+    }
+
+    return cardTagCounts;
+}
+
+/**
+ * Calculates an updated tagcount after the tags for a card are changed
+ * @param oldTagCounts The tag count before the tags where updated for a card
+ * @param oldCardTags The tags for the card before the change
+ * @param newCardTags The tags for the card after the change
+ */
+export function calculateNewTagCount(oldTagCounts: { [tag: string]: number } = { },
+                                     oldCardTags: string[], newCardTags: string[]) {
+    // Calculate which tags where added or removed
+    const oldTags = arrayToObject(oldCardTags, tag => [tag, true]);
+    const newTags = arrayToObject(newCardTags, tag => [tag, true]);
+    const addedTags = arrayToObject(
+        newCardTags.filter(tag => oldTags[tag] === undefined), tag => [tag, true]);
+    const removedTags = arrayToObject(
+        oldCardTags.filter(tag => newTags[tag] === undefined), tag => [tag, true]);
+
+    // Update the count for all tags that where present before
+    const updatedCount = objectMapString(oldTagCounts, (tag, count) => {
+        if (addedTags[tag] === true) {
+            return count + 1;
+        } else if (removedTags[tag] === true) {
+            return count - 1;
+        } else { return count; }
+    });
+
+    // Add any new tags
+    for (const tag of Object.keys(addedTags)) {
+        if (oldTagCounts[tag] === undefined) {
+            updatedCount[tag] = 1;
+        }
+    }
+
+    // Remoe any tags with a count < 1
+    return arrayToObject(
+        Object.keys(updatedCount).filter(tag => updatedCount[tag] > 0),
+        tag => [tag, updatedCount[tag]],
+    );
+}

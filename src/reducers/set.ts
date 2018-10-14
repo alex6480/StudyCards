@@ -10,6 +10,7 @@ export const initialState: IFlashCardSet = {
     name: "New Set",
     cardOrder: [],
     id: "",
+    availableTags: {},
 };
 
 export function id(state: string = initialState.id, action: fromActions.Action) {
@@ -95,6 +96,21 @@ function cardOrder(state: string[] = initialState.cardOrder, action: fromActions
     }
 }
 
+function availableTags(state: { [tag: string]: number } = initialState.availableTags,
+                       setCards: {[id: string]: IRemote<IFlashCard>} | undefined, action: fromActions.Action) {
+    switch (action.type) {
+        case fromActions.SAVE_CARD_META_BEGIN:
+            if (action.payload.cardMeta.tags === undefined) {
+                return state;
+            }
+            return Utils.calculateNewTagCount(state,
+                                              setCards![action.payload.cardId].value!.tags,
+                                              action.payload.cardMeta.tags);
+        default:
+            return state;
+    }
+}
+
 export function setValue(state: Partial<IFlashCardSet> = initialState, action: fromActions.Action): IFlashCardSet {
     // Generate a new id if none has been supplied
     const stateId = id(state.id, action);
@@ -102,10 +118,11 @@ export function setValue(state: Partial<IFlashCardSet> = initialState, action: f
     switch (action.type) {
         default:
             return {
-                cards: cards(state.cards, stateId, action),
-                name: name(state.name, stateId, action),
-                cardOrder: cardOrder(state.cardOrder, action),
                 id: stateId,
+                cardOrder: cardOrder(state.cardOrder, action),
+                name: name(state.name, stateId, action),
+                availableTags: availableTags(state.availableTags, state.cards, action),
+                cards: cards(state.cards, stateId, action),
             };
     }
 }

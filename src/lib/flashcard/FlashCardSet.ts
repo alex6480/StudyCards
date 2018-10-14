@@ -6,6 +6,7 @@ export interface IFlashCardSetMeta {
     cardOrder: string[];
     name: string;
     id: string;
+    availableTags: { [tag: string]: number };
 }
 
 export default interface IFlashCardSet extends IFlashCardSetMeta {

@@ -4,6 +4,7 @@ import { IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import { CardDivider } from "./CardDivider";
 import CardEditor from "./CardEditor";
+import { TagFilter } from "./TagFilter";
 
 interface ISetCardEditorProps {
     onChange?: (newSet: IFlashCardSet) => void;
@@ -51,6 +52,8 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
             <h3 className="subtitle is-6">{this.cardCount === 0
                 ? "This set contains no cards."
                 : "This set contains " + this.cardCount + " card" + (this.cardCount === 1 ? "" : "s") + "." }</h3>
+
+            <TagFilter availableTags={this.props.set.availableTags} />
 
             { /* Button for adding new card to the set*/ }
             <CardDivider

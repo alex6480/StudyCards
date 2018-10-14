@@ -181,6 +181,15 @@ export class LocalStorageProvider implements IStorageProvider {
         };
         this.saveCard(newMeta);
 
+        // If the card tags have changed we need to save the set meta as well
+        if (cardMeta.tags !== undefined && card.tags !== cardMeta.tags) {
+            debugger;
+            const oldSetMeta = this.getSetMeta(setId)!;
+            const tagCount = oldSetMeta.availableTags;
+            const newTags = Utils.calculateNewTagCount(tagCount, card.tags, cardMeta.tags);
+            this.saveSetMetaLocal({ ...oldSetMeta, availableTags: newTags });
+        }
+
         dispatch(fromActions.Action.saveCardMetaComplete(setId, cardId, newMeta));
     }
 
@@ -197,6 +206,7 @@ export class LocalStorageProvider implements IStorageProvider {
             ...initialMeta,
             ...previousSetMeta,
             ...setMeta,
+            availableTags: previousSetMeta !== null ? previousSetMeta.availableTags : initialMeta.availableTags,
         });
 
         const setId = setMeta.id;
