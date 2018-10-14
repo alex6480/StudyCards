@@ -107,7 +107,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                 />;
         } else {
             const card = this.props.card.value!;
-            editor = <div className={"card " + (isFetching ? "saving " : "")}>
+            editor = <div className={"card"}>
                     <div className="main">
                         <div className="columns is-gapless is-marginless flashcard-faces same-height">
                             <div className="column is-half flashcard-face">

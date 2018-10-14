@@ -102,12 +102,6 @@ $transition-medium: 0.5s;
                 }
             }
         }
-
-        /* Show blue glow around saving card editors */
-        transition: box-shadow $transition-short;
-        &.saving {
-            box-shadow: 0 0 5px $primary;
-        }
     }
 }
 
