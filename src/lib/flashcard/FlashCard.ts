@@ -28,6 +28,7 @@ export class ExportFlashCard {
     }
 
     public readonly id: string;
+    public readonly exportVersion: string = "1";
     public readonly faces: {
         front: ExportFlashCardFace,
         back: ExportFlashCardFace,
