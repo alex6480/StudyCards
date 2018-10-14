@@ -43,6 +43,19 @@
             }
         },
         {
+            "label": "Run dev server",
+            "command": "${workspaceFolder}/node_modules/.bin/webpack-dev-server",
+            "windows": {
+                "command": "${workspaceFolder}/node_modules/.bin/webpack-dev-server.cmd"
+            },
+            "args": [
+                "--disable-host-check",
+                "--host 0.0.0.0",
+                "--watch-content-base"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Test",
             "command": "npm run test",
             "problemMatcher": []
