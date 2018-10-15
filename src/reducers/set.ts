@@ -106,6 +106,10 @@ function availableTags(state: { [tag: string]: number } = initialState.available
             return Utils.calculateNewTagCount(state,
                                               setCards![action.payload.cardId].value!.tags,
                                               action.payload.cardMeta.tags);
+        case fromActions.DELETE_CARD_BEGIN:
+            return Utils.calculateNewTagCount(state,
+                                              setCards![action.payload.cardId].value!.tags,
+                                              []);
         default:
             return state;
     }

@@ -72,12 +72,14 @@ export class LocalStorageProvider implements IStorageProvider {
     public deleteCard(dispatch: Dispatch, setId: string, cardId: string) {
         dispatch(fromActions.Action.deleteCardBegin(setId, cardId));
 
-        // Remove it from the card order
+        // Remove it from the card order and update the tags for the set
         const setMeta = this.getSetMeta(setId);
+        const cardMeta = this.getCard(setId, cardId);
         if (setMeta !== null) {
             this.saveSetMetaLocal({
                 ...setMeta,
                 cardOrder: setMeta.cardOrder.filter(c => c !== cardId),
+                availableTags: Utils.calculateNewTagCount(setMeta.availableTags, cardMeta.tags, []),
             });
         }
         // Remove the card data
@@ -183,7 +185,6 @@ export class LocalStorageProvider implements IStorageProvider {
 
         // If the card tags have changed we need to save the set meta as well
         if (cardMeta.tags !== undefined && card.tags !== cardMeta.tags) {
-            debugger;
             const oldSetMeta = this.getSetMeta(setId)!;
             const tagCount = oldSetMeta.availableTags;
             const newTags = Utils.calculateNewTagCount(tagCount, card.tags, cardMeta.tags);
