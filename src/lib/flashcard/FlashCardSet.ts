@@ -3,10 +3,18 @@ import { objectMapString } from "../utils";
 import IFlashCard, { ExportFlashCard } from "./flashcard";
 
 export interface IFlashCardSetMeta {
-    cardOrder: string[];
-    name: string;
     id: string;
+    name: string;
+
+    cardOrder: string[];
+    filter: IFlashCardSetCardFilter;
+    filteredCardOrder: IRemote<string[]>;
+
     availableTags: { [tag: string]: number };
+}
+
+export interface IFlashCardSetCardFilter {
+    tags: { [tag: string]: boolean };
 }
 
 export default interface IFlashCardSet extends IFlashCardSetMeta {

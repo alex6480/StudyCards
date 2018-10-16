@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 import IFlashCard, { IFlashCardMeta } from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
-import IFlashCardSet, { IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
+import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 
 /*
@@ -61,6 +61,9 @@ export const SAVE_CARD_META_COMPLETE = "save card meta complete";
 export const SAVE_SET_META_BEGIN = "save set meta begin";
 export const SAVE_SET_META_COMPLETE = "save set meta complete";
 
+export const SET_FILTER_CARDS_BEGIN = "set filter cards begin";
+export const SET_FILTER_CARDS_COMPLETE = "set filter cards complete";
+
 export const Action = {
     loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
     loadSetMetaAllComplete: (setMeta: {[id: string]: IFlashCardSetMeta}) =>
@@ -104,6 +107,11 @@ export const Action = {
 
     updateCardStudyData: (studyData: ICardStudyData) => createAction(UPDATE_CARD_STUDY_DATA, studyData),
     swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),
+
+    filterCardsBegin: (setId: string, filter: IFlashCardSetCardFilter) =>
+        createAction(SET_FILTER_CARDS_BEGIN, { setId, filter} ),
+    filterCardsComplete: (setId: string, filter: IFlashCardSetCardFilter, result: string[]) =>
+        createAction(SET_FILTER_CARDS_COMPLETE, { setId, filter, result }),
 
     /**
      * Resets the parts of the studydata that are temporary for a single study session

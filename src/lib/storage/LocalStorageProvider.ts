@@ -6,7 +6,8 @@ import * as fromCardStudyData from "../../reducers/cardStudyData";
 import * as fromSet from "../../reducers/set";
 import IFlashCard, { ExportFlashCard, IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace, IRichTextFlashCardFace } from "../flashcard/FlashCardFace";
-import IFlashCardSet, { ExportFlashCardSet, IFlashCardSetMeta } from "../flashcard/FlashCardSet";
+import IFlashCardSet, { ExportFlashCardSet, IFlashCardSetCardFilter,
+    IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 import parseCard from "../flashcard/parsers/parseCard";
 import { ICardStudyData, ISetStudyData, ISetStudyDataMeta } from "../flashcard/StudyData";
 import * as Utils from "../utils";
@@ -214,6 +215,10 @@ export class LocalStorageProvider implements IStorageProvider {
         this.result(() => dispatch(fromActions.Action.saveSetMetaComplete(setId)));
     }
 
+    public filterCards(dispatch: Dispatch, setId: string, filter: IFlashCardSetCardFilter) {
+        dispatch(fromActions.Action.filterCardsBegin(setId, filter));
+    }
+
     public getExportUri(setId: string) {
         // Load the appropriate data
         const setMeta = this.getSetMeta(setId);
@@ -269,7 +274,12 @@ export class LocalStorageProvider implements IStorageProvider {
         if (data === null) {
             return null;
         }
-        return JSON.parse(data);
+        const dataObject: IFlashCardSetMeta = JSON.parse(data);
+        return {
+            ...dataObject,
+            filteredCardOrder: { isFetching: false, value: dataObject.cardOrder },
+            filter: { tags: { } },
+        };
     }
 
     private saveSet(set: IFlashCardSet, saveCards: boolean) {

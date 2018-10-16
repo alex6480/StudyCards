@@ -1,5 +1,5 @@
 import IFlashCard from "../lib/flashcard/flashcard";
-import IFlashCardSet from "../lib/flashcard/FlashCardSet";
+import IFlashCardSet, { IFlashCardSetCardFilter } from "../lib/flashcard/FlashCardSet";
 import IRemote from "../lib/remote";
 import * as Utils from "../lib/utils";
 import * as fromActions from "./actions";
@@ -11,6 +11,8 @@ export const initialState: IFlashCardSet = {
     cardOrder: [],
     id: "",
     availableTags: {},
+    filter: { tags: { } },
+    filteredCardOrder: { isFetching: false, value: [] },
 };
 
 export function id(state: string = initialState.id, action: fromActions.Action) {
@@ -96,6 +98,62 @@ function cardOrder(state: string[] = initialState.cardOrder, action: fromActions
     }
 }
 
+function filter(state: IFlashCardSetCardFilter = initialState.filter, action: fromActions.Action) {
+    switch (action.type) {
+        case fromActions.SET_FILTER_CARDS_BEGIN:
+            return action.payload.filter;
+        default:
+            return state;
+    }
+}
+
+function filteredCardOrder(filteredCards: IRemote<string[]> | undefined,
+                           setCards: string[],
+                           currentFilter: IFlashCardSetCardFilter,
+                           action: fromActions.Action) {
+    switch (action.type) {
+        case fromActions.SET_FILTER_CARDS_BEGIN:
+        case fromActions.SET_FILTER_CARDS_COMPLETE:
+            if (Object.keys(action.payload.filter.tags).length === 0) {
+                // If the filter is removed, we don't need to poll the server and can apply the filter immediately
+                return { isFetching: false, value: setCards };
+            }
+            return {
+                isFetching: action.type === fromActions.SET_FILTER_CARDS_BEGIN,
+                value: filteredCardsValue(filteredCards!.value, setCards, currentFilter, action),
+            };
+        default:
+            if (filteredCards === undefined) {
+                return { isFetching: false, filteredCardOrder: setCards };
+            }
+            return {
+                isFetching: filteredCards.isFetching,
+                value: filteredCardsValue(filteredCards.value, setCards, currentFilter, action),
+            };
+    }
+}
+
+function filteredCardsValue(state: string[] | undefined,
+                            setCards: string[],
+                            currentFilter: IFlashCardSetCardFilter,
+                            action: fromActions.Action) {
+    switch (action.type) {
+        case fromActions.DELETE_CARD_BEGIN:
+        case fromActions.DELETE_CARD_COMPLETE:
+            // The card is removed from the results
+            return state !== undefined ? state.filter(c => c !== action.payload.cardId) : setCards;
+        case fromActions.SET_FILTER_CARDS_COMPLETE:
+            return action.payload.result;
+        case fromActions.ADD_NEW_CARD_BEGIN:
+            // The new card is shown no matter if it matches the filter or not
+            const afterIndex = action.payload.afterCardId !== undefined
+                               ? state!.indexOf(action.payload.afterCardId) : -1;
+            return [...state!.slice(0, afterIndex + 1), action.payload.cardId, ...state!.slice(afterIndex + 1)];
+        default:
+            return state !== undefined ? state : setCards;
+    }
+}
+
 function availableTags(state: { [tag: string]: number } = initialState.availableTags,
                        setCards: {[id: string]: IRemote<IFlashCard>} | undefined, action: fromActions.Action) {
     switch (action.type) {
@@ -121,12 +179,16 @@ export function setValue(state: Partial<IFlashCardSet> = initialState, action: f
 
     switch (action.type) {
         default:
+            const newCardOrder = cardOrder(state.cardOrder, action);
+            const newFilter = filter(state.filter, action);
             return {
                 id: stateId,
-                cardOrder: cardOrder(state.cardOrder, action),
+                cardOrder: newCardOrder,
                 name: name(state.name, stateId, action),
                 availableTags: availableTags(state.availableTags, state.cards, action),
                 cards: cards(state.cards, stateId, action),
+                filter: newFilter,
+                filteredCardOrder: filteredCardOrder(state.filteredCardOrder, newCardOrder, newFilter, action),
             };
     }
 }
@@ -187,6 +249,8 @@ export default function sets(state: IRemote<{ [id: string]: IRemote<IFlashCardSe
         case fromActions.DELETE_CARD_BEGIN:
         case fromActions.SAVE_CARD_META_BEGIN:
         case fromActions.SAVE_CARD_META_COMPLETE:
+        case fromActions.SET_FILTER_CARDS_BEGIN:
+        case fromActions.SET_FILTER_CARDS_COMPLETE:
             const setId = id(action.payload.setId, action);
             const previousSet = state.value === undefined || state.value[setId] === undefined
                                 ? { isFetching: true, value: undefined } : state.value[setId];

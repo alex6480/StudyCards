@@ -17,7 +17,7 @@ import { CardSidebar } from "./CardSidebar";
 import { TagEditor } from "./TagEditor";
 
 interface ICardEditorState {
-    transitionState: CardEditorTransitionState;
+    transitionState: TransitionState;
 }
 
 interface ICardEditorOwnProps {
@@ -49,7 +49,7 @@ interface ICardEditorDispatchProps {
 
 interface ICardEditorProps extends ICardEditorStateProps, ICardEditorDispatchProps { }
 
-enum CardEditorTransitionState {
+enum TransitionState {
     SlideIn,
     None,
     Collapsing,
@@ -65,8 +65,15 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
 
         const slideIn = props.slideIn === undefined || props.slideIn === true;
         this.state = {
-            transitionState: slideIn ? CardEditorTransitionState.SlideIn : CardEditorTransitionState.PlaceholderLoad,
+            transitionState: slideIn ? TransitionState.SlideIn : TransitionState.PlaceholderLoad,
         };
+    }
+
+    public componentWillReceiveProps(newProps: ICardEditorProps) {
+        // Go back to placeholder-load if the card value becomes undefined
+        if (newProps.card.value === undefined && this.state.transitionState !== TransitionState.PlaceholderLoad) {
+            this.setState({ transitionState: TransitionState.PlaceholderLoad });
+        }
     }
 
     public shouldComponentUpdate(newProps: ICardEditorProps, newState: ICardEditorState) {
@@ -139,32 +146,35 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
         }
 
         switch (this.state.transitionState) {
-            case (CardEditorTransitionState.SlideIn):
+            case (TransitionState.SlideIn):
                 return <SlideTransition targetState="expanded" onSlideComplete={this.introComplete.bind(this)}>
                     <li className="listed-flashcard is-clearfix">
                         {editor}
                         {divider}
                     </li>
                 </SlideTransition>;
-            case (CardEditorTransitionState.None):
+            case (TransitionState.None):
                 return <li className="listed-flashcard is-clearfix">
                     {editor}
                     {divider}
                 </li>;
-            case (CardEditorTransitionState.PlaceholderLoad):
+            case (TransitionState.PlaceholderLoad):
                 // Placeholders just pop into place, while the real content animates
                 return <li className={"is-clearfix" + (isPlaceholder ? "" : " listed-flashcard")}>
                     <ResizeTransition doTransition={! isPlaceholder}>
                         <div style={{ background: "white" }} >
-                            <FadeTransition from={isPlaceholder ? "visible" : "hidden"} to={"visible"}
+                            { isPlaceholder
+                                ? editor
+                                : <FadeTransition from="hidden" to={"visible"}
                                             onFadeComplete={this.introComplete.bind(this)}>
-                                {editor}
-                            </FadeTransition>
+                                    {editor}
+                                </FadeTransition>
+                            }
                         </div>
                     </ResizeTransition>
                     {divider}
                 </li>;
-            case (CardEditorTransitionState.Collapsing):
+            case (TransitionState.Collapsing):
                 return <SlideTransition targetState="collapsed" onSlideComplete={this.deleteFinal.bind(this)}>
                     <li className="listed-flashcard is-clearfix">
                         {editor}
@@ -183,7 +193,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     }
 
     private introComplete() {
-        this.setState({ transitionState: CardEditorTransitionState.None });
+        this.setState({ transitionState: TransitionState.None });
     }
 
     private updateTags(newTags: string[]) {
@@ -191,7 +201,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     }
 
     private delete() {
-        this.setState({ transitionState: CardEditorTransitionState.Collapsing });
+        this.setState({ transitionState: TransitionState.Collapsing });
     }
 
     private deleteFinal() {

@@ -67,9 +67,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
 
         switch (this.state.section) {
             case SetSection.Edit:
-                page = <SetCardEditor set={this.props.set.value}
-                            addNewCard={this.addNewCard.bind(this)}
-                            loadCards={this.loadCards.bind(this)} />;
+                page = <SetCardEditor setId={this.props.setId} />;
                 break;
             case SetSection.Export:
                 page = <SetExporter set={this.props.set.value} getExportUri={this.getSetExportUri.bind(this)}/>;

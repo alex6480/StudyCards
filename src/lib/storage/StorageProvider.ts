@@ -3,7 +3,7 @@ import { IAppState } from "../../reducers";
 import * as fromActions from "../../reducers/actions";
 import { IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace } from "../flashcard/FlashCardFace";
-import IFlashCardSet, { IFlashCardSetMeta } from "../flashcard/FlashCardSet";
+import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 
 export default interface IStorageProvider {
     /**
@@ -62,4 +62,9 @@ export default interface IStorageProvider {
      * Checks whether the specified set exists
      */
     setExists: (setId: string, callback: (setExists: boolean) => void) => void;
+
+    /**
+     * Updates the filtered cards for the specified set
+     */
+    filterCards: (dispatch: Dispatch, setId: string, filter: IFlashCardSetCardFilter) => void;
 }

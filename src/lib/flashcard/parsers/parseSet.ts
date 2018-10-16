@@ -31,6 +31,7 @@ export default function parse(set: ExportFlashCardSet,
 function parseSet(set: ExportFlashCardSet, onError: onErrorHandler): IFlashCardSet {
     const id = parseId(set, onError);
     const cards = parseCards(set, id, onError);
+    const cardOrder = parseCardOrder(set, cards, onError);
 
     const result: IFlashCardSet = {
         id,
@@ -38,6 +39,8 @@ function parseSet(set: ExportFlashCardSet, onError: onErrorHandler): IFlashCardS
         cards: Utils.objectMapString(cards, (k, v) => ({ isFetching: false, value: v, lastUpdated: Date.now() })),
         cardOrder: parseCardOrder(set, cards, onError),
         availableTags: Utils.countTags(cards),
+        filter: { tags: { } },
+        filteredCardOrder: { isFetching: false, value: cardOrder },
     };
 
     return result;

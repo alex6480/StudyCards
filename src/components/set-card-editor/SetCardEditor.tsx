@@ -1,23 +1,37 @@
 import * as React from "react";
-import IFlashCard from "../../lib/flashcard/flashcard";
-import { IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
-import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
+import IFlashCardSet, { IFlashCardSetCardFilter } from "../../lib/flashcard/FlashCardSet";
+import IRemote from "../../lib/remote";
+import IStorageProvider from "../../lib/storage/StorageProvider";
+import * as Utils from "../../lib/utils";
+import { IAppState } from "../../reducers";
 import { CardDivider } from "./CardDivider";
 import CardEditor from "./CardEditor";
 import { TagFilter } from "./TagFilter";
 
-interface ISetCardEditorProps {
-    onChange?: (newSet: IFlashCardSet) => void;
-    addNewCard: (afterCardId?: string) => string;
-    loadCards: (cardIds: string[]) => void;
-    set: IFlashCardSet;
+interface ISetCardEditorOwnProps {
+    setId: string;
 }
+
+interface ISetCardEditorStateProps extends ISetCardEditorOwnProps {
+    set: IFlashCardSet;
+    storage: IStorageProvider;
+}
+
+interface ISetCardEditorDispatchProps {
+    addNewCard: (store: IStorageProvider, afterCardId?: string) => string;
+    loadCards: (storage: IStorageProvider, cardIds: string[]) => void;
+    filterCards: (store: IStorageProvider, filter: IFlashCardSetCardFilter) => void;
+}
+
+interface ISetCardEditorProps extends ISetCardEditorStateProps, ISetCardEditorDispatchProps { }
 
 interface ISetCardEditorState {
     shownCards: string[];
 }
 
-export default class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorState> {
+class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorState> {
     /**
      * How many cards to load every time more cards are loaded
      */
@@ -36,29 +50,38 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
 
     constructor(props: ISetCardEditorProps) {
         super(props);
+        const set = this.props.set;
+        if (set.filteredCardOrder.value === undefined) {
+            throw new Error("Filtered card order should never be undefined");
+        }
+
         // Set initial state
         this.state = {
-            shownCards: props.set.cardOrder.slice(0, this.cardsToLoadAtOnce),
+            shownCards: set.filteredCardOrder.value.slice(0, this.cardsToLoadAtOnce),
         };
 
         // Load the cards to be edited
-        props.loadCards(props.set.cardOrder.slice(0, this.cardsToLoadAtOnce));
+        props.loadCards(props.storage, set.filteredCardOrder.value.slice(0, this.cardsToLoadAtOnce));
     }
 
     public render() {
+        const set = this.props.set;
         const content = <div className="container card-editor">
             { /* Set name */ }
-            <h2 className="title is-4">Edit cards in {this.props.set.name}</h2>
-            <h3 className="subtitle is-6">{this.cardCount === 0
+            <h2 className="title is-4">Edit cards in {set.name}</h2>
+            <h3 className="subtitle is-6">{set.cardOrder.length === 0
                 ? "This set contains no cards."
-                : "This set contains " + this.cardCount + " card" + (this.cardCount === 1 ? "" : "s") + "." }</h3>
+                : "Showing " + set.filteredCardOrder.value!.length + " cards out of "
+                    + set.cardOrder.length }</h3>
 
-            <TagFilter availableTags={this.props.set.availableTags} />
+            <TagFilter tags={set.availableTags}
+                activeTags={set.filter.tags || { }}
+                toggleTag={this.toggleTag.bind(this)} />
 
-            { /* Button for adding new card to the set*/ }
+            { /* Button for adding new card to the set. Dummy button is shown if filter is updating */ }
             <CardDivider
-                isSubtle={this.props.set.cardOrder.length !== 0}
-                addCard={this.addNewCard.bind(this)}
+                isSubtle={set.filteredCardOrder.value!.length !== 0}
+                addCard={! set.filteredCardOrder.isFetching ? this.addNewCard.bind(this) : undefined}
             />
 
             { /* Set content */ }
@@ -76,19 +99,29 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
         window.removeEventListener("scroll", this.scrollListener);
     }
 
-    private get cardCount(): number {
-        return this.props.set.cardOrder.length;
-    }
-
     private renderCards() {
-        if (this.cardCount === 0) {
-            // In case no cards currently exist
+        const set = this.props.set;
+        const cards: JSX.Element[] = [];
+        if (set.filteredCardOrder.isFetching || set.filteredCardOrder.value === undefined) {
+            // If currently filtering cards, show two placeholders
+            for (let i = 0; i < 2; i++) {
+                cards.push(
+                    <CardEditor key={i}
+                                setId={this.props.setId}
+                                cardId={"PLACEHOLDER"}
+                                slideIn={false}
+                                addNewCard={this.addNewCard.bind(this)}
+                                onDeleted={this.cardDeleted.bind(this)} />,
+                );
+            }
+        } else if (set.filteredCardOrder.value.length === 0) {
+            // No cards match the filter
         } else {
             // This deck contains cards and they should be rendered
-            const cards: JSX.Element[] = [];
             let loadingCards: number = 0;
-            for (const cardId of this.state.shownCards) {
-                const card = this.props.set.cards[cardId];
+            for (let i = 0; i < this.state.shownCards.length; i++) {
+                const cardId = this.state.shownCards[i];
+                const card = set.cards[cardId];
                 if (card === undefined) {
                     continue;
                 }
@@ -102,8 +135,8 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
                 }
                 // Add the actual card editor
                 cards.push(
-                    <CardEditor key={cardId}
-                                setId={this.props.set.id}
+                    <CardEditor key={i}
+                                setId={this.props.setId}
                                 cardId={cardId}
                                 slideIn={this.newlyAddedCards[cardId] === true}
                                 addNewCard={this.addNewCard.bind(this)}
@@ -113,11 +146,11 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
                 // Make sure the card doesn't show a slide transition in the future
                 delete this.newlyAddedCards[cardId];
             }
-
-            return <ul>
-                { cards }
-            </ul>;
         }
+
+        return <ul>
+            { cards }
+        </ul>;
     }
 
     private onScroll() {
@@ -131,7 +164,7 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
     }
 
     private addNewCard(afterCardId?: string) {
-        const newCardId = this.props.addNewCard(afterCardId);
+        const newCardId = this.props.addNewCard(this.props.storage, afterCardId);
         // Load one extra card to ensure that the newly added card can be shown
         const afterIndex = afterCardId !== undefined ? this.state.shownCards.indexOf(afterCardId) : -1;
         const newShownCards = [
@@ -152,14 +185,15 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
      * Loads more cards
      */
     private loadMoreCards(count: number) {
+        const set = this.props.set;
         const loadingCards = this.state.shownCards
-                                .filter(c => this.props.set.cards[c] !== undefined
-                                          && this.props.set.cards[c].isFetching === true);
+                                .filter(c => set.cards[c] !== undefined
+                                          && set.cards[c].isFetching === true);
         // Only load more cards if the cards from the last loading have actually been loaded
         if (loadingCards.length < this.cardsToLoadAtOnce) {
             let addedCards: number = 0;
             const cardsToLoad: string[] = [];
-            for (const cardId of this.props.set.cardOrder) {
+            for (const cardId of set.cardOrder) {
                 // Only add the specified amount of cards
                 if (addedCards === count) { break; }
 
@@ -172,8 +206,46 @@ export default class SetCardEditor extends React.Component<ISetCardEditorProps, 
             if (cardsToLoad.length === 0) {
                 return;
             }
-            this.props.loadCards(cardsToLoad);
+            this.props.loadCards(this.props.storage, cardsToLoad);
             this.setState({ shownCards:  this.state.shownCards.concat(cardsToLoad)});
         }
     }
+
+    private toggleTag(tag: string) {
+        const set = this.props.set;
+        let newTags: { [tag: string]: boolean };
+        if (set.filter.tags[tag] === true) {
+            // Create a new object where this tag is not present
+            const { [tag]: removedTagValue, ...tagsWithTagRemoved} = set.filter.tags;
+            newTags = tagsWithTagRemoved;
+        } else {
+            newTags = {...set.filter.tags, [tag]: true };
+        }
+
+        this.props.filterCards(this.props.storage, {
+            ...set.filter,
+            tags: newTags,
+        });
+    }
 }
+
+function mapStateToProps(state: IAppState, ownProps: ISetCardEditorOwnProps): ISetCardEditorStateProps {
+    return {
+        ...ownProps,
+        set: state.sets.value![ownProps.setId].value!,
+        storage: state.storageProvider,
+    };
+}
+
+function mapDispatchToProps(dispatch: Dispatch, ownProps: ISetCardEditorOwnProps): ISetCardEditorDispatchProps {
+    return {
+        addNewCard: (store: IStorageProvider, afterCardId?: string) =>
+            store.addCard(dispatch, ownProps.setId, afterCardId),
+        loadCards: (storage: IStorageProvider, cardIds: string[]) =>
+            storage.loadCards(dispatch, ownProps.setId, cardIds),
+        filterCards: (store: IStorageProvider, filter: IFlashCardSetCardFilter) =>
+            store.filterCards(dispatch, ownProps.setId, filter),
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SetCardEditor);
