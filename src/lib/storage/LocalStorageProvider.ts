@@ -217,6 +217,16 @@ export class LocalStorageProvider implements IStorageProvider {
 
     public filterCards(dispatch: Dispatch, setId: string, filter: IFlashCardSetCardFilter) {
         dispatch(fromActions.Action.filterCardsBegin(setId, filter));
+
+        const setMeta = this.getSetMeta(setId)!;
+        const result = setMeta.cardOrder.filter(cardId => {
+            const card = this.getCard(setId, cardId);
+            // Make a list of all the tags on the card that match the filter
+            const matchingTags = card.tags.filter(tag => filter.tags[tag] === true);
+            return matchingTags.length > 0;
+        });
+
+        this.result(() => dispatch(fromActions.Action.filterCardsComplete(setId, filter, result)));
     }
 
     public getExportUri(setId: string) {
