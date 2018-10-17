@@ -4,7 +4,7 @@ import { Dispatch } from "redux";
 import IFlashCard, { IFlashCardMeta } from "../../lib/flashcard/flashcard";
 import { FlashCardFaceId, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
 import IRemote from "../../lib/remote";
-import IStorageProvider from "../../lib/storage/StorageProvider";
+import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
 import FadeTransition from "../transition/FadeTransition";
@@ -36,15 +36,14 @@ interface ICardEditorOwnProps {
 
 interface ICardEditorStateProps extends ICardEditorOwnProps {
     card: IRemote<IFlashCard>;
-    storage: IStorageProvider;
 }
 
 interface ICardEditorDispatchProps {
-    deleteCard: (storage: IStorageProvider, setId: string, cardId: string) => void;
-    saveCardFace: (storage: IStorageProvider, setId: string, cardId: string, face: IFlashCardFace) => void;
+    deleteCard: (setId: string, cardId: string) => void;
+    saveCardFace: (setId: string, cardId: string, face: IFlashCardFace) => void;
     swapCardFaces: (setId: string, cardId: string) => void;
-    loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) => void;
-    saveCardMeta: (storage: IStorageProvider, setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) => void;
+    loadCards: (setId: string, cardIds: string[]) => void;
+    saveCardMeta: (setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) => void;
 }
 
 interface ICardEditorProps extends ICardEditorStateProps, ICardEditorDispatchProps { }
@@ -185,7 +184,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     }
 
     private saveCardFace(face: IFlashCardFace) {
-        this.props.saveCardFace(this.props.storage, this.props.setId, this.props.cardId, face);
+        this.props.saveCardFace(this.props.setId, this.props.cardId, face);
     }
 
     private swapCardFaces() {
@@ -197,7 +196,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     }
 
     private updateTags(newTags: string[]) {
-        this.props.saveCardMeta(this.props.storage, this.props.setId, this.props.cardId, { tags: newTags });
+        this.props.saveCardMeta(this.props.setId, this.props.cardId, { tags: newTags });
     }
 
     private delete() {
@@ -205,7 +204,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     }
 
     private deleteFinal() {
-        this.props.deleteCard(this.props.storage, this.props.setId, this.props.cardId);
+        this.props.deleteCard(this.props.setId, this.props.cardId);
         this.props.onDeleted(this.props.cardId);
     }
 }
@@ -218,21 +217,20 @@ function mapStateToProps(state: IAppState, ownProps: ICardEditorOwnProps): ICard
             isFetching: true,
             value: undefined,
         },
-        storage: state.storageProvider,
     };
 }
 
 function mapDispatchToProps(dispatch: Dispatch): ICardEditorDispatchProps {
     return {
-        deleteCard: (storage: IStorageProvider, setId: string, cardId: string) =>
-            dispatch<any>(storage.deleteCard(setId, cardId)),
-        saveCardFace: (storage: IStorageProvider, setId: string, cardId: string, face: IFlashCardFace) =>
-            dispatch<any>(storage.saveCardFace(setId, cardId, face)),
+        deleteCard: (setId: string, cardId: string) =>
+            dispatch<any>(Storage.deleteCard(setId, cardId)),
+        saveCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
+            dispatch<any>(Storage.saveCardFace(setId, cardId, face)),
         swapCardFaces: (setId: string, cardId: string) => dispatch(Action.swapCardFaces(setId, cardId)),
-        loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) =>
-            dispatch<any>(storage.loadCards(setId, cardIds)),
-        saveCardMeta: (storage: IStorageProvider, setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) =>
-            dispatch<any>(storage.saveCardMeta(setId, cardId, cardMeta)),
+        loadCards: (setId: string, cardIds: string[]) =>
+            dispatch<any>(Storage.loadCards(setId, cardIds)),
+        saveCardMeta: (setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) =>
+            dispatch<any>(Storage.saveCardMeta(setId, cardId, cardMeta)),
     };
 }
 

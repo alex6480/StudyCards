@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
-import IStorageProvider from "../../lib/storage/StorageProvider";
+import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
 import { SetSection } from "../SetContainer";
@@ -17,12 +17,11 @@ interface IDashboardOwnProps {
 
 interface IDashboardStateProps {
     sets: IRemote<{ [id: string]: IRemote<IFlashCardSet> }>;
-    storage: IStorageProvider;
 }
 
 interface IDashboardDispatchProps {
-    addSet: (storage: IStorageProvider, set?: IFlashCardSet, section?: SetSection) => string;
-    loadSetMetaAll: (storageProvider: IStorageProvider) => void;
+    addSet: (set?: IFlashCardSet, section?: SetSection) => string;
+    loadSetMetaAll: () => void;
 }
 
 interface IDashboardProps extends IDashboardStateProps, IDashboardDispatchProps, IDashboardOwnProps { }
@@ -33,7 +32,7 @@ export class Dashboard extends React.Component<IDashboardProps> {
         // Set initial state
         this.state = { };
 
-        props.loadSetMetaAll(props.storage);
+        props.loadSetMetaAll();
     }
 
     public render() {
@@ -70,7 +69,7 @@ export class Dashboard extends React.Component<IDashboardProps> {
     }
 
     private handleAddSet() {
-        const newSetId = this.props.addSet(this.props.storage);
+        const newSetId = this.props.addSet();
         this.props.goToSet(newSetId);
     }
 
@@ -92,14 +91,13 @@ export class Dashboard extends React.Component<IDashboardProps> {
 function mapStateToProps(state: IAppState): IDashboardStateProps {
     return {
         sets: state.sets,
-        storage: state.storageProvider,
     };
 }
 
 function mapDispatchToProps(dispatch: Dispatch): IDashboardDispatchProps {
     return {
-        addSet: (storage: IStorageProvider, set?: IFlashCardSet) => dispatch<any>(storage.addSet(set)),
-        loadSetMetaAll: (storage: IStorageProvider) => dispatch<any>(storage.loadSetMetaAll()),
+        addSet: (set?: IFlashCardSet) => dispatch<any>(Storage.addSet(set)),
+        loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
     };
 }
 

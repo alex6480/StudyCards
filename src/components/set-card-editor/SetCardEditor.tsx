@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import IFlashCardSet, { IFlashCardSetCardFilter } from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
-import IStorageProvider from "../../lib/storage/StorageProvider";
+import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import * as Utils from "../../lib/utils";
 import { IAppState } from "../../reducers";
 import { CardDivider } from "./CardDivider";
@@ -16,13 +16,12 @@ interface ISetCardEditorOwnProps {
 
 interface ISetCardEditorStateProps extends ISetCardEditorOwnProps {
     set: IFlashCardSet;
-    storage: IStorageProvider;
 }
 
 interface ISetCardEditorDispatchProps {
-    addNewCard: (store: IStorageProvider, afterCardId?: string) => string;
-    loadCards: (storage: IStorageProvider, cardIds: string[]) => void;
-    filterCards: (store: IStorageProvider, filter: IFlashCardSetCardFilter) => void;
+    addNewCard: (afterCardId?: string) => string;
+    loadCards: (cardIds: string[]) => void;
+    filterCards: (filter: IFlashCardSetCardFilter) => void;
 }
 
 interface ISetCardEditorProps extends ISetCardEditorStateProps, ISetCardEditorDispatchProps { }
@@ -61,7 +60,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         };
 
         // Load the cards to be edited
-        props.loadCards(props.storage, set.filteredCardOrder.value.slice(0, this.cardsToLoadAtOnce));
+        props.loadCards(set.filteredCardOrder.value.slice(0, this.cardsToLoadAtOnce));
     }
 
     public render() {
@@ -190,7 +189,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
     }
 
     private addNewCard(afterCardId?: string) {
-        const newCardId = this.props.addNewCard(this.props.storage, afterCardId);
+        const newCardId = this.props.addNewCard(afterCardId);
         // Load one extra card to ensure that the newly added card can be shown
         const afterIndex = afterCardId !== undefined ? this.state.shownCards.indexOf(afterCardId) : -1;
         const newShownCards = [
@@ -232,7 +231,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
             if (cardsToLoad.length === 0) {
                 return;
             }
-            this.props.loadCards(this.props.storage, cardsToLoad);
+            this.props.loadCards(cardsToLoad);
             this.setState({ shownCards:  this.state.shownCards.concat(cardsToLoad)});
         }
     }
@@ -248,7 +247,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
             newTags = {...set.filter.tags, [tag]: true };
         }
 
-        this.props.filterCards(this.props.storage, {
+        this.props.filterCards({
             ...set.filter,
             tags: newTags,
         });
@@ -259,18 +258,17 @@ function mapStateToProps(state: IAppState, ownProps: ISetCardEditorOwnProps): IS
     return {
         ...ownProps,
         set: state.sets.value![ownProps.setId].value!,
-        storage: state.storageProvider,
     };
 }
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: ISetCardEditorOwnProps): ISetCardEditorDispatchProps {
     return {
-        addNewCard: (store: IStorageProvider, afterCardId?: string) =>
-            dispatch<any>(store.addCard(ownProps.setId, afterCardId)),
-        loadCards: (storage: IStorageProvider, cardIds: string[]) =>
-            dispatch<any>(storage.loadCards(ownProps.setId, cardIds)),
-        filterCards: (store: IStorageProvider, filter: IFlashCardSetCardFilter) =>
-            dispatch<any>(store.filterCards(ownProps.setId, filter)),
+        addNewCard: (afterCardId?: string) =>
+            dispatch<any>(Storage.addCard(ownProps.setId, afterCardId)),
+        loadCards: (cardIds: string[]) =>
+            dispatch<any>(Storage.loadCards(ownProps.setId, cardIds)),
+        filterCards: (filter: IFlashCardSetCardFilter) =>
+            dispatch<any>(Storage.filterCards(ownProps.setId, filter)),
     };
 }
 

@@ -5,6 +5,12 @@ import { Action } from "../../reducers/actions";
 import { IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace } from "../flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../flashcard/FlashCardSet";
+import { LocalStorageProvider } from "./LocalStorageProvider";
+
+export let Storage: IStorageProvider = new LocalStorageProvider();
+export function setStorage(storageProvider: IStorageProvider) {
+    Storage = storageProvider;
+}
 
 export default interface IStorageProvider {
     /**

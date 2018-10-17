@@ -9,13 +9,11 @@ import sets, * as fromSet from "./set";
 import studyData from "./setStudyData";
 
 export interface IAppState {
-    storageProvider: IStorageProvider;
     sets: IRemote<{ [id: string]: IRemote<IFlashCardSet> }>;
     studyData: { [id: string]: IRemote<ISetStudyData> };
 }
 
 const initialState: IAppState = {
-    storageProvider: new LocalStorageProvider(1000),
     sets: {
         isFetching: false,
         value: undefined,

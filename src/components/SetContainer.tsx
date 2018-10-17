@@ -6,7 +6,7 @@ import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 import IRemote from "../lib/remote";
-import IStorageProvider from "../lib/storage/StorageProvider";
+import IStorageProvider, { Storage } from "../lib/storage/StorageProvider";
 import { IAppState } from "../reducers";
 import { Action } from "../reducers/actions";
 import EditableText from "./rich-text-editor/EditableText";
@@ -22,18 +22,16 @@ interface ISetContainerOwnProps {
 }
 
 interface ISetContainerStateProps extends ISetContainerOwnProps {
-    storage: IStorageProvider;
     set: IRemote<IFlashCardSet>;
     studyData: IRemote<ISetStudyData>;
 }
 
 interface ISetContainerDispatchProps {
-    addNewCard: (store: IStorageProvider, setId: string, afterCardId?: string) => void;
-    saveSetMeta: (storage: IStorageProvider, setMeta: Partial<IFlashCardSetMeta>) => void;
+    saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) => void;
     resetStudySessionData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
-    getSetStudyData: (storage: IStorageProvider, setId: string) => void;
-    loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) => void;
+    getSetStudyData: (setId: string) => void;
+    loadCards: (setId: string, cardIds: string[]) => void;
 }
 
 interface ISetContainerProps extends ISetContainerStateProps, ISetContainerDispatchProps { }
@@ -79,7 +77,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                         studyData={this.props.studyData}
                         goToSection={this.goToSection.bind(this)}
                         loadCards={this.loadCards.bind(this)}
-                        loadStudyData={() => this.props.getSetStudyData(this.props.storage, this.props.setId)}/>;
+                        loadStudyData={() => this.props.getSetStudyData(this.props.setId)}/>;
                 break;
             default:
                 throw new Error("Unknown section");
@@ -113,15 +111,11 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
     }
 
     private getSetExportUri(setId: string) {
-        return this.props.storage.getExportUri(setId);
-    }
-
-    private addNewCard(afterCardId?: string) {
-        return this.props.addNewCard(this.props.storage, this.props.setId, afterCardId);
+        return Storage.getExportUri(setId);
     }
 
     private loadCards(cardIds: string[]) {
-        return this.props.loadCards(this.props.storage, this.props.setId, cardIds);
+        return this.props.loadCards(this.props.setId, cardIds);
     }
 
     private goToSection(newPage: SetSection) {
@@ -130,7 +124,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
 
     private updateSetName(newName: string) {
         if (newName !== this.props.set.value!.name) {
-            this.props.saveSetMeta(this.props.storage, { id: this.props.setId, name: newName });
+            this.props.saveSetMeta({ id: this.props.setId, name: newName });
         }
     }
 }
@@ -140,21 +134,16 @@ function mapStateToProps(state: IAppState, ownProps: ISetContainerOwnProps): ISe
         ...ownProps,
         set: state.sets.value![ownProps.setId],
         studyData: state.studyData[ownProps.setId],
-        storage: state.storageProvider,
     };
 }
 
 function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
     return {
-        addNewCard: (store: IStorageProvider, setId: string, afterCardId?: string) =>
-            dispatch<any>(store.addCard(setId, afterCardId)),
-        getSetStudyData: (storage: IStorageProvider, setId: string) => dispatch<any>(storage.loadSetStudyData(setId)),
-        saveSetMeta: (storage: IStorageProvider, setMeta: Partial<IFlashCardSetMeta>) =>
-            dispatch<any>(storage.saveSetMeta(setMeta)),
+        getSetStudyData: (setId: string) => dispatch<any>(Storage.loadSetStudyData(setId)),
+        saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) => dispatch<any>(Storage.saveSetMeta(setMeta)),
         resetStudySessionData: () => dispatch(Action.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Action.updateCardStudyData(studyData)),
-        loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) =>
-            dispatch<any>(storage.loadCards(setId, cardIds)),
+        loadCards: (setId: string, cardIds: string[]) => dispatch<any>(Storage.loadCards(setId, cardIds)),
     };
 }
 

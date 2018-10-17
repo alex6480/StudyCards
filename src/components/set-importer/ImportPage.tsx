@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
-import IStorageProvider from "../../lib/storage/StorageProvider";
+import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import SetCardEditor from "../set-card-editor/SetCardEditor";
 import SetExporter from "../SetExporter";
@@ -13,16 +13,12 @@ interface ISetImporterOwnProps {
     goToDashboard: () => void;
 }
 
-interface ISetImporterStateProps {
-    storage: IStorageProvider;
-}
-
 interface ISetImporterDispatchProps {
-    addSet: (storage: IStorageProvider, set: IFlashCardSet) => void;
-    setExists: (stroage: IStorageProvider, setId: string, callback: (exists: boolean) => void) => void;
+    addSet: (set: IFlashCardSet) => void;
+    setExists: (setId: string, callback: (exists: boolean) => void) => void;
 }
 
-interface ISetImporterProps extends ISetImporterStateProps, ISetImporterDispatchProps, ISetImporterOwnProps { }
+interface ISetImporterProps extends ISetImporterDispatchProps, ISetImporterOwnProps { }
 
 interface ISetImporterState {
     importedSet: IFlashCardSet | null;
@@ -73,7 +69,7 @@ class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> 
     }
 
     private fileChanged(set: IFlashCardSet) {
-        this.props.setExists(this.props.storage, set.id, (exists) => {
+        this.props.setExists(set.id, (exists) => {
             this.setState({
                 importedSet: set,
                 existingSetExists: exists,
@@ -85,7 +81,7 @@ class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> 
         if (this.state.importedSet == null) {
             throw new Error("Imported set cannot be null when importing");
         }
-        this.props.addSet(this.props.storage, this.state.importedSet);
+        this.props.addSet(this.state.importedSet);
         this.props.goToDashboard();
     }
 
@@ -121,17 +117,14 @@ class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> 
     }
 }
 
-function mapStateToProps(state: IAppState): ISetImporterStateProps {
-    return {
-        storage: state.storageProvider,
-    };
+function mapStateToProps(state: IAppState): { } {
+    return { };
 }
 
 function mapDispatchToProps(dispatch: Dispatch): ISetImporterDispatchProps {
     return {
-        addSet: (storage: IStorageProvider, set: IFlashCardSet) => dispatch<any>(storage.addSet(set)),
-        setExists: (storage: IStorageProvider, setId: string, callback: (exists: boolean) => void) =>
-            storage.setExists(setId, callback),
+        addSet: (set: IFlashCardSet) => dispatch<any>(Storage.addSet(set)),
+        setExists: (setId: string, callback: (exists: boolean) => void) => Storage.setExists(setId, callback),
     };
 }
 
