@@ -10,7 +10,7 @@ import reducer from "./reducers";
 
 import "./mystyles.scss";
 
-setStorageProvider(new LocalStorageProvider(400));
+setStorageProvider(new LocalStorageProvider(1000));
 const store = createStore(reducer, applyMiddleware(thunk));
 
 ReactDOM.render(
