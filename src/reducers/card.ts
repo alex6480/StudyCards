@@ -72,7 +72,6 @@ export default function card(state: IRemote<Partial<IFlashCard>> = initialState,
                 value: undefined, // Don't show default cards while the real cards are being loaded
                 isFetching: true,
             };
-            return { ...state, value: value(state.value, cardId, action) };
         case fromActions.LOAD_CARDS_COMPLETE:
             return {
                 ...state,
