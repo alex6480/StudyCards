@@ -155,7 +155,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                 if (card.isFetching) {
                     loadingCards++;
                     if (loadingCards > 2) {
-                        break;
+                        continue;
                     }
                 }
                 // Add the actual card editor

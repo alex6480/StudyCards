@@ -67,13 +67,11 @@ export default function card(state: IRemote<Partial<IFlashCard>> = initialState,
                              action: fromActions.Action): IRemote<IFlashCard> {
     switch (action.type) {
         case fromActions.LOAD_CARDS_BEGIN:
-            if (cardId in action.payload.cardIds) {
-                return {
-                    ...state,
-                    value: undefined, // Don't show default cards while the real cards are being loaded
-                    isFetching: true,
-                };
-            }
+            return {
+                ...state,
+                value: undefined, // Don't show default cards while the real cards are being loaded
+                isFetching: true,
+            };
             return { ...state, value: value(state.value, cardId, action) };
         case fromActions.LOAD_CARDS_COMPLETE:
             return {
