@@ -191,6 +191,8 @@ export class LocalStorageProvider implements IStorageProvider {
     public saveCardMeta(setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>):
         ThunkAction<void, IAppState, void, fromActions.Action>  {
         return (dispatch, getState) => {
+            const previousAvailableTags = getState().sets.value![setId].value!.availableTags;
+
             dispatch(fromActions.Action.saveCardMetaBegin(setId, cardId, cardMeta));
 
             const card = this.getCard(setId, cardId);
@@ -206,11 +208,29 @@ export class LocalStorageProvider implements IStorageProvider {
             if (cardMeta.tags !== undefined && card.tags !== cardMeta.tags) {
                 const oldSetMeta = this.getSetMeta(setId)!;
                 const tagCount = oldSetMeta.availableTags;
-                const newTags = Utils.calculateNewTagCount(tagCount, card.tags, cardMeta.tags);
-                this.saveSetMetaLocal({ ...oldSetMeta, availableTags: newTags });
+                const newTagCount = Utils.calculateNewTagCount(tagCount, card.tags, cardMeta.tags);
+
+                // If any tags where deleted, we may need to update the filter to not include these tags
+                const deletedTags = Object.keys(previousAvailableTags)
+                .filter(tag => newTagCount[tag] === undefined);
+                if (deletedTags.find(tag => oldSetMeta.filter.tags[tag] === undefined)) {
+                    const newTags = Utils.arrayToObject(
+                        Object.keys(oldSetMeta.filter.tags).filter(tag => deletedTags.indexOf(tag) === -1),
+                        tag => [tag, true],
+                    );
+                    const newFilter = {
+                        ...oldSetMeta.filter,
+                        tags: {
+                            ...newTags,
+                        },
+                    };
+                    dispatch<any>(this.filterCards(setId, newFilter));
+                }
+
+                this.saveSetMetaLocal({ ...oldSetMeta, availableTags: newTagCount });
             }
 
-            dispatch(fromActions.Action.saveCardMetaComplete(setId, cardId, newMeta));
+            this.result(() => dispatch(fromActions.Action.saveCardMetaComplete(setId, cardId, newMeta)));
         };
     }
 
