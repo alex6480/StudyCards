@@ -8,7 +8,7 @@ import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../fl
 import { LocalStorageProvider } from "./LocalStorageProvider";
 
 export let Storage: IStorageProvider = new LocalStorageProvider();
-export function setStorage(storageProvider: IStorageProvider) {
+export function setStorageProvider(storageProvider: IStorageProvider) {
     Storage = storageProvider;
 }
 
