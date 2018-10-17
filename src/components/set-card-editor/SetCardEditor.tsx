@@ -266,11 +266,11 @@ function mapStateToProps(state: IAppState, ownProps: ISetCardEditorOwnProps): IS
 function mapDispatchToProps(dispatch: Dispatch, ownProps: ISetCardEditorOwnProps): ISetCardEditorDispatchProps {
     return {
         addNewCard: (store: IStorageProvider, afterCardId?: string) =>
-            store.addCard(dispatch, ownProps.setId, afterCardId),
+            dispatch<any>(store.addCard(ownProps.setId, afterCardId)),
         loadCards: (storage: IStorageProvider, cardIds: string[]) =>
-            storage.loadCards(dispatch, ownProps.setId, cardIds),
+            dispatch<any>(storage.loadCards(ownProps.setId, cardIds)),
         filterCards: (store: IStorageProvider, filter: IFlashCardSetCardFilter) =>
-            store.filterCards(dispatch, ownProps.setId, filter),
+            dispatch<any>(store.filterCards(ownProps.setId, filter)),
     };
 }
 

@@ -225,14 +225,14 @@ function mapStateToProps(state: IAppState, ownProps: ICardEditorOwnProps): ICard
 function mapDispatchToProps(dispatch: Dispatch): ICardEditorDispatchProps {
     return {
         deleteCard: (storage: IStorageProvider, setId: string, cardId: string) =>
-            storage.deleteCard(dispatch, setId, cardId),
+            dispatch<any>(storage.deleteCard(setId, cardId)),
         saveCardFace: (storage: IStorageProvider, setId: string, cardId: string, face: IFlashCardFace) =>
-            storage.saveCardFace(dispatch, setId, cardId, face),
+            dispatch<any>(storage.saveCardFace(setId, cardId, face)),
         swapCardFaces: (setId: string, cardId: string) => dispatch(Action.swapCardFaces(setId, cardId)),
         loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) =>
-            storage.loadCards(dispatch, setId, cardIds),
+            dispatch<any>(storage.loadCards(setId, cardIds)),
         saveCardMeta: (storage: IStorageProvider, setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) =>
-            storage.saveCardMeta(dispatch, setId, cardId, cardMeta),
+            dispatch<any>(storage.saveCardMeta(setId, cardId, cardMeta)),
     };
 }
 

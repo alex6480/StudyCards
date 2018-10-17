@@ -1,4 +1,5 @@
 import { Dispatch } from "redux";
+import { ThunkAction } from "redux-thunk";
 import { IAppState } from "../../reducers";
 import * as fromActions from "../../reducers/actions";
 import { initialCard } from "../../reducers/card";
@@ -29,204 +30,227 @@ export class LocalStorageProvider implements IStorageProvider {
         this.virtualDelay = virtualDelay;
     }
 
-    public loadSetMetaAll(dispatch: Dispatch) {
-        dispatch(fromActions.Action.loadSetMetaAllBegin());
+    public loadSetMetaAll(): ThunkAction<void, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            dispatch(fromActions.Action.loadSetMetaAllBegin());
 
-        const setIds = this.getSetIds();
-        const meta = setIds.reduce((result: {[id: string]: IFlashCardSetMeta}, item, index, array) => {
-            // Assume that set meta exists since it's in the set id table
-            const setMeta = this.getSetMeta(item)!;
-            result[setMeta.id] = setMeta;
-            return result;
-        }, {});
+            const setIds = this.getSetIds();
+            const meta = setIds.reduce((result: {[id: string]: IFlashCardSetMeta}, item, index, array) => {
+                // Assume that set meta exists since it's in the set id table
+                const setMeta = this.getSetMeta(item)!;
+                result[setMeta.id] = setMeta;
+                return result;
+            }, {});
 
-        this.result(() => dispatch(fromActions.Action.loadSetMetaAllComplete(meta)));
+            this.result(() => dispatch(fromActions.Action.loadSetMetaAllComplete(meta)));
+        };
     }
 
-    public addCard(dispatch: Dispatch, setId: string, afterCardId?: string) {
-        const cardId = Utils.guid();
-        dispatch(fromActions.Action.addNewCardBegin(cardId, setId, afterCardId));
+    public addCard(setId: string, afterCardId?: string): ThunkAction<string, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            const cardId = Utils.guid();
+            dispatch(fromActions.Action.addNewCardBegin(cardId, setId, afterCardId));
 
-        // Save the added card
-        this.saveCard({
-            ...initialCard,
-            setId,
-            id: cardId,
-        });
-
-        // Update the set meta table
-        const setMeta = this.getSetMeta(setId);
-        if (setMeta === null) {
-            throw new Error("Set " + setId + " does not exist");
-        }
-
-        let cardOrder = setMeta.cardOrder;
-        const afterIndex = afterCardId !== undefined ? cardOrder.indexOf(afterCardId) : -1;
-        cardOrder = [...cardOrder.slice(0, afterIndex + 1), cardId, ...cardOrder.slice(afterIndex + 1)];
-        this.saveSetMetaLocal({ ...setMeta, cardOrder });
-
-        this.result(() => dispatch(fromActions.Action.addNewCardComplete(setId, cardId)));
-
-        return cardId;
-    }
-
-    public deleteCard(dispatch: Dispatch, setId: string, cardId: string) {
-        dispatch(fromActions.Action.deleteCardBegin(setId, cardId));
-
-        // Remove it from the card order and update the tags for the set
-        const setMeta = this.getSetMeta(setId);
-        const cardMeta = this.getCard(setId, cardId);
-        if (setMeta !== null) {
-            this.saveSetMetaLocal({
-                ...setMeta,
-                cardOrder: setMeta.cardOrder.filter(c => c !== cardId),
-                availableTags: Utils.calculateNewTagCount(setMeta.availableTags, cardMeta.tags, []),
+            // Save the added card
+            this.saveCard({
+                ...initialCard,
+                setId,
+                id: cardId,
             });
-        }
-        // Remove the card data
-        localStorage.removeItem(this.cardKey(setId, cardId));
 
-        console.log("DELETE STUDY DATA AS WELL");
+            // Update the set meta table
+            const setMeta = this.getSetMeta(setId);
+            if (setMeta === null) {
+                throw new Error("Set " + setId + " does not exist");
+            }
 
-        this.result(() => dispatch(fromActions.Action.deleteCardComplete(setId, cardId)));
+            let cardOrder = setMeta.cardOrder;
+            const afterIndex = afterCardId !== undefined ? cardOrder.indexOf(afterCardId) : -1;
+            cardOrder = [...cardOrder.slice(0, afterIndex + 1), cardId, ...cardOrder.slice(afterIndex + 1)];
+            this.saveSetMetaLocal({ ...setMeta, cardOrder });
+
+            this.result(() => dispatch(fromActions.Action.addNewCardComplete(setId, cardId)));
+
+            return cardId;
+        };
     }
 
-    public addSet(dispatch: Dispatch, set?: IFlashCardSet) {
-        if (set === undefined || set.id === undefined) {
-            set = {
-                ...fromSet.initialState,
-                id: Utils.guid(),
-            };
-        }
-        const setId = set.id!;
+    public deleteCard(setId: string, cardId: string): ThunkAction<void, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            dispatch(fromActions.Action.deleteCardBegin(setId, cardId));
 
-        this.saveSet(set, true);
-        this.saveSetStudyData({
-            setId,
-            cardData: {},
-        }, []);
+            // Remove it from the card order and update the tags for the set
+            const setMeta = this.getSetMeta(setId);
+            const cardMeta = this.getCard(setId, cardId);
+            if (setMeta !== null) {
+                this.saveSetMetaLocal({
+                    ...setMeta,
+                    cardOrder: setMeta.cardOrder.filter(c => c !== cardId),
+                    availableTags: Utils.calculateNewTagCount(setMeta.availableTags, cardMeta.tags, []),
+                });
+            }
+            // Remove the card data
+            localStorage.removeItem(this.cardKey(setId, cardId));
 
-        dispatch(fromActions.Action.addSetBegin(setId, set));
-        this.result(() => dispatch(fromActions.Action.addSetComplete(setId)));
-        return setId;
+            console.log("DELETE STUDY DATA AS WELL");
+
+            this.result(() => dispatch(fromActions.Action.deleteCardComplete(setId, cardId)));
+        };
+    }
+
+    public addSet(set?: IFlashCardSet): ThunkAction<string, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            if (set === undefined || set.id === undefined) {
+                set = {
+                    ...fromSet.initialState,
+                    id: Utils.guid(),
+                };
+            }
+            const setId = set.id!;
+
+            this.saveSet(set, true);
+            this.saveSetStudyData({
+                setId,
+                cardData: {},
+            }, []);
+
+            dispatch(fromActions.Action.addSetBegin(setId, set));
+            this.result(() => dispatch(fromActions.Action.addSetComplete(setId)));
+            return setId;
+        };
     }
 
     public setExists(setId: string, callback: (setExists: boolean) => void) {
         callback(this.getSetIds().indexOf(setId) !== -1);
     }
 
-    public loadSetStudyData(dispatch: Dispatch, setId: string) {
-        dispatch(fromActions.Action.loadSetStudyDataBegin(setId));
+    public loadSetStudyData(setId: string): ThunkAction<void, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            dispatch(fromActions.Action.loadSetStudyDataBegin(setId));
 
-        const setStudyMetaData = localStorage.getItem(this.setStudyDataKey(setId));
-        if (setStudyMetaData === null) {
-            throw new Error("No study metadata is available for set with id " + setId);
-        }
-        const setStudyMeta: ISetStudyDataMeta = JSON.parse(setStudyMetaData);
-        const setMeta = this.getSetMeta(setId);
-        if (setMeta === null) {
-            throw new Error("Set " + setId + " does not exist");
-        }
-        const result = {
-            ...setStudyMeta,
-            cardData: Utils.arrayToObject(
-                setMeta.cardOrder.map(cardId => this.getCardStudyData(setId, cardId)),
-                val => [val.cardId, val]),
+            const setStudyMetaData = localStorage.getItem(this.setStudyDataKey(setId));
+            if (setStudyMetaData === null) {
+                throw new Error("No study metadata is available for set with id " + setId);
+            }
+            const setStudyMeta: ISetStudyDataMeta = JSON.parse(setStudyMetaData);
+            const setMeta = this.getSetMeta(setId);
+            if (setMeta === null) {
+                throw new Error("Set " + setId + " does not exist");
+            }
+            const result = {
+                ...setStudyMeta,
+                cardData: Utils.arrayToObject(
+                    setMeta.cardOrder.map(cardId => this.getCardStudyData(setId, cardId)),
+                    val => [val.cardId, val]),
+            };
+
+            this.result(() => dispatch(fromActions.Action.loadSetStudyDataComplete(result)));
         };
-
-        this.result(() => dispatch(fromActions.Action.loadSetStudyDataComplete(result)));
     }
 
-    public loadCards(dispatch: Dispatch, setId: string, cardIds: string[]) {
-        dispatch(fromActions.Action.loadCardsBegin(setId, cardIds));
+    public loadCards(setId: string, cardIds: string[]): ThunkAction<void, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            dispatch(fromActions.Action.loadCardsBegin(setId, cardIds));
 
-        const cards: IFlashCard[] = [];
-        const setMeta = this.getSetMeta(setId);
-        if (setMeta === null) {
-            throw new Error("Set " + setId + " does not exist");
-        }
-        for (const cardId of cardIds) {
-            cards.push(this.getCard(setId, cardId));
-        }
+            const cards: IFlashCard[] = [];
+            const setMeta = this.getSetMeta(setId);
+            if (setMeta === null) {
+                throw new Error("Set " + setId + " does not exist");
+            }
+            for (const cardId of cardIds) {
+                cards.push(this.getCard(setId, cardId));
+            }
 
-        this.result(() =>
-            dispatch(fromActions.Action.loadCardsComplete(setId, Utils.arrayToObject(cards, c => [c.id, c]))));
-    }
-
-    public saveCardFace(dispatch: Dispatch, setId: string, cardId: string, face: IFlashCardFace) {
-        dispatch(fromActions.Action.saveCardFaceBegin(setId, cardId, face));
-
-        // Save the card face
-        const card = this.getCard(setId, cardId);
-        this.saveCard({
-            ...card,
-            setId,
-            id: cardId,
-            faces: {
-                ...card.faces,
-                [face.id]: face,
-            },
-        });
-
-        this.result(() =>
-            dispatch(fromActions.Action.saveCardFaceComplete(setId, cardId)));
-    }
-
-    public saveCardMeta(dispatch: Dispatch, setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) {
-        dispatch(fromActions.Action.saveCardMetaBegin(setId, cardId, cardMeta));
-
-        const card = this.getCard(setId, cardId);
-        const newMeta = {
-            ...card,
-            setId,
-            id: cardId,
-            ...cardMeta,
+            this.result(() =>
+                dispatch(fromActions.Action.loadCardsComplete(setId, Utils.arrayToObject(cards, c => [c.id, c]))));
         };
-        this.saveCard(newMeta);
-
-        // If the card tags have changed we need to save the set meta as well
-        if (cardMeta.tags !== undefined && card.tags !== cardMeta.tags) {
-            const oldSetMeta = this.getSetMeta(setId)!;
-            const tagCount = oldSetMeta.availableTags;
-            const newTags = Utils.calculateNewTagCount(tagCount, card.tags, cardMeta.tags);
-            this.saveSetMetaLocal({ ...oldSetMeta, availableTags: newTags });
-        }
-
-        dispatch(fromActions.Action.saveCardMetaComplete(setId, cardId, newMeta));
     }
 
-    public saveSetMeta(dispatch: Dispatch, setMeta: Partial<IFlashCardSetMeta>) {
-        if (setMeta.id === undefined) {
-            throw new Error("Set id must be provided");
-        }
+    public saveCardFace(setId: string, cardId: string, face: IFlashCardFace):
+            ThunkAction<void, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            dispatch(fromActions.Action.saveCardFaceBegin(setId, cardId, face));
 
-        dispatch(fromActions.Action.saveSetMetaBegin(setMeta));
-
-        const previousSetMeta = this.getSetMeta(setMeta.id);
-        const {cards, ...initialMeta} = fromSet.initialState;
-        this.saveSetMetaLocal({
-            ...initialMeta,
-            ...previousSetMeta,
-            ...setMeta,
-            availableTags: previousSetMeta !== null ? previousSetMeta.availableTags : initialMeta.availableTags,
-        });
-
-        const setId = setMeta.id;
-        this.result(() => dispatch(fromActions.Action.saveSetMetaComplete(setId)));
-    }
-
-    public filterCards(dispatch: Dispatch, setId: string, filter: IFlashCardSetCardFilter) {
-        dispatch(fromActions.Action.filterCardsBegin(setId, filter));
-
-        const setMeta = this.getSetMeta(setId)!;
-        const result = setMeta.cardOrder.filter(cardId => {
+            // Save the card face
             const card = this.getCard(setId, cardId);
-            // Make a list of all the tags on the card that match the filter
-            const matchingTags = card.tags.filter(tag => filter.tags[tag] === true);
-            return matchingTags.length > 0;
-        });
+            this.saveCard({
+                ...card,
+                setId,
+                id: cardId,
+                faces: {
+                    ...card.faces,
+                    [face.id]: face,
+                },
+            });
 
-        this.result(() => dispatch(fromActions.Action.filterCardsComplete(setId, filter, result)));
+            this.result(() =>
+                dispatch(fromActions.Action.saveCardFaceComplete(setId, cardId)));
+        };
+    }
+
+    public saveCardMeta(setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>):
+        ThunkAction<void, IAppState, void, fromActions.Action>  {
+        return (dispatch, getState) => {
+            dispatch(fromActions.Action.saveCardMetaBegin(setId, cardId, cardMeta));
+
+            const card = this.getCard(setId, cardId);
+            const newMeta = {
+                ...card,
+                setId,
+                id: cardId,
+                ...cardMeta,
+            };
+            this.saveCard(newMeta);
+
+            // If the card tags have changed we need to save the set meta as well
+            if (cardMeta.tags !== undefined && card.tags !== cardMeta.tags) {
+                const oldSetMeta = this.getSetMeta(setId)!;
+                const tagCount = oldSetMeta.availableTags;
+                const newTags = Utils.calculateNewTagCount(tagCount, card.tags, cardMeta.tags);
+                this.saveSetMetaLocal({ ...oldSetMeta, availableTags: newTags });
+            }
+
+            dispatch(fromActions.Action.saveCardMetaComplete(setId, cardId, newMeta));
+        };
+    }
+
+    public saveSetMeta(setMeta: Partial<IFlashCardSetMeta>): ThunkAction<void, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            if (setMeta.id === undefined) {
+                throw new Error("Set id must be provided");
+            }
+
+            dispatch(fromActions.Action.saveSetMetaBegin(setMeta));
+
+            const previousSetMeta = this.getSetMeta(setMeta.id);
+            const {cards, ...initialMeta} = fromSet.initialState;
+            this.saveSetMetaLocal({
+                ...initialMeta,
+                ...previousSetMeta,
+                ...setMeta,
+                availableTags: previousSetMeta !== null ? previousSetMeta.availableTags : initialMeta.availableTags,
+            });
+
+            const setId = setMeta.id;
+            this.result(() => dispatch(fromActions.Action.saveSetMetaComplete(setId)));
+        };
+    }
+
+    public filterCards(setId: string, filter: IFlashCardSetCardFilter):
+        ThunkAction<void, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            dispatch(fromActions.Action.filterCardsBegin(setId, filter));
+
+            const setMeta = this.getSetMeta(setId)!;
+            const result = setMeta.cardOrder.filter(cardId => {
+                const card = this.getCard(setId, cardId);
+                // Make a list of all the tags on the card that match the filter
+                const matchingTags = card.tags.filter(tag => filter.tags[tag] === true);
+                return matchingTags.length > 0;
+            });
+
+            this.result(() => dispatch(fromActions.Action.filterCardsComplete(setId, filter, result)));
+        };
     }
 
     public getExportUri(setId: string) {
@@ -241,6 +265,7 @@ export class LocalStorageProvider implements IStorageProvider {
             cards: Utils.arrayToObject(cards, card =>
             [card.id, {
                 isFetching: false,
+                requestId: null,
                 value: card,
             }]),
         };
@@ -287,7 +312,10 @@ export class LocalStorageProvider implements IStorageProvider {
         const dataObject: IFlashCardSetMeta = JSON.parse(data);
         return {
             ...dataObject,
-            filteredCardOrder: { isFetching: false, value: dataObject.cardOrder },
+            filteredCardOrder: {
+                isFetching: false,
+                value: dataObject.cardOrder,
+            },
             filter: { tags: { } },
         };
     }

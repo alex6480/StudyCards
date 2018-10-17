@@ -147,14 +147,14 @@ function mapStateToProps(state: IAppState, ownProps: ISetContainerOwnProps): ISe
 function mapDispatchToProps(dispatch: Dispatch): ISetContainerDispatchProps {
     return {
         addNewCard: (store: IStorageProvider, setId: string, afterCardId?: string) =>
-            store.addCard(dispatch, setId, afterCardId),
-        getSetStudyData: (storage: IStorageProvider, setId: string) => storage.loadSetStudyData(dispatch, setId),
+            dispatch<any>(store.addCard(setId, afterCardId)),
+        getSetStudyData: (storage: IStorageProvider, setId: string) => dispatch<any>(storage.loadSetStudyData(setId)),
         saveSetMeta: (storage: IStorageProvider, setMeta: Partial<IFlashCardSetMeta>) =>
-            storage.saveSetMeta(dispatch, setMeta),
+            dispatch<any>(storage.saveSetMeta(setMeta)),
         resetStudySessionData: () => dispatch(Action.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Action.updateCardStudyData(studyData)),
         loadCards: (storage: IStorageProvider, setId: string, cardIds: string[]) =>
-            storage.loadCards(dispatch, setId, cardIds),
+            dispatch<any>(storage.loadCards(setId, cardIds)),
     };
 }
 

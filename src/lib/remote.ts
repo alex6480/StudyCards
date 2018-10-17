@@ -13,3 +13,11 @@ export default interface IRemote<T> {
      */
     value?: T;
 }
+
+export function EmptyRemote<T>(): IRemote<T> {
+    return {
+        isFetching: false,
+        error: undefined,
+        value: undefined,
+    };
+}

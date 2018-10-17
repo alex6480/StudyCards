@@ -129,7 +129,7 @@ function mapStateToProps(state: IAppState): ISetImporterStateProps {
 
 function mapDispatchToProps(dispatch: Dispatch): ISetImporterDispatchProps {
     return {
-        addSet: (storage: IStorageProvider, set: IFlashCardSet) => storage.addSet(dispatch, set),
+        addSet: (storage: IStorageProvider, set: IFlashCardSet) => dispatch<any>(storage.addSet(set)),
         setExists: (storage: IStorageProvider, setId: string, callback: (exists: boolean) => void) =>
             storage.setExists(setId, callback),
     };

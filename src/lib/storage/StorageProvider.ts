@@ -1,6 +1,7 @@
 import { Dispatch } from "redux";
+import { ThunkAction } from "redux-thunk";
 import { IAppState } from "../../reducers";
-import * as fromActions from "../../reducers/actions";
+import { Action } from "../../reducers/actions";
 import { IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace } from "../flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../flashcard/FlashCardSet";
@@ -9,49 +10,51 @@ export default interface IStorageProvider {
     /**
      * Used to get meta data for all sets
      */
-    loadSetMetaAll: (dispatch: Dispatch) => void;
+    loadSetMetaAll: () => ThunkAction<void, IAppState, void, Action>;
 
     /**
      * Saves the metadata for the specified set on the remote source
      */
-    saveSetMeta: (dispatch: Dispatch, setMeta: Partial<IFlashCardSetMeta>) => void;
+    saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) => ThunkAction<void, IAppState, void, Action>;
 
     /**
      * Fetches the studydata for the specified set
      */
-    loadSetStudyData: (dispatch: Dispatch, setId: string) => void;
+    loadSetStudyData: (setId: string) => ThunkAction<void, IAppState, void, Action>;
 
     /**
      * Fetches card data for the specified card ids
      */
-    loadCards: (dispatch: Dispatch, setId: string, cardIds: string[]) => void;
+    loadCards: (setId: string, cardIds: string[]) => ThunkAction<void, IAppState, void, Action>;
 
     /**
      * Adds a new card to the deck
      * Returns the id of the newly added card
      */
-    addCard: (dispatch: Dispatch, setId: string, afterCardId?: string) => string;
+    addCard: (setId: string, afterCardId?: string) => ThunkAction<string, IAppState, void, Action>;
 
     /**
      * Deletes the specified card
      */
-    deleteCard: (dispatch: Dispatch, setId: string, cardId: string) => void;
+    deleteCard: (setId: string, cardId: string) => ThunkAction<void, IAppState, void, Action>;
 
     /**
      * Saves everything about a card except for its faces
      */
-    saveCardMeta: (dispatch: Dispatch, setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) => void;
+    saveCardMeta: (setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) =>
+        ThunkAction<void, IAppState, void, Action>;
 
     /**
      * Adds the specified set. A set with the same id cannot exist
      * Returns the id of the newly added set
      */
-    addSet: (dispatch: Dispatch, set?: IFlashCardSet) => string;
+    addSet: (set?: IFlashCardSet) => ThunkAction<string, IAppState, void, Action>;
 
     /**
      * Saves the card face on the remote host
      */
-    saveCardFace: (dispatch: Dispatch, setId: string, cardId: string, face: IFlashCardFace) => void;
+    saveCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
+        ThunkAction<void, IAppState, void, Action>;
 
     /**
      * Returns a URI where an exported version of this set can be downloaded
@@ -66,5 +69,5 @@ export default interface IStorageProvider {
     /**
      * Updates the filtered cards for the specified set
      */
-    filterCards: (dispatch: Dispatch, setId: string, filter: IFlashCardSetCardFilter) => void;
+    filterCards: (setId: string, filter: IFlashCardSetCardFilter) => ThunkAction<void, IAppState, void, Action>;
 }
