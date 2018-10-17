@@ -26,7 +26,6 @@ export function id(state: string = initialState.id, action: fromActions.Action) 
 function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.cards,
                setId: string,
                action: fromActions.Action): { [id: string]: IRemote<IFlashCard>; } {
-    console.log(action);
     switch (action.type) {
         case fromActions.LOAD_SET_META_ALL_COMPLETE:
             return Utils.arrayToObject(action.payload[setId].cardOrder, v => {
