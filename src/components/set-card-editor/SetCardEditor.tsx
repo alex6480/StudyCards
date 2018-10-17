@@ -27,7 +27,7 @@ interface ISetCardEditorDispatchProps {
 interface ISetCardEditorProps extends ISetCardEditorStateProps, ISetCardEditorDispatchProps { }
 
 interface ISetCardEditorState {
-    shownCards: string[];
+    shownCards: { [cardId: string]: boolean };
 }
 
 class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorState> {
@@ -55,12 +55,13 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         }
 
         // Set initial state
+        const initialShownCards = set.filteredCardOrder.value.slice(0, this.cardsToLoadAtOnce);
         this.state = {
-            shownCards: set.filteredCardOrder.value.slice(0, this.cardsToLoadAtOnce),
+            shownCards: Utils.arrayToObject(initialShownCards, cardId => [cardId, true]),
         };
 
         // Load the cards to be edited
-        props.loadCards(set.filteredCardOrder.value.slice(0, this.cardsToLoadAtOnce));
+        props.loadCards(initialShownCards);
     }
 
     public render() {
@@ -98,32 +99,6 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         window.removeEventListener("scroll", this.scrollListener);
     }
 
-    public componentWillReceiveProps(newProps: ISetCardEditorProps) {
-        const oldCards = this.props.set.filteredCardOrder.value;
-        const newCards = newProps.set.filteredCardOrder.value;
-        if (newCards !== undefined && oldCards !== undefined) {
-            // Check if the filtered cards have changed
-            let different = newCards.length !== oldCards.length;
-            if (! different) {
-                for (let i = 0; i < newCards.length; i++) {
-                    if (newCards[i] !== oldCards[i]) {
-                        different = true;
-                        break;
-                    }
-                }
-            }
-            if (! different) { return; }
-
-            // Make an object for fast lookups
-            const map = Utils.arrayToObject(newCards, cardId => [cardId, true]);
-            // Update the shown cards to only include those that match the filter
-            const matchingCards =  this.state.shownCards.filter(cardId => map[cardId] === true);
-            // Afterwards check if we have reached the bottom of the screen and more cards should be loaded
-            this.setState({ shownCards: matchingCards},
-                () => this.onScroll());
-        }
-    }
-
     private renderCards() {
         const set = this.props.set;
         const cards: JSX.Element[] = [];
@@ -144,8 +119,14 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         } else {
             // This deck contains cards and they should be rendered
             let loadingCards: number = 0;
-            for (let i = 0; i < this.state.shownCards.length; i++) {
-                const cardId = this.state.shownCards[i];
+            let shownCards: number = 0;
+            for (const cardId of this.props.set.filteredCardOrder.value!) {
+                if (shownCards === Object.keys(this.state.shownCards).length) {
+                    // All the cards have been shown. No need to go through the rest
+                    break;
+                }
+                if (this.state.shownCards[cardId] !== true) { continue; }
+
                 const card = set.cards[cardId];
                 if (card === undefined) {
                     continue;
@@ -160,13 +141,14 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                 }
                 // Add the actual card editor
                 cards.push(
-                    <CardEditor key={i}
+                    <CardEditor key={cardId}
                                 setId={this.props.setId}
                                 cardId={cardId}
                                 slideIn={this.newlyAddedCards[cardId] === true}
                                 addNewCard={this.addNewCard.bind(this)}
                                 onDeleted={this.cardDeleted.bind(this)}/>,
                 );
+                shownCards++;
 
                 // Make sure the card doesn't show a slide transition in the future
                 delete this.newlyAddedCards[cardId];
@@ -190,18 +172,17 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
 
     private addNewCard(afterCardId?: string) {
         const newCardId = this.props.addNewCard(afterCardId);
-        // Load one extra card to ensure that the newly added card can be shown
-        const afterIndex = afterCardId !== undefined ? this.state.shownCards.indexOf(afterCardId) : -1;
-        const newShownCards = [
-            ...this.state.shownCards.slice(0, afterIndex + 1),
-            newCardId,
-            ...this.state.shownCards.slice(afterIndex + 1)];
-        this.setState({ shownCards: newShownCards });
+        // The newly added card will always be shown
+        this.setState({ shownCards: {
+            ...this.state.shownCards,
+            [newCardId]: true,
+        }});
         this.newlyAddedCards[newCardId] = true;
     }
 
     private cardDeleted(cardId: string) {
-        this.setState({ shownCards: this.state.shownCards.filter(c => c !== cardId) });
+        const {[cardId]: deletedCard, ...rest} = this.state.shownCards;
+        this.setState({ shownCards: rest });
         // Run the scroll listener in case more cards need to be loaded
         this.onScroll();
     }
@@ -211,7 +192,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
      */
     private loadMoreCards(count: number) {
         const set = this.props.set;
-        const loadingCards = this.state.shownCards
+        const loadingCards = Object.keys(this.state.shownCards)
                                 .filter(c => set.cards[c] !== undefined
                                           && set.cards[c].isFetching === true);
         // Only load more cards if the cards from the last loading have actually been loaded
@@ -222,7 +203,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                 // Only add the specified amount of cards
                 if (addedCards === count) { break; }
 
-                if (this.state.shownCards.indexOf(cardId) === -1) {
+                if (this.state.shownCards[cardId] !== true) {
                     cardsToLoad.push(cardId);
                     addedCards++;
                 }
@@ -232,7 +213,11 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                 return;
             }
             this.props.loadCards(cardsToLoad);
-            this.setState({ shownCards:  this.state.shownCards.concat(cardsToLoad)});
+            this.setState({ shownCards: {
+                    ...this.state.shownCards,
+                    ...Utils.arrayToObject(cardsToLoad, cardId => [cardId, true]),
+                },
+            });
         }
     }
 
