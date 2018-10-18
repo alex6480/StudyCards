@@ -13,7 +13,7 @@ interface ISetHeaderOwnProps {
 }
 
 interface ISetHeaderStateProps extends ISetHeaderOwnProps {
-    set: IRemote<IFlashCardSet>;
+    set?: IRemote<IFlashCardSet>;
 }
 
 interface ISetHeaderDispatchProps {
@@ -41,7 +41,9 @@ class SetHeader extends React.Component<ISetHeaderProps> {
     }
 
     private renderTitle() {
-        if (this.props.set.value === undefined) {
+        if (this.props.set === undefined) {
+            return <span>Set Not Found</span>;
+        } else if (this.props.set.value === undefined) {
             // No data is available at all. Just show the spinner
             return <span className="icon is-large">
                 <i className=" fas fa-spinner fa-pulse "></i>
@@ -66,7 +68,7 @@ class SetHeader extends React.Component<ISetHeaderProps> {
     }
 
     private renderBreadcrumbs() {
-        if (this.props.set.value === undefined) {
+        if (this.props.set === undefined || this.props.set.value === undefined) {
             // Show empty breadcrumbs
             return <li>&nbsp;</li>;
         } else {
@@ -81,7 +83,7 @@ class SetHeader extends React.Component<ISetHeaderProps> {
     }
 
     private updateSetName(newName: string) {
-        if (newName !== this.props.set.value!.name) {
+        if (newName !== this.props.set!.value!.name) {
             this.props.saveSetMeta({ id: this.props.setId, name: newName });
         }
     }
