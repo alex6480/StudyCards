@@ -1,11 +1,11 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
 import IRemote from "../lib/remote";
 import EditableText from "./rich-text-editor/EditableText";
 
 interface ISetHeaderProps {
     set: IRemote<IFlashCardSet>;
-    goToDashboard: () => void;
     updateSetName: (newName: string) => void;
 }
 
@@ -58,7 +58,7 @@ export default class SetHeader extends React.Component<ISetHeaderProps> {
         } else {
             // Show the current set in the breadcrumbs
             return <>
-                <li><a href="#" onClick={this.props.goToDashboard}>My Sets</a></li>
+                <li><Link to="/">My Sets</Link></li>
                 <li className="is-active"><a href="#" aria-current="page">
                     {this.props.set.value.name}
                 </a></li>

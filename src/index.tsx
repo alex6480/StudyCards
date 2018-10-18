@@ -1,3 +1,5 @@
+import { BrowserRouter, Route } from "react-router-dom";
+
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
@@ -15,7 +17,9 @@ const store = createStore(reducer, applyMiddleware(thunk));
 
 ReactDOM.render(
     <Provider store={store}>
-        <StudyCardsApp />
+        <BrowserRouter>
+            <StudyCardsApp/>
+        </BrowserRouter>
     </Provider>,
     document.getElementById("app"),
 );

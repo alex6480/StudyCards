@@ -1,3 +1,4 @@
+import { History } from "history";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -11,8 +12,7 @@ import AddNewSetTile from "./AddNewSetTile";
 import SetTile from "./SetTile";
 
 interface IDashboardOwnProps {
-    goToImport: () => void;
-    goToSet: (setId: string, section?: SetSection) => void;
+    history: History<any>;
 }
 
 interface IDashboardStateProps {
@@ -61,7 +61,7 @@ export class Dashboard extends React.Component<IDashboardProps> {
         if (this.props.sets.value !== undefined) {
             return <div className="columns is-multiline">
                 { this.getSetTiles(this.props.sets.isFetching, this.props.sets.value) }
-                <AddNewSetTile addSet={this.handleAddSet.bind(this)} goToImport={this.props.goToImport}/>
+                <AddNewSetTile addSet={this.handleAddSet.bind(this)} />
             </div>;
         } else {
             return <p>Loading sets</p>;
@@ -70,7 +70,7 @@ export class Dashboard extends React.Component<IDashboardProps> {
 
     private handleAddSet() {
         const newSetId = this.props.addSet();
-        this.props.goToSet(newSetId);
+        this.props.history.push("/set/" + newSetId + "/edit");
     }
 
     private getSetTiles(isFetching: boolean, sets: { [id: string]: IRemote<IFlashCardSet> }) {
@@ -81,7 +81,7 @@ export class Dashboard extends React.Component<IDashboardProps> {
                 isFetching,
                 value: sets[setId].value,
             };
-            result.push(<SetTile key={setId} set={set} goToSet={this.props.goToSet} setId={setId}/>);
+            result.push(<SetTile key={setId} set={set} setId={setId}/>);
         }
 
         return result;

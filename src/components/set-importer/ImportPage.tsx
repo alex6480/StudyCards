@@ -1,5 +1,7 @@
+import { History } from "history";
 import * as React from "react";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 import { Dispatch } from "redux";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
@@ -10,7 +12,7 @@ import SetExporter from "../SetExporter";
 import SetFilePicker from "./SetFilePicker";
 
 interface ISetImporterOwnProps {
-    goToDashboard: () => void;
+    history: History<any>;
 }
 
 interface ISetImporterDispatchProps {
@@ -18,7 +20,7 @@ interface ISetImporterDispatchProps {
     setExists: (setId: string, callback: (exists: boolean) => void) => void;
 }
 
-interface ISetImporterProps extends ISetImporterDispatchProps, ISetImporterOwnProps { }
+interface ISetImporterProps extends ISetImporterOwnProps, ISetImporterDispatchProps { }
 
 interface ISetImporterState {
     importedSet: IFlashCardSet | null;
@@ -43,7 +45,7 @@ class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> 
                         <h1 className="title is-1">Import set</h1>
                         <nav className="breadcrumb subtitle is-6" aria-label="breadcrumbs">
                             <ul>
-                                <li><a href="#" onClick={this.props.goToDashboard}>My Sets</a></li>
+                                <li><Link to="/">My Sets</Link></li>
                                 <li className="is-active"><a href="#" aria-current="page">Import</a></li>
                             </ul>
                         </nav>
@@ -82,7 +84,7 @@ class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> 
             throw new Error("Imported set cannot be null when importing");
         }
         this.props.addSet(this.state.importedSet);
-        this.props.goToDashboard();
+        this.props.history.replace("/");
     }
 
     private renderReplaceBox() {

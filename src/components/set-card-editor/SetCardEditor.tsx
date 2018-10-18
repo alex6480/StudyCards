@@ -1,11 +1,14 @@
 import * as React from "react";
 import { connect } from "react-redux";
+import { RouteComponentProps } from "react-router";
 import { Dispatch } from "redux";
-import IFlashCardSet, { IFlashCardSetCardFilter } from "../../lib/flashcard/FlashCardSet";
+import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
 import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import * as Utils from "../../lib/utils";
 import { IAppState } from "../../reducers";
+import SetHeader from "../SetHeader";
+import SetNav from "../SetNav";
 import { CardDivider } from "./CardDivider";
 import CardEditor from "./CardEditor";
 import { TagFilter } from "./TagFilter";
@@ -14,14 +17,16 @@ interface ISetCardEditorOwnProps {
     setId: string;
 }
 
-interface ISetCardEditorStateProps extends ISetCardEditorOwnProps {
-    set: IFlashCardSet;
+interface ISetCardEditorStateProps extends RouteComponentProps<ISetCardEditorOwnProps> {
+    set: IRemote<IFlashCardSet>;
+    setId: string;
 }
 
 interface ISetCardEditorDispatchProps {
     addNewCard: (afterCardId?: string) => string;
     loadCards: (cardIds: string[]) => void;
     filterCards: (filter: IFlashCardSetCardFilter) => void;
+    saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) => void;
 }
 
 interface ISetCardEditorProps extends ISetCardEditorStateProps, ISetCardEditorDispatchProps { }
@@ -55,7 +60,9 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
 
     constructor(props: ISetCardEditorProps) {
         super(props);
-        const set = this.props.set;
+        console.log(props);
+        const set = this.props.set.value!;
+
         if (set.filteredCardOrder.value === undefined) {
             throw new Error("Filtered card order should never be undefined");
         }
@@ -75,11 +82,15 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
     }
 
     public componentWillReceiveProps(newProps: ISetCardEditorProps) {
-        if (newProps.set.filter !== this.props.set.filter) {
+        if (this.props.set.isFetching && newProps.set.isFetching === false) {
+            this.updateVisibleCards();
+        }
+
+        if (newProps.set.value!.filter !== this.props.set.value!.filter) {
             // Filter has been changed.
             // Since filter can only be changed at the top of the page, it's safe to set all cards to invisible
             this.setState({
-                cardDisplayData: Utils.arrayToObject(newProps.set.filteredCardOrder.value!,
+                cardDisplayData: Utils.arrayToObject(newProps.set.value!.filteredCardOrder.value!,
                     cardId => [cardId, { visible: false, loaded: this.state.cardDisplayData[cardId].loaded }],
                 ),
             }, () => {
@@ -90,30 +101,43 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
     }
 
     public render() {
-        const set = this.props.set;
-        const content = <div className="container card-editor">
-            { /* Set name */ }
-            <h2 className="title is-4">Edit cards in {set.name}</h2>
-            <h3 className="subtitle is-6">{set.cardOrder.length === 0
-                ? "This set contains no cards."
-                : "Showing " + set.filteredCardOrder.value!.length + " cards out of "
-                    + set.cardOrder.length }</h3>
+        const set = this.props.set.value!;
+        let content: JSX.Element;
 
-            <TagFilter tags={set.availableTags}
-                activeTags={set.filter.tags || { }}
-                toggleTag={this.toggleTag.bind(this)} />
+        if (this.props.set.isFetching) {
+            content = <div>Loading Set</div>;
+        } else {
+            content = <div className="container card-editor">
+                { /* Set name */ }
+                <h2 className="title is-4">Edit cards in {set.name}</h2>
+                <h3 className="subtitle is-6">{set.cardOrder.length === 0
+                    ? "This set contains no cards."
+                    : "Showing " + set.filteredCardOrder.value!.length + " cards out of "
+                        + set.cardOrder.length }</h3>
 
-            { /* Button for adding new card to the set. Dummy button is shown if filter is updating */ }
-            <CardDivider
-                isSubtle={set.filteredCardOrder.value!.length !== 0}
-                addCard={! set.filteredCardOrder.isFetching ? this.addNewCard.bind(this) : undefined}
-            />
+                <TagFilter tags={set.availableTags}
+                    activeTags={set.filter.tags || { }}
+                    toggleTag={this.toggleTag.bind(this)} />
 
-            { /* Set content */ }
-            {this.renderCards()}
+                { /* Button for adding new card to the set. Dummy button is shown if filter is updating */ }
+                <CardDivider
+                    isSubtle={set.filteredCardOrder.value!.length !== 0}
+                    addCard={! set.filteredCardOrder.isFetching ? this.addNewCard.bind(this) : undefined}
+                />
+
+                { /* Set content */ }
+                {this.renderCards()}
+            </div>;
+        }
+
+        return <div>
+            <SetHeader set={this.props.set}
+                updateSetName={this.updateSetName.bind(this)} />
+            <SetNav setId={this.props.setId} activePage="edit" />
+            <section>
+                {content}
+            </section>
         </div>;
-
-        return content;
     }
 
     public componentWillMount() {
@@ -125,7 +149,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
     }
 
     private renderCards() {
-        const set = this.props.set;
+        const set = this.props.set.value!;
         const cards: JSX.Element[] = [];
         if (set.filteredCardOrder.isFetching || set.filteredCardOrder.value === undefined) {
             // If currently filtering cards, show two placeholders
@@ -144,7 +168,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         } else {
             // This deck contains cards and they should be rendered
             let loadingCards: number = 0;
-            for (const cardId of this.props.set.filteredCardOrder.value!) {
+            for (const cardId of set.filteredCardOrder.value!) {
                 if (! this.state.cardDisplayData[cardId].visible) { continue; }
 
                 const card = set.cards[cardId];
@@ -212,7 +236,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
      * If the cards have not been loaded before, they will be
      */
     private showMoreCards(count: number) {
-        const set = this.props.set;
+        const set = this.props.set.value!;
         const loadingCards = Object.keys(this.state.cardDisplayData)
                                 .filter(c => set.cards[c] !== undefined
                                           && set.cards[c].isFetching === true);
@@ -245,7 +269,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
     }
 
     private toggleTag(tag: string) {
-        const set = this.props.set;
+        const set = this.props.set.value!;
         let newTags: { [tag: string]: boolean };
         if (set.filter.tags[tag] === true) {
             // Create a new object where this tag is not present
@@ -271,23 +295,35 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
             });
         }
     }
+
+    private updateSetName(newName: string) {
+        if (newName !== this.props.set.value!.name) {
+            this.props.saveSetMeta({ id: this.props.setId, name: newName });
+        }
+    }
 }
 
-function mapStateToProps(state: IAppState, ownProps: ISetCardEditorOwnProps): ISetCardEditorStateProps {
+function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<ISetCardEditorOwnProps>):
+    ISetCardEditorStateProps {
     return {
         ...ownProps,
-        set: state.sets.value![ownProps.setId].value!,
+        setId: ownProps.match.params.setId,
+        set: state.sets.value![ownProps.match.params.setId],
     };
 }
 
-function mapDispatchToProps(dispatch: Dispatch, ownProps: ISetCardEditorOwnProps): ISetCardEditorDispatchProps {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: RouteComponentProps<ISetCardEditorOwnProps>):
+    ISetCardEditorDispatchProps {
+    const setId = ownProps.match.params.setId;
     return {
         addNewCard: (afterCardId?: string) =>
-            dispatch<any>(Storage.addCard(ownProps.setId, afterCardId)),
+            dispatch<any>(Storage.addCard(setId, afterCardId)),
         loadCards: (cardIds: string[]) =>
-            dispatch<any>(Storage.loadCards(ownProps.setId, cardIds)),
+            dispatch<any>(Storage.loadCards(setId, cardIds)),
         filterCards: (filter: IFlashCardSetCardFilter) =>
-            dispatch<any>(Storage.filterCards(ownProps.setId, filter)),
+            dispatch<any>(Storage.filterCards(setId, filter)),
+        saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) =>
+            dispatch<any>(Storage.saveSetMeta(setMeta)),
     };
 }
 

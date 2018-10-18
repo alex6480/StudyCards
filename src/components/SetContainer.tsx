@@ -64,9 +64,9 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
         }
 
         switch (this.state.section) {
-            case SetSection.Edit:
+            /* case SetSection.Edit:
                 page = <SetCardEditor setId={this.props.setId} />;
-                break;
+                break;*/
             case SetSection.Export:
                 page = <SetExporter set={this.props.set.value} getExportUri={this.getSetExportUri.bind(this)}/>;
                 break;
@@ -85,25 +85,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
 
         return <div>
             <SetHeader set={this.props.set}
-                updateSetName={this.updateSetName.bind(this)}
-                goToDashboard={this.props.goToDashboard.bind(this)} />
-            <nav className="navbar" role="navigation" aria-label="main navigation">
-                <div className="navbar-menu container">
-                    <div className="navbar-start">
-                        <a className="navbar-item" onClick={this.props.goToDashboard}>
-                            <span className="icon icon-small">
-                                <i className="fas fa-arrow-left"></i>
-                            </span>&nbsp;
-                            Back
-                        </a>
-                        <a className="navbar-item" onClick={() => this.goToSection(SetSection.Study)}>Study</a>
-                        <a className="navbar-item" onClick={() => this.goToSection(SetSection.Edit)}>Edit Cards</a>
-                        <a className="navbar-item"
-                            onClick={() => this.goToSection(SetSection.Properties)}>Set Properties</a>
-                        <a className="navbar-item" onClick={() => this.goToSection(SetSection.Export)}>Export</a>
-                    </div>
-                </div>
-            </nav>
+                updateSetName={this.updateSetName.bind(this)} />
             <section className="section">
                 {page}
             </section>

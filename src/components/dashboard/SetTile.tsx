@@ -1,4 +1,6 @@
+import { History } from "history";
 import * as React from "react";
+import { Link } from "react-router-dom";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
 import { SetSection } from "../SetContainer";
@@ -9,11 +11,9 @@ import SlideTransition from "../transition/SlideTransition";
 interface ISetTileProps {
     set: IRemote<IFlashCardSet>;
     setId: string;
-    goToSet: (setId: string, section: SetSection) => void;
 }
 
 export default class SetTile extends React.Component<ISetTileProps> {
-    private transition: "slide" | "fade" = "fade";
     constructor(props: ISetTileProps) {
         super(props);
         // Set initial state
@@ -49,20 +49,20 @@ export default class SetTile extends React.Component<ISetTileProps> {
                     <div className="card-footer-item">
                         <div className="field has-addons">
                             <p className="control">
-                                <a href="#" className="button is-primary" onClick={this.goToStudy.bind(this)}>
+                                <Link href="#" className="button is-primary" to={"/set/" + this.props.setId + "/study"}>
                                     <span className="icon is-small">
                                         <i className="fas fa-book"></i>
                                     </span>&nbsp;
                                     Study
-                                </a>
+                                </Link>
                             </p>
                             <p className="control">
-                                <a href="#" className="button" onClick={this.goToEdit.bind(this)}>
+                                <Link href="#" className="button" to={"/set/" + this.props.setId + "/edit"}>
                                     <span className="icon is-small">
                                         <i className="fas fa-pen"></i>
                                     </span>&nbsp;
                                     Edit
-                                </a>
+                                </Link>
                             </p>
                         </div>
                     </div>
@@ -80,13 +80,5 @@ export default class SetTile extends React.Component<ISetTileProps> {
                 </ResizeTransition>
             </div>
         </div>;
-    }
-
-    private goToStudy() {
-        this.props.goToSet(this.props.setId, SetSection.Study);
-    }
-
-    private goToEdit() {
-        this.props.goToSet(this.props.setId, SetSection.Edit);
     }
 }

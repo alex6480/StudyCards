@@ -1,7 +1,7 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 
 interface IAddNewSetTileProps {
-    goToImport: () => void;
     addSet: () => void;
 }
 
@@ -15,12 +15,12 @@ export default class AddNewSetTile extends React.Component<IAddNewSetTileProps> 
     public render() {
         return <div className="column is-2">
             <div className="tile is-vertical">
-                <a className="tile button is-primary is-child" onClick={this.props.addSet.bind(this)}>
+                <a className="tile button is-primary is-child" onClick={this.props.addSet}>
                     Create new
                 </a>
-                <a className="tile button is-info is-child" onClick={this.props.goToImport.bind(this)}>
+                <Link className="tile button is-info is-child" to="/import">
                     Import
-                </a>
+                </Link>
             </div>
         </div>;
     }
