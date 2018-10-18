@@ -3,7 +3,6 @@ import * as React from "react";
 import { Link } from "react-router-dom";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
-import { SetSection } from "../SetContainer";
 import FadeTransition from "../transition/FadeTransition";
 import ResizeTransition from "../transition/ResizeTransition";
 import SlideTransition from "../transition/SlideTransition";

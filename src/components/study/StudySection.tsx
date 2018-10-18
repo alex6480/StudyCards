@@ -10,7 +10,6 @@ import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
-import { SetSection } from "../SetContainer";
 import SetHeader from "../SetHeader";
 import SetNav from "../SetNav";
 import PresentedCard from "./PresentedCard";

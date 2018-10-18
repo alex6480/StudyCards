@@ -7,7 +7,6 @@ import IRemote from "../../lib/remote";
 import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
-import { SetSection } from "../SetContainer";
 import AddNewSetTile from "./AddNewSetTile";
 import SetTile from "./SetTile";
 
@@ -20,7 +19,7 @@ interface IDashboardStateProps {
 }
 
 interface IDashboardDispatchProps {
-    addSet: (set?: IFlashCardSet, section?: SetSection) => string;
+    addSet: (set?: IFlashCardSet) => string;
     loadSetMetaAll: () => void;
 }
 
