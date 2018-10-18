@@ -53,7 +53,7 @@
                 "--disable-host-check",
                 "--host 0.0.0.0",
                 "--watch-content-base",
-                "--output-public-path=/dist/",
+                "--output-public-path='http://localhost:8080/dist/'",
                 "--history-api-fallback"
             ],
             "problemMatcher": []

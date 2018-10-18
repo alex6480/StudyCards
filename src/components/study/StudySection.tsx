@@ -11,7 +11,9 @@ import * as Utils from "../../lib/utils";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
 import SetHeader from "../SetHeader";
+import SetLoader from "../SetLoader";
 import SetNav from "../SetNav";
+import SetNotFound from "../SetNotFound";
 import PresentedCard from "./PresentedCard";
 import StudyOverview from "./StudyOverview";
 
@@ -21,7 +23,7 @@ interface IStudySectionOwnProps {
 
 interface IStudySectionStateProps extends RouteComponentProps<IStudySectionOwnProps> {
     setId: string;
-    set: IRemote<IFlashCardSet>;
+    set?: IRemote<IFlashCardSet>;
     studyData: IRemote<ISetStudyData>;
 }
 
@@ -30,6 +32,7 @@ interface IStudySectionDispatchProps {
     updateCardStudyData: (studyData: ICardStudyData) => void;
     getSetStudyData: (setId: string) => void;
     loadCards: (setId: string, cardIds: string[]) => void;
+    loadSetMetaAll: () => void;
 }
 
 interface IStudySectionProps extends IStudySectionOwnProps, IStudySectionStateProps, IStudySectionDispatchProps { }
@@ -51,7 +54,14 @@ class StudySection extends React.Component<IStudySectionProps, IStudySectionStat
     constructor(props: IStudySectionProps) {
         super(props);
         this.state = { };
-        props.getSetStudyData(props.setId);
+    }
+
+    public componentWillMount() {
+        // Refresh study data
+        this.props.getSetStudyData(this.props.setId);
+        if (this.props.set === undefined) {
+            this.props.loadSetMetaAll();
+        }
     }
 
     public render() {
@@ -65,9 +75,12 @@ class StudySection extends React.Component<IStudySectionProps, IStudySectionStat
     }
 
     private renderContent() {
-        if (this.state.currentSession === undefined
-            || this.props.set.value === undefined
-            || this.props.studyData.value === undefined) {
+        if (this.props.set === undefined) {
+            // No set with the specified id exists
+            return <SetNotFound setId={this.props.setId} />;
+        } else if (this.props.set.value === undefined
+                || this.props.studyData.value === undefined
+                || this.state.currentSession === undefined) {
             // A session can never be started when set or studydata is unavailable
             // The extra parts to the if statement are just to satisfy the type checker
             return <div className="container">
@@ -171,11 +184,25 @@ class StudySection extends React.Component<IStudySectionProps, IStudySectionStat
 
 function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<IStudySectionOwnProps>):
     IStudySectionStateProps {
+
+    const setId = ownProps.match.params.setId;
+    let set: IRemote<IFlashCardSet> | undefined;
+    if (state.sets.isFetching === false && state.sets.value === undefined) {
+        // Return an undefined set, so the component will attempt to fetch it
+        set = undefined;
+    } else {
+        set = state.sets.value === undefined || state.sets.value[setId] === undefined
+            ? { isFetching: true, value: undefined }
+            : state.sets.value[setId];
+    }
+
     return {
         ...ownProps,
-        setId: ownProps.match.params.setId,
-        set: state.sets.value![ownProps.match.params.setId],
-        studyData: state.studyData[ownProps.match.params.setId],
+        setId,
+        set,
+        studyData: state.studyData[setId] !== undefined
+                        ? state.studyData[setId]
+                        : { isFetching: false, value: undefined },
     };
 }
 
@@ -185,6 +212,7 @@ function mapDispatchToProps(dispatch: Dispatch): IStudySectionDispatchProps {
         resetSessionStudyData: () => dispatch(Action.resetSessionStudyData()),
         updateCardStudyData: (studyData: ICardStudyData) => dispatch(Action.updateCardStudyData(studyData)),
         loadCards: (setId: string, cardIds: string[]) => dispatch<any>(Storage.loadCards(setId, cardIds)),
+        loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
     };
 }
 

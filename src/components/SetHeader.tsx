@@ -42,8 +42,10 @@ class SetHeader extends React.Component<ISetHeaderProps> {
 
     private renderTitle() {
         if (this.props.set.value === undefined) {
-            // No data is available at all. Just show an empty header
-            return <>&nbsp;</>;
+            // No data is available at all. Just show the spinner
+            return <span className="icon is-large">
+                <i className=" fas fa-spinner fa-pulse "></i>
+            </span>;
         } else if (this.props.set.isFetching) {
             // Show a readonly header with a loading icon
             return <>
@@ -94,7 +96,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
 function mapStateToProps(state: IAppState, ownProps: ISetHeaderOwnProps): ISetHeaderStateProps {
     return {
         ...ownProps,
-        set: state.sets.value![ownProps.setId],
+        set: state.sets.value !== undefined
+            ? state.sets.value[ownProps.setId]
+            : { isFetching: false, value: undefined },
     };
 }
 
