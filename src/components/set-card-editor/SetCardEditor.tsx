@@ -8,7 +8,9 @@ import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import * as Utils from "../../lib/utils";
 import { IAppState } from "../../reducers";
 import SetHeader from "../SetHeader";
+import SetLoader from "../SetLoader";
 import SetNav from "../SetNav";
+import SetNotFound from "../SetNotFound";
 import { CardDivider } from "./CardDivider";
 import CardEditor from "./CardEditor";
 import { TagFilter } from "./TagFilter";
@@ -18,7 +20,7 @@ interface ISetCardEditorOwnProps {
 }
 
 interface ISetCardEditorStateProps extends RouteComponentProps<ISetCardEditorOwnProps> {
-    set: IRemote<IFlashCardSet>;
+    set?: IRemote<IFlashCardSet>;
     setId: string;
 }
 
@@ -26,6 +28,7 @@ interface ISetCardEditorDispatchProps {
     addNewCard: (afterCardId?: string) => string;
     loadCards: (cardIds: string[]) => void;
     filterCards: (filter: IFlashCardSetCardFilter) => void;
+    loadSetMetaAll: () => void;
 }
 
 interface ISetCardEditorProps extends ISetCardEditorStateProps, ISetCardEditorDispatchProps { }
@@ -59,52 +62,60 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
 
     constructor(props: ISetCardEditorProps) {
         super(props);
-        const set = this.props.set.value!;
-
-        if (set.filteredCardOrder.value === undefined) {
-            throw new Error("Filtered card order should never be undefined");
-        }
-
         // Set initial state
-        const initialShownCards = set.filteredCardOrder.value.slice(0, this.cardsToLoadAtOnce);
-        const initialHiddenCards = set.filteredCardOrder.value.slice(this.cardsToLoadAtOnce);
         this.state = {
-            cardDisplayData: {
-                ...Utils.arrayToObject(initialShownCards, cardId => [cardId, { visible: true, loaded: true }]),
-                ...Utils.arrayToObject(initialHiddenCards, cardId => [cardId, { visible: false, loaded: false }]),
-            },
+            cardDisplayData: this.props.set !== undefined && this.props.set.value !== undefined
+                            && this.props.set.value.filteredCardOrder.value !== undefined
+                ? Utils.arrayToObject(
+                    this.props.set.value.filteredCardOrder.value,
+                    cardId => [cardId, { visible: false, loaded: false }])
+                : { },
         };
-
-        // Load the cards to be edited
-        props.loadCards(initialShownCards);
     }
 
     public componentWillReceiveProps(newProps: ISetCardEditorProps) {
+        if (this.props.set === undefined || newProps.set === undefined) {
+            // Do nothing, until proper data is available
+            return;
+        }
+
         if (this.props.set.isFetching && newProps.set.isFetching === false) {
+            // After set metadata has been updated, cards always need to be updated
             this.updateVisibleCards();
         }
 
-        if (newProps.set.value!.filter !== this.props.set.value!.filter) {
-            // Filter has been changed.
-            // Since filter can only be changed at the top of the page, it's safe to set all cards to invisible
-            this.setState({
-                cardDisplayData: Utils.arrayToObject(newProps.set.value!.filteredCardOrder.value!,
-                    cardId => [cardId, { visible: false, loaded: this.state.cardDisplayData[cardId].loaded }],
-                ),
-            }, () => {
-                // Make sure that some cards are visible
-                this.updateVisibleCards();
-            });
+        if (newProps.set.value !== undefined) {
+            const oldFilter = this.props.set.value !== undefined ? this.props.set.value.filter : undefined;
+            const newFilter = newProps.set.value !== undefined ? newProps.set.value.filter : undefined;
+            if (newFilter !== oldFilter) {
+                // Filter has been changed.
+                // Since filter can only be changed at the top of the page, it's safe to set all cards to invisible
+                this.setState({
+                    cardDisplayData: Utils.arrayToObject(newProps.set.value.filteredCardOrder.value!,
+                        cardId => [cardId, {
+                            visible: false,
+                            loaded: this.state.cardDisplayData[cardId] !== undefined
+                                ? this.state.cardDisplayData[cardId].loaded
+                                : false,
+                        }],
+                    ),
+                }, () => {
+                    // Make sure that some cards are visible
+                    this.updateVisibleCards();
+                });
+            }
         }
     }
 
     public render() {
-        const set = this.props.set.value!;
         let content: JSX.Element;
 
-        if (this.props.set.value === undefined) {
-            content = <div className="container">Loading Set</div>;
+        if (this.props.set === undefined) {
+            content = <SetNotFound setId={this.props.setId} />;
+        } else if (this.props.set.value === undefined) {
+            content = <SetLoader />;
         } else {
+            const set = this.props.set.value!;
             content = <div className="container card-editor">
                 { /* Set name */ }
                 <h2 className="title is-4">Edit cards in {set.name}</h2>
@@ -124,7 +135,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                 />
 
                 { /* Set content */ }
-                {this.renderCards()}
+                {this.renderCards(set)}
             </div>;
         }
 
@@ -138,6 +149,19 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
     }
 
     public componentWillMount() {
+        if (this.props.set === undefined) {
+            // Load the set
+            this.props.loadSetMetaAll();
+        }
+
+        if (this.props.set !== undefined && this.props.set.value !== undefined) {
+            const set = this.props.set.value;
+            if (set.filteredCardOrder.value === undefined) {
+                throw new Error("Filtered card order should never be undefined");
+            }
+            this.updateVisibleCards();
+        }
+
         window.addEventListener("scroll", this.scrollListener);
     }
 
@@ -145,8 +169,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         window.removeEventListener("scroll", this.scrollListener);
     }
 
-    private renderCards() {
-        const set = this.props.set.value!;
+    private renderCards(set: IFlashCardSet) {
         const cards: JSX.Element[] = [];
         if (set.filteredCardOrder.isFetching || set.filteredCardOrder.value === undefined) {
             // If currently filtering cards, show two placeholders
@@ -207,7 +230,10 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         const screenHeight = window.innerHeight;
 
         if (docHeight - (scrollPos + screenHeight) < this.loadNextCardsAt) {
-            this.showMoreCards(this.cardsToLoadAtOnce);
+            // This can only be done once the set has been loaded
+            if (this.props.set !== undefined && this.props.set.value !== undefined) {
+                this.showMoreCards(this.cardsToLoadAtOnce, this.props.set.value);
+            }
         }
     }
 
@@ -232,8 +258,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
      * Makes more cards visible on the screen
      * If the cards have not been loaded before, they will be
      */
-    private showMoreCards(count: number) {
-        const set = this.props.set.value!;
+    private showMoreCards(count: number, set: IFlashCardSet) {
         const loadingCards = Object.keys(this.state.cardDisplayData)
                                 .filter(c => set.cards[c] !== undefined
                                           && set.cards[c].isFetching === true);
@@ -266,7 +291,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
     }
 
     private toggleTag(tag: string) {
-        const set = this.props.set.value!;
+        const set = this.props.set!.value!;
         let newTags: { [tag: string]: boolean };
         if (set.filter.tags[tag] === true) {
             // Create a new object where this tag is not present
@@ -296,10 +321,20 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
 
 function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<ISetCardEditorOwnProps>):
     ISetCardEditorStateProps {
+    const setId = ownProps.match.params.setId;
+    let set: IRemote<IFlashCardSet> | undefined;
+    if (state.sets.isFetching === false && state.sets.value === undefined) {
+        // Return an undefined set, so the component will attempt to fetch it
+        set = undefined;
+    } else {
+        set = state.sets.value === undefined
+            ? { isFetching: true, value: undefined }
+            : state.sets.value[setId];
+    }
     return {
         ...ownProps,
-        setId: ownProps.match.params.setId,
-        set: state.sets.value![ownProps.match.params.setId],
+        setId,
+        set,
     };
 }
 
@@ -313,6 +348,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: RouteComponentProps<IS
             dispatch<any>(Storage.loadCards(setId, cardIds)),
         filterCards: (filter: IFlashCardSetCardFilter) =>
             dispatch<any>(Storage.filterCards(setId, filter)),
+        loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
     };
 }
 
