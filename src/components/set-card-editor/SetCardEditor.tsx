@@ -26,7 +26,6 @@ interface ISetCardEditorDispatchProps {
     addNewCard: (afterCardId?: string) => string;
     loadCards: (cardIds: string[]) => void;
     filterCards: (filter: IFlashCardSetCardFilter) => void;
-    saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) => void;
 }
 
 interface ISetCardEditorProps extends ISetCardEditorStateProps, ISetCardEditorDispatchProps { }
@@ -60,7 +59,6 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
 
     constructor(props: ISetCardEditorProps) {
         super(props);
-        console.log(props);
         const set = this.props.set.value!;
 
         if (set.filteredCardOrder.value === undefined) {
@@ -104,8 +102,8 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         const set = this.props.set.value!;
         let content: JSX.Element;
 
-        if (this.props.set.isFetching) {
-            content = <div>Loading Set</div>;
+        if (this.props.set.value === undefined) {
+            content = <div className="container">Loading Set</div>;
         } else {
             content = <div className="container card-editor">
                 { /* Set name */ }
@@ -131,10 +129,9 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         }
 
         return <div>
-            <SetHeader set={this.props.set}
-                updateSetName={this.updateSetName.bind(this)} />
+            <SetHeader set={this.props.set} setId={this.props.setId} />
             <SetNav setId={this.props.setId} activePage="edit" />
-            <section>
+            <section className="section">
                 {content}
             </section>
         </div>;
@@ -295,12 +292,6 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
             });
         }
     }
-
-    private updateSetName(newName: string) {
-        if (newName !== this.props.set.value!.name) {
-            this.props.saveSetMeta({ id: this.props.setId, name: newName });
-        }
-    }
 }
 
 function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<ISetCardEditorOwnProps>):
@@ -322,8 +313,6 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: RouteComponentProps<IS
             dispatch<any>(Storage.loadCards(setId, cardIds)),
         filterCards: (filter: IFlashCardSetCardFilter) =>
             dispatch<any>(Storage.filterCards(setId, filter)),
-        saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) =>
-            dispatch<any>(Storage.saveSetMeta(setMeta)),
     };
 }
 

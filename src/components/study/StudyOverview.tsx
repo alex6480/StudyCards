@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import { ISetStudyData } from "../../lib/flashcard/StudyData";
 import IRemote from "../../lib/remote";
@@ -15,7 +16,6 @@ interface IStudyOverviewProps {
     maxTotalCards: number;
 
     startStudy?: (deck: string[]) => void;
-    goToSetEditor: () => void;
 }
 
 export default class StudyOverview extends React.Component<IStudyOverviewProps> {
@@ -64,9 +64,9 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
                                 <button className="button is-primary" disabled>
                                     Study Now
                                 </button>
-                                <a className="button is-info" onClick={this.props.goToSetEditor}>
+                                <Link className="button is-info" to={"/set/" + this.props.set.value.id + "/edit"}>
                                     Add cards
-                                </a>
+                                </Link>
                             </div>
                         </> : <>
                             { /* The set contains cards*/ }

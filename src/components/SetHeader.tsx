@@ -1,15 +1,24 @@
 import * as React from "react";
+import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import IFlashCardSet from "../lib/flashcard/FlashCardSet";
+import { Dispatch } from "redux";
+import IFlashCardSet, { IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
 import IRemote from "../lib/remote";
+import { Storage } from "../lib/storage/StorageProvider";
 import EditableText from "./rich-text-editor/EditableText";
 
-interface ISetHeaderProps {
+interface ISetHeaderOwnProps {
+    setId: string;
     set: IRemote<IFlashCardSet>;
-    updateSetName: (newName: string) => void;
 }
 
-export default class SetHeader extends React.Component<ISetHeaderProps> {
+interface ISetHeaderDispatchProps {
+    saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) => void;
+}
+
+interface ISetHeaderProps extends ISetHeaderOwnProps, ISetHeaderDispatchProps { }
+
+class SetHeader extends React.Component<ISetHeaderProps> {
     public render() {
         return <section className="hero is-primary">
             <div className="hero-body">
@@ -39,15 +48,14 @@ export default class SetHeader extends React.Component<ISetHeaderProps> {
                 </span>
                 <EditableText maxLength={30}
                     readOnly={true}
-                    value={this.props.set.value.name}
-                    onBlur={this.props.updateSetName.bind(this)}/>
+                    value={this.props.set.value.name} />
             </>;
         } else {
             // Show a normal editable text
             return <EditableText maxLength={30}
                 readOnly={false}
                 value={this.props.set.value.name}
-                onBlur={this.props.updateSetName.bind(this)}/>;
+                onBlur={this.updateSetName.bind(this)}/>;
         }
     }
 
@@ -65,4 +73,19 @@ export default class SetHeader extends React.Component<ISetHeaderProps> {
             </>;
         }
     }
+
+    private updateSetName(newName: string) {
+        if (newName !== this.props.set.value!.name) {
+            this.props.saveSetMeta({ id: this.props.setId, name: newName });
+        }
+    }
 }
+
+function mapDispatchToProps(dispatch: Dispatch) {
+    return {
+        saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) => dispatch<any>(Storage.saveSetMeta(setMeta)),
+    };
+}
+
+export default connect(() => ({ }), mapDispatchToProps)(SetHeader);
+

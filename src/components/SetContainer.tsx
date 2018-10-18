@@ -70,7 +70,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
             case SetSection.Export:
                 page = <SetExporter set={this.props.set.value} getExportUri={this.getSetExportUri.bind(this)}/>;
                 break;
-            case SetSection.Study:
+            /*case SetSection.Study:
                 page = <StudySection set={this.props.set}
                         resetSessionStudyData={this.props.resetStudySessionData}
                         updateCardStudyData={this.props.updateCardStudyData}
@@ -78,14 +78,14 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
                         goToSection={this.goToSection.bind(this)}
                         loadCards={this.loadCards.bind(this)}
                         loadStudyData={() => this.props.getSetStudyData(this.props.setId)}/>;
-                break;
+                break;*/
             default:
                 throw new Error("Unknown section");
         }
 
         return <div>
             <SetHeader set={this.props.set}
-                updateSetName={this.updateSetName.bind(this)} />
+                setId="fisk" />
             <section className="section">
                 {page}
             </section>

@@ -1,22 +1,39 @@
 import * as React from "react";
+import { connect } from "react-redux";
+import { RouteComponentProps } from "react-router";
+import { Dispatch } from "redux";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../../lib/flashcard/StudyData";
 import IRemote from "../../lib/remote";
+import { Storage } from "../../lib/storage/StorageProvider";
 import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
+import { IAppState } from "../../reducers";
+import { Action } from "../../reducers/actions";
 import { SetSection } from "../SetContainer";
+import SetHeader from "../SetHeader";
+import SetNav from "../SetNav";
 import PresentedCard from "./PresentedCard";
 import StudyOverview from "./StudyOverview";
 
-interface IStudySectionProps {
+interface IStudySectionOwnProps {
+    setId: string;
+}
+
+interface IStudySectionStateProps extends RouteComponentProps<IStudySectionOwnProps> {
+    setId: string;
     set: IRemote<IFlashCardSet>;
     studyData: IRemote<ISetStudyData>;
+}
+
+interface IStudySectionDispatchProps {
     resetSessionStudyData: () => void;
     updateCardStudyData: (studyData: ICardStudyData) => void;
-    goToSection: (section: SetSection) => void;
-    loadStudyData: () => void;
-    loadCards: (cardIds: string[]) => void;
+    getSetStudyData: (setId: string) => void;
+    loadCards: (setId: string, cardIds: string[]) => void;
 }
+
+interface IStudySectionProps extends IStudySectionOwnProps, IStudySectionStateProps, IStudySectionDispatchProps { }
 
 interface IStudySession {
     deck: string[];
@@ -27,7 +44,7 @@ interface IStudySectionState {
     currentSession?: IStudySession;
 }
 
-export default class StudySection extends React.Component<IStudySectionProps, IStudySectionState> {
+class StudySection extends React.Component<IStudySectionProps, IStudySectionState> {
     // TODO: Make these parameters variable
     private StudyMaxNewCards: number = 20;
     private StudyMaxTotalCards: number = 40;
@@ -35,10 +52,20 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
     constructor(props: IStudySectionProps) {
         super(props);
         this.state = { };
-        props.loadStudyData();
+        props.getSetStudyData(props.setId);
     }
 
     public render() {
+        return <div>
+            <SetHeader set={this.props.set} setId={this.props.setId} />
+            <SetNav setId={this.props.setId} activePage="edit" />
+            <section className="section">
+                {this.renderContent()}
+            </section>
+        </div>;
+    }
+
+    private renderContent() {
         if (this.state.currentSession === undefined
             || this.props.set.value === undefined
             || this.props.studyData.value === undefined) {
@@ -49,8 +76,7 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
                     studyData={this.props.studyData}
                     maxNewCards={this.StudyMaxNewCards}
                     maxTotalCards={this.StudyMaxTotalCards}
-                    startStudy={this.startStudy.bind(this)}
-                    goToSetEditor={() => this.props.goToSection(SetSection.Edit)}/>
+                    startStudy={this.startStudy.bind(this)} />
             </div>;
         } else {
             const card = this.props.set.value.cards[this.state.currentSession.currentCardId];
@@ -80,7 +106,7 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
         });
 
         // Fetch the deck from the remote source
-        this.props.loadCards(deck);
+        this.props.loadCards(this.props.setId, deck);
 
         // Make sure no temporary data is left from previous study session
         this.props.resetSessionStudyData();
@@ -143,3 +169,25 @@ export default class StudySection extends React.Component<IStudySectionProps, IS
         });
     }
 }
+
+function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<IStudySectionOwnProps>):
+    IStudySectionStateProps {
+    return {
+        ...ownProps,
+        setId: ownProps.match.params.setId,
+        set: state.sets.value![ownProps.match.params.setId],
+        studyData: state.studyData[ownProps.match.params.setId],
+    };
+}
+
+function mapDispatchToProps(dispatch: Dispatch): IStudySectionDispatchProps {
+    return {
+        getSetStudyData: (setId: string) => dispatch<any>(Storage.loadSetStudyData(setId)),
+        resetSessionStudyData: () => dispatch(Action.resetSessionStudyData()),
+        updateCardStudyData: (studyData: ICardStudyData) => dispatch(Action.updateCardStudyData(studyData)),
+        loadCards: (setId: string, cardIds: string[]) => dispatch<any>(Storage.loadCards(setId, cardIds)),
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(StudySection);
+
