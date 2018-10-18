@@ -5,10 +5,14 @@ import { Dispatch } from "redux";
 import IFlashCardSet, { IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
 import IRemote from "../lib/remote";
 import { Storage } from "../lib/storage/StorageProvider";
+import { IAppState } from "../reducers";
 import EditableText from "./rich-text-editor/EditableText";
 
 interface ISetHeaderOwnProps {
     setId: string;
+}
+
+interface ISetHeaderStateProps extends ISetHeaderOwnProps {
     set: IRemote<IFlashCardSet>;
 }
 
@@ -16,7 +20,7 @@ interface ISetHeaderDispatchProps {
     saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) => void;
 }
 
-interface ISetHeaderProps extends ISetHeaderOwnProps, ISetHeaderDispatchProps { }
+interface ISetHeaderProps extends ISetHeaderStateProps, ISetHeaderDispatchProps { }
 
 class SetHeader extends React.Component<ISetHeaderProps> {
     public render() {
@@ -87,5 +91,12 @@ function mapDispatchToProps(dispatch: Dispatch) {
     };
 }
 
-export default connect(() => ({ }), mapDispatchToProps)(SetHeader);
+function mapStateToProps(state: IAppState, ownProps: ISetHeaderOwnProps): ISetHeaderStateProps {
+    return {
+        ...ownProps,
+        set: state.sets.value![ownProps.setId],
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SetHeader);
 

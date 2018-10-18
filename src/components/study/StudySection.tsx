@@ -57,7 +57,7 @@ class StudySection extends React.Component<IStudySectionProps, IStudySectionStat
 
     public render() {
         return <div>
-            <SetHeader set={this.props.set} setId={this.props.setId} />
+            <SetHeader setId={this.props.setId} />
             <SetNav setId={this.props.setId} activePage="edit" />
             <section className="section">
                 {this.renderContent()}

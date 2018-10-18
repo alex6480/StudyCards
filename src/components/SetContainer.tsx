@@ -67,9 +67,9 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
             /* case SetSection.Edit:
                 page = <SetCardEditor setId={this.props.setId} />;
                 break;*/
-            case SetSection.Export:
+            /*case SetSection.Export:
                 page = <SetExporter set={this.props.set.value} getExportUri={this.getSetExportUri.bind(this)}/>;
-                break;
+                break;*/
             /*case SetSection.Study:
                 page = <StudySection set={this.props.set}
                         resetSessionStudyData={this.props.resetStudySessionData}
@@ -84,8 +84,7 @@ class SetContainer extends React.Component<ISetContainerProps, ISetContainerStat
         }
 
         return <div>
-            <SetHeader set={this.props.set}
-                setId="fisk" />
+            <SetHeader setId="fisk" />
             <section className="section">
                 {page}
             </section>

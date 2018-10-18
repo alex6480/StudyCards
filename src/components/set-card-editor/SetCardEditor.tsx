@@ -129,7 +129,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         }
 
         return <div>
-            <SetHeader set={this.props.set} setId={this.props.setId} />
+            <SetHeader setId={this.props.setId} />
             <SetNav setId={this.props.setId} activePage="edit" />
             <section className="section">
                 {content}
