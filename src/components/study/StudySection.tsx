@@ -58,7 +58,12 @@ class StudySection extends React.Component<IStudySectionProps, IStudySectionStat
 
     public componentWillMount() {
         // Refresh study data
-        this.props.getSetStudyData(this.props.setId);
+        try {
+            this.props.getSetStudyData(this.props.setId);
+        } catch (err) {
+            // Could not get study data for the set.
+            // This is ignored, since it means the set doesn't exist, which is handled elsewhere
+        }
         if (this.props.set === undefined) {
             this.props.loadSetMetaAll();
         }
@@ -191,7 +196,7 @@ function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<IStudyS
         // Return an undefined set, so the component will attempt to fetch it
         set = undefined;
     } else {
-        set = state.sets.value === undefined || state.sets.value[setId] === undefined
+        set = state.sets.value === undefined
             ? { isFetching: true, value: undefined }
             : state.sets.value[setId];
     }
@@ -201,8 +206,8 @@ function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<IStudyS
         setId,
         set,
         studyData: state.studyData[setId] !== undefined
-                        ? state.studyData[setId]
-                        : { isFetching: false, value: undefined },
+                    ? state.studyData[setId]
+                    : { isFetching: false, value: undefined },
     };
 }
 
