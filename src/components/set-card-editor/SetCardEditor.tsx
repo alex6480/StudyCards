@@ -27,7 +27,13 @@ interface ISetCardEditorDispatchProps {
 interface ISetCardEditorProps extends ISetCardEditorStateProps, ISetCardEditorDispatchProps { }
 
 interface ISetCardEditorState {
-    shownCards: { [cardId: string]: boolean };
+    cardDisplayData: {
+        [cardId: string]: {
+            // Whether the card is visible on screen, to prevent drops in local performance
+            visible: boolean,
+            // Whether the card has been fetched this session. Each card will only be loaded once to limit server load
+            loaded: boolean },
+    };
 }
 
 class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorState> {
@@ -39,7 +45,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
      * The number of pixels from the bottom of the screen until more cards are loaded
      */
     private loadNextCardsAt = 1500;
-    private scrollListener = this.onScroll.bind(this);
+    private scrollListener = this.updateVisibleCards.bind(this);
 
     /**
      * Indicates whether the current render is the first one taking place
@@ -56,12 +62,31 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
 
         // Set initial state
         const initialShownCards = set.filteredCardOrder.value.slice(0, this.cardsToLoadAtOnce);
+        const initialHiddenCards = set.filteredCardOrder.value.slice(this.cardsToLoadAtOnce);
         this.state = {
-            shownCards: Utils.arrayToObject(initialShownCards, cardId => [cardId, true]),
+            cardDisplayData: {
+                ...Utils.arrayToObject(initialShownCards, cardId => [cardId, { visible: true, loaded: true }]),
+                ...Utils.arrayToObject(initialHiddenCards, cardId => [cardId, { visible: false, loaded: false }]),
+            },
         };
 
         // Load the cards to be edited
         props.loadCards(initialShownCards);
+    }
+
+    public componentWillReceiveProps(newProps: ISetCardEditorProps) {
+        if (newProps.set.filter !== this.props.set.filter) {
+            // Filter has been changed.
+            // Since filter can only be changed at the top of the page, it's safe to set all cards to invisible
+            this.setState({
+                cardDisplayData: Utils.arrayToObject(newProps.set.filteredCardOrder.value!,
+                    cardId => [cardId, { visible: false, loaded: this.state.cardDisplayData[cardId].loaded }],
+                ),
+            }, () => {
+                // Make sure that some cards are visible
+                this.updateVisibleCards();
+            });
+        }
     }
 
     public render() {
@@ -119,13 +144,8 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         } else {
             // This deck contains cards and they should be rendered
             let loadingCards: number = 0;
-            let shownCards: number = 0;
             for (const cardId of this.props.set.filteredCardOrder.value!) {
-                if (shownCards === Object.keys(this.state.shownCards).length) {
-                    // All the cards have been shown. No need to go through the rest
-                    break;
-                }
-                if (this.state.shownCards[cardId] !== true) { continue; }
+                if (! this.state.cardDisplayData[cardId].visible) { continue; }
 
                 const card = set.cards[cardId];
                 if (card === undefined) {
@@ -146,9 +166,9 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                                 cardId={cardId}
                                 slideIn={this.newlyAddedCards[cardId] === true}
                                 addNewCard={this.addNewCard.bind(this)}
-                                onDeleted={this.cardDeleted.bind(this)}/>,
+                                onDeleted={this.cardDeleted.bind(this)}
+                                onBelowScreen={this.cardBelowScreen.bind(this)}/>,
                 );
-                shownCards++;
 
                 // Make sure the card doesn't show a slide transition in the future
                 delete this.newlyAddedCards[cardId];
@@ -160,62 +180,65 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         </ul>;
     }
 
-    private onScroll() {
+    private updateVisibleCards() {
         const scrollPos = window.scrollY;
         const docHeight = document.body.scrollHeight;
         const screenHeight = window.innerHeight;
 
         if (docHeight - (scrollPos + screenHeight) < this.loadNextCardsAt) {
-            this.loadMoreCards(this.cardsToLoadAtOnce);
+            this.showMoreCards(this.cardsToLoadAtOnce);
         }
     }
 
     private addNewCard(afterCardId?: string) {
         const newCardId = this.props.addNewCard(afterCardId);
         // The newly added card will always be shown
-        this.setState({ shownCards: {
-            ...this.state.shownCards,
-            [newCardId]: true,
+        this.setState({ cardDisplayData: {
+            ...this.state.cardDisplayData,
+            [newCardId]: { visible: true, loaded: true },
         }});
         this.newlyAddedCards[newCardId] = true;
     }
 
     private cardDeleted(cardId: string) {
-        const {[cardId]: deletedCard, ...rest} = this.state.shownCards;
-        this.setState({ shownCards: rest });
+        const {[cardId]: deletedCard, ...rest} = this.state.cardDisplayData;
+        this.setState({ cardDisplayData: rest });
         // Run the scroll listener in case more cards need to be loaded
-        this.onScroll();
+        this.updateVisibleCards();
     }
 
     /**
-     * Loads more cards
+     * Makes more cards visible on the screen
+     * If the cards have not been loaded before, they will be
      */
-    private loadMoreCards(count: number) {
+    private showMoreCards(count: number) {
         const set = this.props.set;
-        const loadingCards = Object.keys(this.state.shownCards)
+        const loadingCards = Object.keys(this.state.cardDisplayData)
                                 .filter(c => set.cards[c] !== undefined
                                           && set.cards[c].isFetching === true);
         // Only load more cards if the cards from the last loading have actually been loaded
         if (loadingCards.length < this.cardsToLoadAtOnce) {
             let addedCards: number = 0;
-            const cardsToLoad: string[] = [];
+            const cardsToShow: string[] = [];
             for (const cardId of set.filteredCardOrder.value!) {
                 // Only add the specified amount of cards
                 if (addedCards === count) { break; }
 
-                if (this.state.shownCards[cardId] !== true) {
-                    cardsToLoad.push(cardId);
+                if (this.state.cardDisplayData[cardId].visible !== true) {
+                    cardsToShow.push(cardId);
                     addedCards++;
                 }
             }
 
-            if (cardsToLoad.length === 0) {
+            if (cardsToShow.length === 0) {
                 return;
             }
-            this.props.loadCards(cardsToLoad);
-            this.setState({ shownCards: {
-                    ...this.state.shownCards,
-                    ...Utils.arrayToObject(cardsToLoad, cardId => [cardId, true]),
+            // Load all the newly shown cards, that have not been loaded before
+            this.props.loadCards(cardsToShow.filter(cardId => this.state.cardDisplayData[cardId].loaded === false));
+            // Update state to include the newly shown cards
+            this.setState({ cardDisplayData: {
+                    ...this.state.cardDisplayData,
+                    ...Utils.arrayToObject(cardsToShow, cardId => [cardId, { visible: true, loaded: true }]),
                 },
             });
         }
@@ -236,6 +259,17 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
             ...set.filter,
             tags: newTags,
         });
+    }
+
+    private cardBelowScreen(cardId: string, delta: number) {
+        if (delta > this.loadNextCardsAt + 1000) {
+            this.setState({
+                cardDisplayData: {
+                    ...this.state.cardDisplayData,
+                    [cardId]: { visible: false, loaded: this.state.cardDisplayData[cardId].loaded },
+                },
+            });
+        }
     }
 }
 

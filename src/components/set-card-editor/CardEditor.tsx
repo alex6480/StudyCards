@@ -32,6 +32,11 @@ interface ICardEditorOwnProps {
 
     addNewCard: (afterCardId?: string) => string;
     onDeleted: (cardId: string) => void;
+    /**
+     * Callback is called whenever this card is below the screen
+     * Delta is the number of pixels that this card is below the screen
+     */
+    onBelowScreen?: (cardId: string, delta: number) => void;
 }
 
 interface ICardEditorStateProps extends ICardEditorOwnProps {
@@ -59,6 +64,9 @@ enum TransitionState {
  * A card that is part of a cardlist
  */
 class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
+    private onScroll?: () => void;
+    private cardElement: HTMLElement | null = null;
+
     constructor(props: ICardEditorProps) {
         super(props);
 
@@ -77,6 +85,18 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
 
     public shouldComponentUpdate(newProps: ICardEditorProps, newState: ICardEditorState) {
         return newProps.card !== this.props.card || newState.transitionState !== this.state.transitionState;
+    }
+
+    public componentWillMount() {
+        if (this.props.onBelowScreen) {
+            // Add a scroll listener if the leave screen handler is bound
+            this.onScroll = this.onLeaveScreen.bind(this);
+            window.addEventListener("scroll", this.onScroll!);
+        }
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener("scroll", this.onScroll!);
     }
 
     public render() {
@@ -153,7 +173,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                     </li>
                 </SlideTransition>;
             case (TransitionState.None):
-                return <li className="listed-flashcard is-clearfix">
+                return <li className="listed-flashcard is-clearfix" ref={el => this.cardElement = el}>
                     {editor}
                     {divider}
                 </li>;
@@ -206,6 +226,18 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     private deleteFinal() {
         this.props.deleteCard(this.props.setId, this.props.cardId);
         this.props.onDeleted(this.props.cardId);
+    }
+
+    private onLeaveScreen() {
+        if (this.cardElement !== null && this.props.onBelowScreen !== undefined) {
+            const scrollPos = window.scrollY;
+            const screenHeight = window.innerHeight;
+            const elementPos = this.cardElement.offsetTop;
+
+            if (elementPos > scrollPos + screenHeight) {
+                this.props.onBelowScreen(this.props.cardId, elementPos - (scrollPos + screenHeight));
+            }
+        }
     }
 }
 
