@@ -1,4 +1,5 @@
 import * as fromActions from "../actions";
+import * as fromCard from "../card";
 import * as fromSet from "../set";
 
 test("added card is added in the correct position", () => {

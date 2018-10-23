@@ -58,7 +58,7 @@ function faces(state: {front: IFlashCardFace, back: IFlashCardFace} = initialCar
         case fromActions.SAVE_CARD_FACE_BEGIN:
             return {
                 ...state,
-                [action.payload.face.id]: action.payload.face,
+                [action.payload.face.id]: face(state[action.payload.face.id], action),
             };
         default:
             return state;
