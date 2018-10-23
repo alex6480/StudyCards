@@ -90,11 +90,12 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
             const newFilter = newProps.set.value !== undefined ? newProps.set.value.filter : undefined;
             if (newFilter !== oldFilter) {
                 // Filter has been changed.
-                // Since filter can only be changed at the top of the page, it's safe to set all cards to invisible
                 this.setState({
                     cardDisplayData: Utils.arrayToObject(newProps.set.value.filteredCardOrder.value!,
                         cardId => [cardId, {
-                            visible: false,
+                            visible: this.state.cardDisplayData[cardId] !== undefined
+                            ? this.state.cardDisplayData[cardId].visible
+                            : false,
                             loaded: this.state.cardDisplayData[cardId] !== undefined
                                 ? this.state.cardDisplayData[cardId].loaded
                                 : false,
