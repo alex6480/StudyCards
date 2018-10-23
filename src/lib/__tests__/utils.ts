@@ -38,3 +38,34 @@ describe("select keys", () => {
     });
 });
 
+describe("calculate new tag count", () => {
+    const beforeTags = {
+        tag1: 2,
+        tag2: 1,
+    };
+    test("added tags", () => {
+        expect(Utils.calculateNewTagCount(beforeTags, ["tag1"], ["tag1", "tag2"])).toStrictEqual({
+            tag1: 2,
+            tag2: 2,
+        });
+
+        expect(Utils.calculateNewTagCount(beforeTags, ["tag1"], ["tag1", "tag3"])).toStrictEqual({
+            tag1: 2,
+            tag2: 1,
+            tag3: 1,
+        });
+    });
+
+    test("removed tags", () => {
+        expect(Utils.calculateNewTagCount(beforeTags, ["tag1"], [])).toStrictEqual({
+            tag1: 1,
+            tag2: 1,
+        });
+
+        expect(Utils.calculateNewTagCount(beforeTags, ["tag1"], ["tag2"])).toStrictEqual({
+            tag1: 1,
+            tag2: 2,
+        });
+    });
+});
+
