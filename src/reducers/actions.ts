@@ -78,8 +78,8 @@ export const Action = {
     loadCardsComplete: (setId: string, cards: {[id: string]: IFlashCard }) =>
         createAction(LOAD_CARDS_COMPLETE, { setId, cards }),
 
-    addNewCardBegin: (cardId: string, setId: string, afterCardId?: string) =>
-        createAction(ADD_NEW_CARD_BEGIN, { cardId, setId, afterCardId }),
+    addNewCardBegin: (cardId: string, setId: string, afterCard?: IFlashCard) =>
+        createAction(ADD_NEW_CARD_BEGIN, { cardId, setId, afterCard }),
     addNewCardComplete: (setId: string, cardId: string) =>
         createAction(ADD_NEW_CARD_COMPLETE, { setId, cardId }),
 

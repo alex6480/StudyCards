@@ -49,7 +49,8 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
         case fromActions.LOAD_CARDS_BEGIN:
             return {
                 ...state,
-                ...Utils.arrayToObject(action.payload.cardIds, cardId => [cardId, card(state[cardId], cardId, action)]),
+                ...Utils.arrayToObject(action.payload.cardIds,
+                    cardId => [cardId, card(state[cardId], cardId, action)]),
             };
         case fromActions.LOAD_CARDS_COMPLETE:
             return {
@@ -66,9 +67,10 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
         case fromActions.SAVE_CARD_FACE_COMPLETE:
         case fromActions.SAVE_CARD_META_BEGIN:
         case fromActions.SAVE_CARD_META_COMPLETE:
+            const cId = action.payload.cardId;
             return {
                 ...state,
-                [action.payload.cardId]: card(state[action.payload.cardId], setId, action),
+                [cId]: card(state[action.payload.cardId], cId, action),
             };
         default:
             return state;
@@ -87,8 +89,8 @@ function name(state: string = initialState.name, setId: string, action: fromActi
 function cardOrder(state: string[] = initialState.cardOrder, action: fromActions.Action) {
     switch (action.type) {
         case fromActions.ADD_NEW_CARD_BEGIN:
-            const afterIndex = action.payload.afterCardId !== undefined
-                               ? state.indexOf(action.payload.afterCardId) : -1;
+            const afterIndex = action.payload.afterCard !== undefined
+                               ? state.indexOf(action.payload.afterCard.id) : -1;
             return [...state.slice(0, afterIndex + 1), action.payload.cardId, ...state.slice(afterIndex + 1)];
         case fromActions.DELETE_CARD_COMPLETE:
         case fromActions.DELETE_CARD_BEGIN:
@@ -110,7 +112,7 @@ function filter(state: IFlashCardSetCardFilter = initialState.filter, action: fr
 function filteredCardOrder(filteredCards: IRemote<string[]> | undefined,
                            setCards: string[],
                            currentFilter: IFlashCardSetCardFilter,
-                           action: fromActions.Action) {
+                           action: fromActions.Action): IRemote<string[]> {
     switch (action.type) {
         case fromActions.SET_FILTER_CARDS_BEGIN:
         case fromActions.SET_FILTER_CARDS_COMPLETE:
@@ -124,7 +126,7 @@ function filteredCardOrder(filteredCards: IRemote<string[]> | undefined,
             };
         default:
             if (filteredCards === undefined) {
-                return { isFetching: false, filteredCardOrder: setCards };
+                return { isFetching: false, value: setCards };
             }
             return {
                 isFetching: filteredCards.isFetching,
@@ -146,8 +148,8 @@ function filteredCardsValue(state: string[] | undefined,
             return action.payload.result;
         case fromActions.ADD_NEW_CARD_BEGIN:
             // The new card is shown no matter if it matches the filter or not
-            const afterIndex = action.payload.afterCardId !== undefined
-                               ? state!.indexOf(action.payload.afterCardId) : -1;
+            const afterIndex = action.payload.afterCard !== undefined
+                               ? state!.indexOf(action.payload.afterCard.id) : -1;
             return [...state!.slice(0, afterIndex + 1), action.payload.cardId, ...state!.slice(afterIndex + 1)];
         default:
             return state !== undefined ? state : setCards;
@@ -164,6 +166,10 @@ function availableTags(state: { [tag: string]: number } = initialState.available
             return Utils.calculateNewTagCount(state,
                                               setCards![action.payload.cardId].value!.tags,
                                               action.payload.cardMeta.tags);
+        case fromActions.ADD_NEW_CARD_BEGIN:
+            return action.payload.afterCard !== undefined
+                ? Utils.calculateNewTagCount(state, [], action.payload.afterCard.tags)
+                : state;
         case fromActions.DELETE_CARD_BEGIN:
             return Utils.calculateNewTagCount(state,
                                               setCards![action.payload.cardId].value!.tags,

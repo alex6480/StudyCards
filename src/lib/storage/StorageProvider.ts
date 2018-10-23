@@ -2,7 +2,7 @@ import { Dispatch } from "redux";
 import { ThunkAction } from "redux-thunk";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
-import { IFlashCardMeta } from "../flashcard/flashcard";
+import IFlashCard, { IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace } from "../flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 import { LocalStorageProvider } from "./LocalStorageProvider";
@@ -37,7 +37,7 @@ export default interface IStorageProvider {
      * Adds a new card to the deck
      * Returns the id of the newly added card
      */
-    addCard: (setId: string, afterCardId?: string) => ThunkAction<string, IAppState, void, Action>;
+    addCard: (setId: string, afterCard?: IFlashCard) => ThunkAction<string, IAppState, void, Action>;
 
     /**
      * Deletes the specified card

@@ -2,6 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { Dispatch } from "redux";
+import IFlashCard from "../../lib/flashcard/flashcard";
 import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
 import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
@@ -25,7 +26,7 @@ interface ISetCardEditorStateProps extends RouteComponentProps<ISetCardEditorOwn
 }
 
 interface ISetCardEditorDispatchProps {
-    addNewCard: (afterCardId?: string) => string;
+    addNewCard: (afterCard?: IFlashCard) => string;
     loadCards: (cardIds: string[]) => void;
     filterCards: (filter: IFlashCardSetCardFilter) => void;
     loadSetMetaAll: () => void;
@@ -238,7 +239,8 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
     }
 
     private addNewCard(afterCardId?: string) {
-        const newCardId = this.props.addNewCard(afterCardId);
+        const afterCard = afterCardId !== undefined ? this.props.set!.value!.cards[afterCardId].value! : undefined;
+        const newCardId = this.props.addNewCard(afterCard);
         // The newly added card will always be shown
         this.setState({ cardDisplayData: {
             ...this.state.cardDisplayData,
@@ -342,8 +344,8 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: RouteComponentProps<IS
     ISetCardEditorDispatchProps {
     const setId = ownProps.match.params.setId;
     return {
-        addNewCard: (afterCardId?: string) =>
-            dispatch<any>(Storage.addCard(setId, afterCardId)),
+        addNewCard: (afterCard?: IFlashCard) =>
+            dispatch<any>(Storage.addCard(setId, afterCard)),
         loadCards: (cardIds: string[]) =>
             dispatch<any>(Storage.loadCards(setId, cardIds)),
         filterCards: (filter: IFlashCardSetCardFilter) =>

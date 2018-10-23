@@ -46,16 +46,17 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public addCard(setId: string, afterCardId?: string): ThunkAction<string, IAppState, void, fromActions.Action> {
+    public addCard(setId: string, afterCard?: IFlashCard): ThunkAction<string, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             const cardId = Utils.guid();
-            dispatch(fromActions.Action.addNewCardBegin(cardId, setId, afterCardId));
+            dispatch(fromActions.Action.addNewCardBegin(cardId, setId, afterCard));
 
             // Save the added card
             this.saveCard({
                 ...initialCard,
                 setId,
                 id: cardId,
+                tags: afterCard !== undefined ? afterCard.tags : [],
             });
 
             // Update the set meta table
@@ -64,10 +65,17 @@ export class LocalStorageProvider implements IStorageProvider {
                 throw new Error("Set " + setId + " does not exist");
             }
 
+            const newTagCount = Utils.calculateNewTagCount(setMeta.availableTags,
+                                                            [],
+                                                            afterCard !== undefined ? afterCard.tags : []);
             let cardOrder = setMeta.cardOrder;
-            const afterIndex = afterCardId !== undefined ? cardOrder.indexOf(afterCardId) : -1;
+            const afterIndex = afterCard !== undefined ? cardOrder.indexOf(afterCard.id) : -1;
             cardOrder = [...cardOrder.slice(0, afterIndex + 1), cardId, ...cardOrder.slice(afterIndex + 1)];
-            this.saveSetMetaLocal({ ...setMeta, cardOrder });
+            this.saveSetMetaLocal({
+                ...setMeta,
+                cardOrder,
+                availableTags: newTagCount,
+            });
 
             this.result(() => dispatch(fromActions.Action.addNewCardComplete(setId, cardId)));
 
