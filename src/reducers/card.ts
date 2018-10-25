@@ -28,8 +28,8 @@ export const initialCard: IFlashCard = {
 };
 export const initialState = { isFetching: false, lastUpdated: Date.now(), value: undefined };
 
-function value(state: Partial<IFlashCard> | undefined,
-               cardId: string, action: fromActions.Action): IFlashCard | undefined {
+export function cardValue(state: Partial<IFlashCard> | undefined,
+                          cardId: string, action: fromActions.Action): IFlashCard | undefined {
     switch (action.type) {
         case fromActions.ADD_NEW_CARD_BEGIN:
             return {
@@ -124,13 +124,13 @@ export default function card(state: IRemote<Partial<IFlashCard>> = initialState,
         case fromActions.SAVE_CARD_META_BEGIN:
             return {
                 ...state,
-                value: value(state.value, cardId, action),
+                value: cardValue(state.value, cardId, action),
                 isFetching: false,
             };
         default:
             return {
                 ...state,
-                value: value(state.value, cardId, action),
+                value: cardValue(state.value, cardId, action),
             };
     }
 }
