@@ -200,3 +200,7 @@ export function drawCard(deck: string[],
     });
     return futureCards.sort((a, b) => a.score - b.score)[0].card.cardId;
 }
+
+export function getNewUnderstandingLevel(cardData: ICardStudyData, evaluations: CardEvaluation[]) {
+    return cardData.understandingLevel + 1;
+}

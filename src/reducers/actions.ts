@@ -4,6 +4,7 @@ import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 import { IStudyState } from "../lib/flashcard/StudyState";
+import { CardEvaluation } from "../lib/study";
 
 /*
     Boilerplate stuff used to get typesafety within Redux
@@ -60,8 +61,11 @@ export const SAVE_SET_META_COMPLETE = "save set meta complete";
 export const SET_FILTER_CARDS_BEGIN = "set filter cards begin";
 export const SET_FILTER_CARDS_COMPLETE = "set filter cards complete";
 
-export const UPDATE_STUDY_STATE_BEGIN = "update study state begin";
-export const UPDATE_STUDY_STATE_COMPLETE = "update study state complete";
+export const SET_STUDY_STATE_BEGIN = "set study state begin";
+export const SET_STUDY_STATE_COMPLETE = "set study state complete";
+
+export const EVALUATE_CARD_BEGIN = "evaluate card begin";
+export const EVALUATE_CARD_COMPLETE = "evaluate card complete";
 
 export const Action = {
     loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
@@ -107,8 +111,14 @@ export const Action = {
     filterCardsComplete: (setId: string, filter: IFlashCardSetCardFilter, result: string[]) =>
         createAction(SET_FILTER_CARDS_COMPLETE, { setId, filter, result }),
 
-    updateStudyStateBegin: (state?: Partial<IStudyState>) => createAction(UPDATE_STUDY_STATE_BEGIN, { state }),
-    updateStudyStateComplete: (state: Partial<IStudyState>) => createAction(UPDATE_STUDY_STATE_COMPLETE, { state }),
+    setStudyStateBegin: (state?: Partial<IStudyState>) => createAction(SET_STUDY_STATE_BEGIN, { state }),
+    setStudyStateComplete: (state: Partial<IStudyState>) => createAction(SET_STUDY_STATE_COMPLETE, { state }),
+
+    evaluateCardBegin: (setId: string, cardId: string, evaluation: CardEvaluation) =>
+        createAction(EVALUATE_CARD_BEGIN, { setId, cardId, evaluation }),
+    evaluateCardComplete: (setId: string, cardId: string, evaluation: CardEvaluation,
+                           redrawTime: Date | null, nextCardId: string) =>
+        createAction(EVALUATE_CARD_COMPLETE, { setId, cardId, evaluation, redrawTime, nextCardId }),
 };
 
 export type Action = ActionsUnion<typeof Action>;

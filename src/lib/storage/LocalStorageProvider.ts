@@ -165,8 +165,8 @@ export class LocalStorageProvider implements IStorageProvider {
                 currentSession: null,
             };
 
-            dispatch(fromActions.Action.updateStudyStateBegin());
-            this.result(() => dispatch(fromActions.Action.updateStudyStateComplete(result)));
+            dispatch(fromActions.Action.setStudyStateBegin());
+            this.result(() => dispatch(fromActions.Action.setStudyStateComplete(result)));
         };
     }
 
@@ -313,12 +313,13 @@ export class LocalStorageProvider implements IStorageProvider {
             const deck = Study.selectStudyDeck(studyData, options.maxNewCards,
                 options.maxTotalCards, setMeta.cardOrder);
             const cardData = Utils.arrayToObject(setMeta.cardOrder, cardId => [cardId, {
+                evaluations: [],
                 redrawTime: null,
             }]);
             const currentCardId = Study.drawCard(deck, studyData, cardData);
 
             // Set an empty deck so the user can see progress
-            dispatch(fromActions.Action.updateStudyStateBegin({
+            dispatch(fromActions.Action.setStudyStateBegin({
                 currentSession: {
                     deck: Array(deck.length).map(a => "loading"),
                     currentCardId: "loading",
@@ -327,7 +328,7 @@ export class LocalStorageProvider implements IStorageProvider {
             }));
             this.result(() => {
                 // Update the study state
-                dispatch(fromActions.Action.updateStudyStateComplete({
+                dispatch(fromActions.Action.setStudyStateComplete({
                     currentSession: {
                         deck,
                         currentCardId,
@@ -357,62 +358,42 @@ export class LocalStorageProvider implements IStorageProvider {
             if (studyData === null) {
                 throw new Error("No study data exists for set " + setId);
             }
+            if (studyState.currentSession === null) {
+                throw new Error("A session must have been started");
+            }
 
             const cardData: ICardStudyData = studyData.cardData[cardId];
-            let newSession: IStudySession;
+            let redrawTime: Date | null;
             switch (evaluation) {
                 case Study.CardEvaluation.Good:
+                    // Redraw time doesn't matter anymore since the card will be removed fomr the deck
+                    redrawTime = null;
                     // Update the due date for the card
                     this.saveCardStudyData({
                         ...cardData,
+                        understandingLevel: Study.getNewUnderstandingLevel(cardData,
+                            studyState.currentSession.cardData[cardId].evaluations),
                         dueDate: Study.getDueTimeIncrease(cardData, evaluation),
                     });
-                    if (studyState.currentSession !== null) {
-                        // Remove the card from the session
-                        const { [cardId]: cData, ...rest} = studyState.currentSession.cardData;
-                        const newDeck = studyState.currentSession.deck.filter(cId => cId !== cardId);
-                        newSession = {
-                            ...studyState.currentSession,
-                            // Update the current card
-                            currentCardId: Study.drawCard(newDeck,
-                                studyData,
-                                studyState.currentSession.cardData,
-                                studyState.currentSession.currentCardId),
-                            // Remove the card from the deck
-                            deck: newDeck,
-                            cardData: rest,
-                        };
-                        break;
-                    }
+                    break;
                 case Study.CardEvaluation.Decent:
                 case Study.CardEvaluation.Poor:
-                    if (studyState.currentSession !== null) {
-                        // Just increase the redraw time
-                        newSession = {
-                            ...studyState.currentSession,
-                            // Update the current card
-                            currentCardId: Study.drawCard(studyState.currentSession.deck,
-                                studyData,
-                                studyState.currentSession.cardData,
-                                studyState.currentSession.currentCardId),
-                            // Update the card data to reflect the card
-                            cardData: {
-                                ...studyState.currentSession.cardData,
-                                [cardId]: {
-                                    ...studyState.currentSession.cardData[cardId],
-                                    redrawTime: Study.getDueTimeIncrease(cardData, evaluation),
-                                },
-                            },
-                        };
-                        break;
-                    }
+                    // Just increase the redraw time
+                    redrawTime = Study.getDueTimeIncrease(cardData, evaluation);
+                    break;
             }
 
-            dispatch(fromActions.Action.updateStudyStateBegin());
-            this.result(() => dispatch(fromActions.Action.updateStudyStateComplete({
-                ...studyState,
-                currentSession: newSession,
-            })));
+            const nextCardId = Study.drawCard(studyState.currentSession.deck,
+                studyData,
+                studyState.currentSession.cardData,
+                studyState.currentSession.currentCardId);
+            dispatch(fromActions.Action.evaluateCardBegin(setId, cardId, evaluation));
+            this.result(() => dispatch(fromActions.Action.evaluateCardComplete(setId,
+                cardId,
+                evaluation,
+                redrawTime,
+                nextCardId,
+            )));
         };
     }
 
