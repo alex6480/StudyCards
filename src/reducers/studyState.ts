@@ -106,6 +106,7 @@ function knownCardIds(state: string[] = initialState.knownCardIds, action: fromA
 
 function currentSession(state: IStudySession | null = initialState.currentSession,
                         action: fromActions.Action): IStudySession | null {
+    let updating: boolean = true;
     switch (action.type) {
         case fromActions.SET_STUDY_STATE_BEGIN:
         case fromActions.SET_STUDY_STATE_COMPLETE:
@@ -119,9 +120,11 @@ function currentSession(state: IStudySession | null = initialState.currentSessio
                 // Session is over, when the last card is removed from the deck
                 return null;
             }
+            updating = false;
         case fromActions.EVALUATE_CARD_BEGIN:
             return {
                 ...state!,
+                updating,
                 currentCardId: sessionCurrentCardId(state!.currentCardId, action),
                 deck: sessionDeck(state!.deck, action),
                 cardData: {

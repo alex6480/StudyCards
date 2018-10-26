@@ -5,7 +5,7 @@ import { Dispatch } from "redux";
 import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../../lib/flashcard/StudyData";
 import { IStudyState } from "../../lib/flashcard/StudyState";
-import IRemote from "../../lib/remote";
+import IRemote, { EmptyRemote } from "../../lib/remote";
 import { Storage } from "../../lib/storage/StorageProvider";
 import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
@@ -83,8 +83,10 @@ class StudySection extends React.Component<IStudySectionProps, {}> {
             return <div className="container">
                 <p>{currentSession.deck.length}&#32;
                     {Utils.plural("card", currentSession.deck.length)} left</p>
-                <PresentedCard card={card}
-                    evaluateCard={this.evaluateCard.bind(this)}/>
+                { currentSession.updating
+                    ? <PresentedCard card={EmptyRemote()} />
+                    : <PresentedCard card={card} evaluateCard={this.evaluateCard.bind(this)}/>
+                }
             </div>;
         }
     }

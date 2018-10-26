@@ -324,6 +324,7 @@ export class LocalStorageProvider implements IStorageProvider {
                     deck: Array(deck.length).map(a => "loading"),
                     currentCardId: "loading",
                     cardData: {},
+                    updating: false,
                 },
             }));
             this.result(() => {
@@ -333,6 +334,7 @@ export class LocalStorageProvider implements IStorageProvider {
                         deck,
                         currentCardId,
                         cardData,
+                        updating: false,
                     },
                 }));
 
@@ -521,6 +523,7 @@ export class LocalStorageProvider implements IStorageProvider {
             };
         }
         const card: ICardStudyData = JSON.parse(data);
+        card.dueDate = new Date(card.dueDate.toString());
 
         return card;
     }

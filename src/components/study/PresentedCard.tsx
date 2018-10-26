@@ -8,7 +8,7 @@ import PresentedCardFace from "./PresentedCardFace";
 
 interface IPresentedCardProps {
     card?: IRemote<IFlashCard>;
-    evaluateCard: (evaluation: Study.CardEvaluation) => void;
+    evaluateCard?: (evaluation: Study.CardEvaluation) => void;
 }
 
 interface IPresentedCardState {
@@ -84,6 +84,9 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
     }
 
     private evaluateCard(evaluation: Study.CardEvaluation) {
-        this.props.evaluateCard(evaluation);
+        this.setState({ showBack: false });
+        if (this.props.evaluateCard !== undefined) {
+            this.props.evaluateCard(evaluation);
+        }
     }
 }

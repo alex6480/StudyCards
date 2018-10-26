@@ -11,6 +11,7 @@ export interface IStudySession {
     deck: string[];
     currentCardId: string;
     cardData: {[cardId: string]: IStudySessionCardData};
+    updating: boolean;
 }
 
 export interface IStudySessionCardData {
