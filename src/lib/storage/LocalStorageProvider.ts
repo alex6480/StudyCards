@@ -267,7 +267,8 @@ export class LocalStorageProvider implements IStorageProvider {
 
             const setMeta = this.getSetMeta(setId)!;
             const result = setMeta.cardOrder.filter(cardId => {
-                const card = this.getCard(setId, cardId);
+                // Don't parse the card because rich text content is slow to parse
+                const card = this.getCardRaw(setId, cardId);
                 // Make a list of all the tags on the card that match the filter
                 const matchingTags = card.tags.filter(tag => filter.tags[tag] === true);
                 return matchingTags.length > 0;
@@ -400,14 +401,18 @@ export class LocalStorageProvider implements IStorageProvider {
     }
 
     private getCard(setId: string, cardId: string): IFlashCard {
+        const exportCard = this.getCardRaw(setId, cardId);
+        const card = parseCard(exportCard, setId);
+
+        return card as IFlashCard;
+    }
+
+    private getCardRaw(setId: string, cardId: string): ExportFlashCard {
         const data = localStorage.getItem(this.cardKey(setId, cardId));
         if (data === null) {
             throw new Error("Card does not exist");
         }
-        const exportCard = JSON.parse(data) as ExportFlashCard;
-        const card = parseCard(exportCard, setId);
-
-        return card as IFlashCard;
+        return JSON.parse(data) as ExportFlashCard;
     }
 
     /**
