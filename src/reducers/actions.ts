@@ -3,6 +3,7 @@ import IFlashCard, { IFlashCardMeta } from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
+import { IStudyState } from "../lib/flashcard/StudyState";
 
 /*
     Boilerplate stuff used to get typesafety within Redux
@@ -27,8 +28,6 @@ interface IActionsCreatorMapObject {
 
 export type ActionsUnion<A extends IActionsCreatorMapObject> = ReturnType<A[keyof A]>;
 
-export const RESET_SESSION_STUDY_DATA = "reset session study data";
-export const UPDATE_CARD_STUDY_DATA = "update card study data";
 export const SWAP_CARD_FACES = "swap card faces";
 
 // Remote actions
@@ -49,9 +48,6 @@ export const LOAD_SET_META_ALL_BEGIN = "load meta data for all sets begin";
 export const LOAD_SET_META_ALL_COMPLETE = "load meta data for all sets complete";
 export const LOAD_SET_META_ALL_ERROR = "load meta data for all sets error";
 
-export const LOAD_SET_STUDY_DATA_BEGIN = "load set study data begin";
-export const LOAD_SET_STUDY_DATA_COMPLETE = "load set study data complete";
-
 export const LOAD_CARDS_BEGIN = "load cards begin";
 export const LOAD_CARDS_COMPLETE = "load cards complete";
 
@@ -64,15 +60,14 @@ export const SAVE_SET_META_COMPLETE = "save set meta complete";
 export const SET_FILTER_CARDS_BEGIN = "set filter cards begin";
 export const SET_FILTER_CARDS_COMPLETE = "set filter cards complete";
 
+export const UPDATE_STUDY_STATE_BEGIN = "update study state begin";
+export const UPDATE_STUDY_STATE_COMPLETE = "update study state complete";
+
 export const Action = {
     loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
     loadSetMetaAllComplete: (setMeta: {[id: string]: IFlashCardSetMeta}) =>
         createAction(LOAD_SET_META_ALL_COMPLETE, setMeta),
     loadSetMetaAllError: (message: string) => createAction(LOAD_SET_META_ALL_ERROR, { message }),
-
-    loadSetStudyDataBegin: (setId: string) => createAction(LOAD_SET_STUDY_DATA_BEGIN, { setId }),
-    loadSetStudyDataComplete: (result: ISetStudyData) =>
-        createAction(LOAD_SET_STUDY_DATA_COMPLETE, { setId: result.setId, result }),
 
     loadCardsBegin: (setId: string, cardIds: string[]) => createAction(LOAD_CARDS_BEGIN, { setId, cardIds }),
     loadCardsComplete: (setId: string, cards: {[id: string]: IFlashCard }) =>
@@ -105,7 +100,6 @@ export const Action = {
     deleteCardBegin: (setId: string, cardId: string) => createAction(DELETE_CARD_BEGIN, { cardId, setId }),
     deleteCardComplete: (setId: string, cardId: string) => createAction(DELETE_CARD_COMPLETE, { cardId, setId }),
 
-    updateCardStudyData: (studyData: ICardStudyData) => createAction(UPDATE_CARD_STUDY_DATA, studyData),
     swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),
 
     filterCardsBegin: (setId: string, filter: IFlashCardSetCardFilter) =>
@@ -113,10 +107,8 @@ export const Action = {
     filterCardsComplete: (setId: string, filter: IFlashCardSetCardFilter, result: string[]) =>
         createAction(SET_FILTER_CARDS_COMPLETE, { setId, filter, result }),
 
-    /**
-     * Resets the parts of the studydata that are temporary for a single study session
-     */
-    resetSessionStudyData: () => createAction(RESET_SESSION_STUDY_DATA),
+    updateStudyStateBegin: (state?: Partial<IStudyState>) => createAction(UPDATE_STUDY_STATE_BEGIN, { state }),
+    updateStudyStateComplete: (state: Partial<IStudyState>) => createAction(UPDATE_STUDY_STATE_COMPLETE, { state }),
 };
 
 export type Action = ActionsUnion<typeof Action>;

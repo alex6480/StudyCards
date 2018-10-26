@@ -3,7 +3,6 @@ import { ThunkAction } from "redux-thunk";
 import { IAppState } from "../../reducers";
 import * as fromActions from "../../reducers/actions";
 import { initialCard } from "../../reducers/card";
-import * as fromCardStudyData from "../../reducers/cardStudyData";
 import * as fromSet from "../../reducers/set";
 import IFlashCard, { ExportFlashCard, IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace, IRichTextFlashCardFace } from "../flashcard/FlashCardFace";
@@ -11,6 +10,8 @@ import IFlashCardSet, { ExportFlashCardSet, IFlashCardSetCardFilter,
     IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 import parseCard from "../flashcard/parsers/parseCard";
 import { ICardStudyData, ISetStudyData, ISetStudyDataMeta } from "../flashcard/StudyData";
+import { IStudySession, IStudyState } from "../flashcard/StudyState";
+import * as Study from "../study";
 import * as Utils from "../utils";
 import IStorageProvider from "./StorageProvider";
 
@@ -132,30 +133,6 @@ export class LocalStorageProvider implements IStorageProvider {
         callback(this.getSetIds().indexOf(setId) !== -1);
     }
 
-    public loadSetStudyData(setId: string): ThunkAction<void, IAppState, void, fromActions.Action> {
-        return (dispatch, getState) => {
-            dispatch(fromActions.Action.loadSetStudyDataBegin(setId));
-
-            const setStudyMetaData = localStorage.getItem(this.setStudyDataKey(setId));
-            if (setStudyMetaData === null) {
-                throw new Error("No study metadata is available for set with id " + setId);
-            }
-            const setStudyMeta: ISetStudyDataMeta = JSON.parse(setStudyMetaData);
-            const setMeta = this.getSetMeta(setId);
-            if (setMeta === null) {
-                throw new Error("Set " + setId + " does not exist");
-            }
-            const result = {
-                ...setStudyMeta,
-                cardData: Utils.arrayToObject(
-                    setMeta.cardOrder.map(cardId => this.getCardStudyData(setId, cardId)),
-                    val => [val.cardId, val]),
-            };
-
-            this.result(() => dispatch(fromActions.Action.loadSetStudyDataComplete(result)));
-        };
-    }
-
     public loadCards(setId: string, cardIds: string[]): ThunkAction<void, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             dispatch(fromActions.Action.loadCardsBegin(setId, cardIds));
@@ -171,6 +148,25 @@ export class LocalStorageProvider implements IStorageProvider {
 
             this.result(() =>
                 dispatch(fromActions.Action.loadCardsComplete(setId, Utils.arrayToObject(cards, c => [c.id, c]))));
+        };
+    }
+
+    public loadStudyState(setId: string): ThunkAction<void, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            const setStudyData = this.getSetStudyData(setId);
+            if (setStudyData === null) {
+                throw new Error("No study data available for this set");
+            }
+
+            const result: IStudyState = {
+                setId,
+                newCardIds: Study.getNewCardIds(Object.keys(setStudyData.cardData), setStudyData),
+                knownCardIds: Study.getKnownCardIds(Object.keys(setStudyData.cardData), setStudyData),
+                currentSession: null,
+            };
+
+            dispatch(fromActions.Action.updateStudyStateBegin());
+            this.result(() => dispatch(fromActions.Action.updateStudyStateComplete(result)));
         };
     }
 
@@ -304,17 +300,120 @@ export class LocalStorageProvider implements IStorageProvider {
         return dataStr;
     }
 
-    private getCardStudyData(setId: string, cardId: string): ICardStudyData {
-        const data = localStorage.getItem(this.cardStudyDataKey(setId, cardId));
-        if (data === null) {
-            // Return an empty study data object instead
-            return {
-                ...fromCardStudyData.initialState,
-                setId,
-                cardId,
-            };
-        }
-        return JSON.parse(data);
+    public beginStudySession(options: Study.IStudySessionOptions):
+        ThunkAction<void, IAppState, void, fromActions.Action> {
+        return (dispatch, getState) => {
+            const setId = getState().studyState.value!.setId;
+            const setMeta = this.getSetMeta(setId);
+            const studyData = this.getSetStudyData(setId);
+            if (studyData === null || setMeta === null) {
+                throw new Error("Could not start a study session for set " + setId);
+            }
+
+            const deck = Study.selectStudyDeck(studyData, options.maxNewCards,
+                options.maxTotalCards, setMeta.cardOrder);
+            const cardData = Utils.arrayToObject(setMeta.cardOrder, cardId => [cardId, {
+                redrawTime: null,
+            }]);
+            const currentCardId = Study.drawCard(deck, studyData, cardData);
+
+            // Set an empty deck so the user can see progress
+            dispatch(fromActions.Action.updateStudyStateBegin({
+                currentSession: {
+                    deck: Array(deck.length).map(a => "loading"),
+                    currentCardId: "loading",
+                    cardData: {},
+                },
+            }));
+            this.result(() => {
+                // Update the study state
+                dispatch(fromActions.Action.updateStudyStateComplete({
+                    currentSession: {
+                        deck,
+                        currentCardId,
+                        cardData,
+                    },
+                }));
+
+                // Load all cards in the deck
+                dispatch(fromActions.Action.loadCardsComplete(
+                    setId,
+                    Utils.arrayToObject(deck, cardId => [cardId, this.getCard(setId, cardId)]),
+                ));
+            });
+        };
+    }
+
+    public evaluateCard(cardId: string, evaluation: Study.CardEvaluation):
+        ThunkAction<void, IAppState, void, fromActions.Action> {
+        const self = this;
+        return (dispatch, getState) => {
+            if (getState().studyState.value === undefined) {
+                throw new Error("Cannot evaluate a card when no study state data is available");
+            }
+            const studyState = getState().studyState.value!;
+            const setId = studyState.setId;
+            const studyData = this.getSetStudyData(setId);
+            if (studyData === null) {
+                throw new Error("No study data exists for set " + setId);
+            }
+
+            const cardData: ICardStudyData = studyData.cardData[cardId];
+            let newSession: IStudySession;
+            switch (evaluation) {
+                case Study.CardEvaluation.Good:
+                    // Update the due date for the card
+                    this.saveCardStudyData({
+                        ...cardData,
+                        dueDate: Study.getDueTimeIncrease(cardData, evaluation),
+                    });
+                    if (studyState.currentSession !== null) {
+                        // Remove the card from the session
+                        const { [cardId]: cData, ...rest} = studyState.currentSession.cardData;
+                        const newDeck = studyState.currentSession.deck.filter(cId => cId !== cardId);
+                        newSession = {
+                            ...studyState.currentSession,
+                            // Update the current card
+                            currentCardId: Study.drawCard(newDeck,
+                                studyData,
+                                studyState.currentSession.cardData,
+                                studyState.currentSession.currentCardId),
+                            // Remove the card from the deck
+                            deck: newDeck,
+                            cardData: rest,
+                        };
+                        break;
+                    }
+                case Study.CardEvaluation.Decent:
+                case Study.CardEvaluation.Poor:
+                    if (studyState.currentSession !== null) {
+                        // Just increase the redraw time
+                        newSession = {
+                            ...studyState.currentSession,
+                            // Update the current card
+                            currentCardId: Study.drawCard(studyState.currentSession.deck,
+                                studyData,
+                                studyState.currentSession.cardData,
+                                studyState.currentSession.currentCardId),
+                            // Update the card data to reflect the card
+                            cardData: {
+                                ...studyState.currentSession.cardData,
+                                [cardId]: {
+                                    ...studyState.currentSession.cardData[cardId],
+                                    redrawTime: Study.getDueTimeIncrease(cardData, evaluation),
+                                },
+                            },
+                        };
+                        break;
+                    }
+            }
+
+            dispatch(fromActions.Action.updateStudyStateBegin());
+            this.result(() => dispatch(fromActions.Action.updateStudyStateComplete({
+                ...studyState,
+                currentSession: newSession,
+            })));
+        };
     }
 
     private getCard(setId: string, cardId: string): IFlashCard {
@@ -366,14 +465,7 @@ export class LocalStorageProvider implements IStorageProvider {
             // Save the cards
             for (const cardId of set.cardOrder) {
                 const cardValue = cards[cardId].value;
-                if (cardValue === undefined) {
-                    // Just save a generic cardstudydata
-                    this.saveCardStudyData({
-                        ...fromCardStudyData.initialState,
-                        setId: set.id,
-                        cardId,
-                    });
-                } else {
+                if (cardValue !== undefined) {
                     this.saveCard(cardValue);
                 }
             }
@@ -409,8 +501,47 @@ export class LocalStorageProvider implements IStorageProvider {
         }
     }
 
+    private getSetStudyData(setId: string): ISetStudyData | null {
+        const setMeta: IFlashCardSetMeta | null = this.getSetMeta(setId);
+        if (setMeta === null) {
+            return null;
+        }
+
+        const setStudyMetaJsonData = localStorage.getItem(this.setStudyDataKey(setId));
+        if (setStudyMetaJsonData === null) {
+            return null;
+        }
+
+        const setStudyMeta: ISetStudyDataMeta = JSON.parse(setStudyMetaJsonData);
+        const cards = Utils.arrayToObject(setMeta.cardOrder, cardId => [
+            cardId,
+            this.getCardStudyData(setId, cardId),
+        ]);
+
+        return {
+            ...setStudyMeta,
+            cardData: cards,
+        };
+    }
+
     private saveCardStudyData(card: ICardStudyData) {
         localStorage.setItem(this.cardStudyDataKey(card.setId, card.cardId), JSON.stringify(card));
+    }
+
+    private getCardStudyData(setId: string, cardId: string): ICardStudyData {
+        const data = localStorage.getItem(this.cardStudyDataKey(setId, cardId));
+        if (data === null) {
+            // If no study data is present, just generate a default study data
+            return {
+                setId,
+                cardId,
+                dueDate: new Date(),
+                understandingLevel: 0,
+            };
+        }
+        const card: ICardStudyData = JSON.parse(data);
+
+        return card;
     }
 
     /**

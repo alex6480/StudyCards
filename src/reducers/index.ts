@@ -1,24 +1,22 @@
 import IFlashCardSet from "../lib/flashcard/FlashCardSet";
 import { ISetStudyData } from "../lib/flashcard/StudyData";
-import IRemote from "../lib/remote";
+import { IStudyState } from "../lib/flashcard/StudyState";
+import IRemote, { EmptyRemote } from "../lib/remote";
 import { LocalStorageProvider } from "../lib/storage/LocalStorageProvider";
 import IStorageProvider from "../lib/storage/StorageProvider";
 import * as Utils from "../lib/utils";
 import * as fromActions from "./actions";
 import sets, * as fromSet from "./set";
-import studyData from "./setStudyData";
+import { studyState } from "./studyState";
 
 export interface IAppState {
     sets: IRemote<{ [id: string]: IRemote<IFlashCardSet> }>;
-    studyData: { [id: string]: IRemote<ISetStudyData> };
+    studyState: IRemote<IStudyState>;
 }
 
 const initialState: IAppState = {
-    sets: {
-        isFetching: false,
-        value: undefined,
-    },
-    studyData: { },
+    sets: EmptyRemote(),
+    studyState: EmptyRemote(),
 };
 
 export default function studyCardsStore(state: IAppState = initialState, action: fromActions.Action): IAppState {
@@ -30,7 +28,7 @@ export default function studyCardsStore(state: IAppState = initialState, action:
             return {
                 ...state,
                 sets: sets(state.sets, action),
-                studyData: studyData(state.studyData, action),
+                studyState: studyState(state.studyState, action),
             };
     }
 }

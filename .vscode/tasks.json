@@ -20,7 +20,8 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "problemMatcher": []
         },
         {
             "label": "Build (dist)",
@@ -42,7 +43,6 @@
                 "fileLocation": "relative"
             }
         },
-
         {
             "label": "Run dev server",
             "command": "${workspaceFolder}/node_modules/.bin/webpack-dev-server",

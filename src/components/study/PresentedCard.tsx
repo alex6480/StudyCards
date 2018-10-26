@@ -7,10 +7,8 @@ import Tooltip from "../Tooltip";
 import PresentedCardFace from "./PresentedCardFace";
 
 interface IPresentedCardProps {
-    card: IRemote<IFlashCard>;
-    studyData: ICardStudyData;
-    updateStudyData: (data: ICardStudyData, nextCard: boolean) => void;
-    nextCard: () => void;
+    card?: IRemote<IFlashCard>;
+    evaluateCard: (evaluation: Study.CardEvaluation) => void;
 }
 
 interface IPresentedCardState {
@@ -27,7 +25,7 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
     }
 
     public render() {
-        if (this.props.card.value === undefined) {
+        if (this.props.card === undefined || this.props.card.value === undefined) {
             return <div className="card">
                 <div className="card-content content">
                     <p>Loading</p>
@@ -52,13 +50,13 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
                 <br />
                 <p className="title is-5">How good is your memory of this card?</p>
                 <div className="buttons">
-                    <a className="button" onClick={this.evaluateCard(Study.CardEvaluation.Poor).bind(this)}>
+                    <a className="button" onClick={() => this.evaluateCard(Study.CardEvaluation.Poor)}>
                         Poor
                     </a>
-                    <a className="button" onClick={this.evaluateCard(Study.CardEvaluation.Decent).bind(this)}>
+                    <a className="button" onClick={() => this.evaluateCard(Study.CardEvaluation.Decent)}>
                         Decent
                     </a>
-                    <a className="button" onClick={this.evaluateCard(Study.CardEvaluation.Good).bind(this)}>
+                    <a className="button" onClick={() => this.evaluateCard(Study.CardEvaluation.Good)}>
                         Good
                     </a>
                 </div>
@@ -86,12 +84,6 @@ export default class PresentedCard extends React.Component<IPresentedCardProps, 
     }
 
     private evaluateCard(evaluation: Study.CardEvaluation) {
-        return (() => {
-            const newData = Study.updateCardStudyData(this.props.card.value!.id, this.props.studyData, evaluation);
-            this.props.updateStudyData(newData, true);
-
-            // Make sure only the front of the next card is showed
-            this.setState({ showBack: false });
-        }).bind(this);
+        this.props.evaluateCard(evaluation);
     }
 }

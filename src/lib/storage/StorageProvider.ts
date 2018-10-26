@@ -5,6 +5,8 @@ import { Action } from "../../reducers/actions";
 import IFlashCard, { IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace } from "../flashcard/FlashCardFace";
 import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../flashcard/FlashCardSet";
+import { ICardStudyData } from "../flashcard/StudyData";
+import { CardEvaluation, IStudySessionOptions } from "../study";
 import { LocalStorageProvider } from "./LocalStorageProvider";
 
 export let Storage: IStorageProvider = new LocalStorageProvider();
@@ -24,14 +26,15 @@ export default interface IStorageProvider {
     saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) => ThunkAction<void, IAppState, void, Action>;
 
     /**
-     * Fetches the studydata for the specified set
-     */
-    loadSetStudyData: (setId: string) => ThunkAction<void, IAppState, void, Action>;
-
-    /**
      * Fetches card data for the specified card ids
      */
     loadCards: (setId: string, cardIds: string[]) => ThunkAction<void, IAppState, void, Action>;
+
+    /**
+     * Loads the study state for the specified set
+     * If a session is ongoing it will be reset
+     */
+    loadStudyState: (setId: string) => ThunkAction<void, IAppState, void, Action>;
 
     /**
      * Adds a new card to the deck
@@ -76,4 +79,14 @@ export default interface IStorageProvider {
      * Updates the filtered cards for the specified set
      */
     filterCards: (setId: string, filter: IFlashCardSetCardFilter) => ThunkAction<void, IAppState, void, Action>;
+
+    /**
+     * Begins a new study session a fetched a deck according to the specified options
+     */
+    beginStudySession: (options: IStudySessionOptions) => ThunkAction<void, IAppState, void, Action>;
+
+    /**
+     * Evaluates the specified card, updates it's study data and draws a new card
+     */
+    evaluateCard: (cardId: string, evaluation: CardEvaluation) => ThunkAction<void, IAppState, void, Action>;
 }

@@ -2,6 +2,7 @@ import * as React from "react";
 import { Link } from "react-router-dom";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import { ISetStudyData } from "../../lib/flashcard/StudyData";
+import { IStudyState } from "../../lib/flashcard/StudyState";
 import IRemote from "../../lib/remote";
 import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
@@ -11,18 +12,14 @@ import ResizeTransition from "../transition/ResizeTransition";
 
 interface IStudyOverviewProps {
     set: IRemote<IFlashCardSet>;
-    studyData?: IRemote<ISetStudyData>;
-    maxNewCards: number;
-    maxTotalCards: number;
-
-    startStudy?: (deck: string[]) => void;
+    studyState: IRemote<IStudyState>;
+    startStudySession: () => void;
 }
 
 export default class StudyOverview extends React.Component<IStudyOverviewProps> {
     public render() {
         if (this.props.set.value === undefined || this.props.set.isFetching
-            || this.props.studyData === undefined || this.props.studyData.value === undefined
-            || this.props.studyData.isFetching) {
+            || this.props.studyState.value === undefined || this.props.studyState.isFetching) {
             return <div className="columns">
                 <div className="column">
                     <div className="card">
@@ -45,10 +42,10 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
             </div>;
         }
 
-        const newCardIds = Study.getNewCardIds(this.props.set.value.cardOrder, this.props.studyData.value);
-        const knownCardIds = Study.getKnownCardIds(this.props.set.value.cardOrder, this.props.studyData.value);
-        const newCardsInStudy = Math.min(newCardIds.length, this.props.maxNewCards);
-        const knownCardsInStudy = Math.min(knownCardIds.length, this.props.maxTotalCards - newCardsInStudy);
+        const newCardIds = this.props.studyState.value.newCardIds;
+        const knownCardIds = this.props.studyState.value.knownCardIds;
+        const newCardsInStudy = Math.min(newCardIds.length, Study.MAX_NEW_CARDS);
+        const knownCardsInStudy = Math.min(knownCardIds.length, Study.MAX_TOTAL_CARDS - newCardsInStudy);
         const p = Utils.plural;
 
         return <div className="columns same-height">
@@ -116,13 +113,6 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
     }
 
     private handleStartClick() {
-        const deck = Study.selectStudyDeck(this.props.studyData!.value!,
-            this.props.maxNewCards,
-            this.props.maxTotalCards,
-            this.props.set.value!.cardOrder);
-
-        if (this.props.startStudy !== undefined) {
-            this.props.startStudy(deck);
-        }
+        this.props.startStudySession();
     }
 }

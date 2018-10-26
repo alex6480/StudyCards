@@ -1,6 +1,14 @@
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 import IFlashCard from "./flashcard/flashcard";
+import { IFlashCardSetCardFilter } from "./flashcard/FlashCardSet";
+import { IStudySessionCardData } from "./flashcard/StudyState";
 import * as Utils from "./utils";
+
+export interface IStudySessionOptions {
+    maxTotalCards: number;
+    maxNewCards: number;
+    filter?: IFlashCardSetCardFilter;
+}
 
 /**
  * A score indicating how well the user remembered the presented card
@@ -10,6 +18,9 @@ export enum CardEvaluation {
     Decent,
     Good,
 }
+
+export const MAX_NEW_CARDS = 20;
+export const MAX_TOTAL_CARDS = 40;
 
 export function selectStudyDeck(studyData: ISetStudyData, maxNewCards: number,
                                 maxTotalCards: number, cardIds: string[]): string[];
@@ -120,33 +131,6 @@ function selectKnownCardsForStudy(knownCards: string[] | {[id: string]: IFlashCa
 }
 
 /**
- * Returns an updated studyData for the card based on the given evaluation
- * @param studyData The study data to update
- * @param evaluation The evaluation of the card
- */
-export function updateCardStudyData(cardId: string,
-                                    studyData: ICardStudyData,
-                                    evaluation: CardEvaluation): ICardStudyData {
-    switch (evaluation) {
-        case CardEvaluation.Good:
-            return {
-                ...studyData,
-                cardId,
-                dueDate: getDueTimeIncrease(studyData, evaluation),
-                redrawTime: null,
-                removeFromSession: true,
-            };
-        case CardEvaluation.Decent:
-        case CardEvaluation.Poor:
-            return {
-                ...studyData,
-                cardId,
-                redrawTime: getDueTimeIncrease(studyData, evaluation),
-            };
-    }
-}
-
-/**
  * Returns the time when this card will be presented again. Either in the same study session or in a future one
  */
 export function getDueTimeIncrease(studyData: ICardStudyData, evaluation: CardEvaluation) {
@@ -173,7 +157,10 @@ export function getDueTimeIncrease(studyData: ICardStudyData, evaluation: CardEv
  * @param possibleCards The ids of the cards that can be drawn
  * @param StudyData Study data for the cards in the deck
  */
-export function drawCard(deck: string[], studyData: ISetStudyData, currentCardId?: string): string {
+export function drawCard(deck: string[],
+                         studyData: ISetStudyData,
+                         cardSessionData: {[cardId: string]: IStudySessionCardData},
+                         currentCardId?: string): string {
     if (deck.length === 0) {
         throw new Error("Deck cannot be empty");
     }
@@ -191,13 +178,14 @@ export function drawCard(deck: string[], studyData: ISetStudyData, currentCardId
     // 1. Try to return a card with a redraw time earlier than now
     const dueCards = possibleCards.filter(id => {
         const card = studyData.cardData[id];
-        return card !== undefined && card.redrawTime !== null && card.redrawTime.getTime() <= new Date().getTime();
+        const redrawTime = cardSessionData[id].redrawTime;
+        return card !== undefined && redrawTime !== null && redrawTime.getTime() <= new Date().getTime();
     });
     if (dueCards.length > 0) { return dueCards[Math.floor(Math.random() * dueCards.length)]; }
 
     // 2. Try to return a card with no redraw time
     const cardWithoutRedraw = possibleCards.filter(id =>
-        studyData.cardData[id] === undefined || studyData.cardData[id].redrawTime === null);
+        studyData.cardData[id] === undefined || cardSessionData[id].redrawTime === null);
     if (cardWithoutRedraw.length > 0) {
         return cardWithoutRedraw[Math.floor(Math.random() * cardWithoutRedraw.length)];
     }
@@ -207,7 +195,7 @@ export function drawCard(deck: string[], studyData: ISetStudyData, currentCardId
         const card = studyData.cardData[id];
         return {
             card,
-            score: (card.redrawTime as Date).getTime(),
+            score: cardSessionData[id].redrawTime!.getTime(),
         };
     });
     return futureCards.sort((a, b) => a.score - b.score)[0].card.cardId;
