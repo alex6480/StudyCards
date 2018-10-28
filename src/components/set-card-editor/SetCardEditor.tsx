@@ -111,6 +111,10 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         }
     }
 
+    public componentDidMount() {
+        this.loadCards();
+    }
+
     public componentDidUpdate() {
         this.loadCards();
     }
