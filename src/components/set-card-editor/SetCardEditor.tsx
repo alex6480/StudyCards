@@ -13,7 +13,7 @@ import SetLoader from "../SetLoader";
 import SetNav from "../SetNav";
 import SetNotFound from "../SetNotFound";
 import { CardDivider } from "./CardDivider";
-import CardEditor from "./CardEditor";
+import CardEditor, { ScreenPosition } from "./CardEditor";
 import { TagFilter } from "./TagFilter";
 
 interface ISetCardEditorOwnProps {
@@ -37,23 +37,24 @@ interface ISetCardEditorProps extends ISetCardEditorStateProps, ISetCardEditorDi
 interface ISetCardEditorState {
     cardDisplayData: {
         [cardId: string]: {
-            // Whether the card is visible on screen, to prevent drops in local performance
-            visible: boolean,
             // Whether the card has been fetched this session. Each card will only be loaded once to limit server load
-            loaded: boolean },
+            loaded: boolean,
+            // Position relative to the screen
+            screenPos: ScreenPosition;
+        },
     };
 }
 
 class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorState> {
     /**
-     * How many cards to load every time more cards are loaded
+     * Number of cards to render below the screen
+     */
+    private showCardsBelowScreen = 5;
+
+    /**
+     * How many cards will be loaded at once
      */
     private cardsToLoadAtOnce = 10;
-    /**
-     * The number of pixels from the bottom of the screen until more cards are loaded
-     */
-    private loadNextCardsAt = 1500;
-    private scrollListener = this.updateVisibleCards.bind(this);
 
     /**
      * Indicates whether the current render is the first one taking place
@@ -69,7 +70,12 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                             && this.props.set.value.filteredCardOrder.value !== undefined
                 ? Utils.arrayToObject(
                     this.props.set.value.filteredCardOrder.value,
-                    cardId => [cardId, { visible: false, loaded: false }])
+                    cardId => [cardId,
+                        {
+                            visible: false,
+                            loaded: false,
+                            screenPos: "unknown" as ScreenPosition,
+                        }])
                 : { },
         };
     }
@@ -80,33 +86,33 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
             return;
         }
 
-        if (this.props.set.isFetching && newProps.set.isFetching === false) {
-            // After set metadata has been updated, cards always need to be updated
-            this.updateVisibleCards();
-        }
-
         if (newProps.set.value !== undefined) {
             const oldFilter = this.props.set.value !== undefined ? this.props.set.value.filter : undefined;
             const newFilter = newProps.set.value !== undefined ? newProps.set.value.filter : undefined;
             if (newFilter !== oldFilter) {
                 // Filter has been changed.
-                this.setState({
-                    cardDisplayData: Utils.arrayToObject(newProps.set.value.filteredCardOrder.value!,
-                        cardId => [cardId, {
-                            visible: this.state.cardDisplayData[cardId] !== undefined
-                            ? this.state.cardDisplayData[cardId].visible
-                            : false,
-                            loaded: this.state.cardDisplayData[cardId] !== undefined
-                                ? this.state.cardDisplayData[cardId].loaded
-                                : false,
-                        }],
-                    ),
-                }, () => {
-                    // Make sure that some cards are visible
-                    this.updateVisibleCards();
+                const newDisplayData: { [cardId: string]: {
+                    loaded: boolean,
+                    screenPos: ScreenPosition,
+                } } = { };
+                const cardsToLoad: string[] = [];
+                for (const cardId of newProps.set.value.filteredCardOrder.value!) {
+                    let loaded = this.state.cardDisplayData[cardId] !== undefined && this.state.cardDisplayData[cardId].loaded;
+                    newDisplayData[cardId] = {
+                        loaded,
+                        screenPos: "unknown",
+                    };
+                }
+
+                this.setState({ cardDisplayData: newDisplayData }, () => {
+                    this.props.loadCards(cardsToLoad);
                 });
             }
         }
+    }
+
+    public componentDidUpdate() {
+        this.loadCards();
     }
 
     public render() {
@@ -161,14 +167,13 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
             if (set.filteredCardOrder.value === undefined) {
                 throw new Error("Filtered card order should never be undefined");
             }
-            this.updateVisibleCards();
         }
 
-        window.addEventListener("scroll", this.scrollListener);
+        //window.addEventListener("scroll", this.scrollListener);
     }
 
     public componentWillUnmount() {
-        window.removeEventListener("scroll", this.scrollListener);
+        //window.removeEventListener("scroll", this.scrollListener);
     }
 
     private renderCards(set: IFlashCardSet) {
@@ -190,21 +195,28 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         } else {
             // This deck contains cards and they should be rendered
             let loadingCards: number = 0;
+            let cardsBelowScreen: number = 0;
             for (const cardId of set.filteredCardOrder.value!) {
-                if (! this.state.cardDisplayData[cardId].visible) { continue; }
-
                 const card = set.cards[cardId];
+                const displayData = this.state.cardDisplayData[cardId];
                 if (card === undefined) {
                     continue;
                 }
 
                 // Never show more than two cards loading at once
-                if (card.isFetching) {
+                if (card.isFetching || card.value === undefined) {
                     loadingCards++;
                     if (loadingCards > 2) {
                         continue;
                     }
                 }
+
+                if (displayData.screenPos === "below" || displayData.screenPos === "unknown") {
+                    if (++cardsBelowScreen > this.showCardsBelowScreen) {
+                        break;
+                    }
+                }
+
                 // Add the actual card editor
                 cards.push(
                     <CardEditor key={cardId}
@@ -213,7 +225,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                                 slideIn={this.newlyAddedCards[cardId] === true}
                                 addNewCard={this.addNewCard.bind(this)}
                                 onDeleted={this.cardDeleted.bind(this)}
-                                onBelowScreen={this.cardBelowScreen.bind(this)}/>,
+                                onScreenPositionChanged={this.cardScreenPositionChanged.bind(this)}/>,
                 );
 
                 // Make sure the card doesn't show a slide transition in the future
@@ -226,26 +238,14 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         </ul>;
     }
 
-    private updateVisibleCards() {
-        const scrollPos = window.scrollY;
-        const docHeight = document.body.scrollHeight;
-        const screenHeight = window.innerHeight;
-
-        if (docHeight - (scrollPos + screenHeight) < this.loadNextCardsAt) {
-            // This can only be done once the set has been loaded
-            if (this.props.set !== undefined && this.props.set.value !== undefined) {
-                this.showMoreCards(this.cardsToLoadAtOnce, this.props.set.value);
-            }
-        }
-    }
-
     private addNewCard(afterCardId?: string) {
         const afterCard = afterCardId !== undefined ? this.props.set!.value!.cards[afterCardId].value! : undefined;
         const newCardId = this.props.addNewCard(afterCard);
         // The newly added card will always be shown
         this.setState({ cardDisplayData: {
             ...this.state.cardDisplayData,
-            [newCardId]: { visible: true, loaded: true },
+            // Assume that newly added cards are onscreen. It will be quickly corrected if incorrect
+            [newCardId]: { loaded: true, screenPos: "onscreen" },
         }});
         this.newlyAddedCards[newCardId] = true;
     }
@@ -253,15 +253,13 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
     private cardDeleted(cardId: string) {
         const {[cardId]: deletedCard, ...rest} = this.state.cardDisplayData;
         this.setState({ cardDisplayData: rest });
-        // Run the scroll listener in case more cards need to be loaded
-        this.updateVisibleCards();
     }
 
     /**
      * Makes more cards visible on the screen
      * If the cards have not been loaded before, they will be
      */
-    private showMoreCards(count: number, set: IFlashCardSet) {
+    /*private showMoreCards(count: number, set: IFlashCardSet) {
         const loadingCards = Object.keys(this.state.cardDisplayData)
                                 .filter(c => set.cards[c] !== undefined
                                           && set.cards[c].isFetching === true);
@@ -291,6 +289,54 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                 },
             });
         }
+    }*/
+
+    private loadCards() {
+        if (this.props.set === undefined || this.props.set.value === undefined) { return; }
+        const set = this.props.set.value;
+        if (set.filteredCardOrder.value === undefined) { return; }
+
+        const cardOrder = set.filteredCardOrder.value;
+        let cardsBelowScreen: number = 0;
+        const cardsToLoad: string[] = [];
+        let loadFrom: number = -1;
+        for (let i = 0; i < cardOrder.length; i++) {
+            const displayData = this.state.cardDisplayData[cardOrder[i]];
+            let visible: boolean = true;
+            if (displayData.screenPos === "below" || displayData.screenPos === "unknown") {
+                if (++cardsBelowScreen > this.showCardsBelowScreen) {
+                    visible = false;
+                }
+            }
+
+            // Load a block containing the visible unloaded card
+            if (visible && !displayData.loaded) {
+                loadFrom = i - i % this.cardsToLoadAtOnce;
+                break;
+            }
+        }
+
+        if (loadFrom === -1) {
+            return;
+        } else {
+            for (let i = loadFrom; i < cardOrder.length && i < loadFrom + this.cardsToLoadAtOnce; i++) {
+                if (! this.state.cardDisplayData[cardOrder[i]].loaded) {
+                    cardsToLoad.push(cardOrder[i]);
+                }
+            }
+        }
+
+        if (cardsToLoad.length !== 0) {
+            this.setState({
+                cardDisplayData: {
+                    ...this.state.cardDisplayData,
+                    ...Utils.arrayToObject(cardsToLoad, cardId => [cardId, {
+                        loaded: true,
+                        screenPos: this.state.cardDisplayData[cardId].screenPos,
+                    }]),
+                }
+            }, () => this.props.loadCards(cardsToLoad));
+        }
     }
 
     private toggleTag(tag: string) {
@@ -310,15 +356,15 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         });
     }
 
-    private cardBelowScreen(cardId: string, delta: number) {
-        if (delta > this.loadNextCardsAt + 1000) {
-            this.setState({
-                cardDisplayData: {
-                    ...this.state.cardDisplayData,
-                    [cardId]: { visible: false, loaded: this.state.cardDisplayData[cardId].loaded },
-                },
-            });
+    private cardScreenPositionChanged(cardId: string, screenPos: ScreenPosition) {
+        const newCardDisplayData = {
+            ...this.state.cardDisplayData,
+            [cardId]: {
+                ...this.state.cardDisplayData[cardId],
+                screenPos,
+            },
         }
+        this.setState({ cardDisplayData: newCardDisplayData })
     }
 }
 

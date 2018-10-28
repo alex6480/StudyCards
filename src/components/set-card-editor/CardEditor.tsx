@@ -16,8 +16,11 @@ import { CardFaceEditorToolbar } from "./CardFaceEditorToolbar";
 import { CardSidebar } from "./CardSidebar";
 import { TagEditor } from "./TagEditor";
 
+export type ScreenPosition = "unknown" | "below" | "onscreen" | "above";
+
 interface ICardEditorState {
     transitionState: TransitionState;
+    screenPosition: ScreenPosition;
 }
 
 interface ICardEditorOwnProps {
@@ -33,10 +36,9 @@ interface ICardEditorOwnProps {
     addNewCard: (afterCardId?: string) => string;
     onDeleted: (cardId: string) => void;
     /**
-     * Callback is called whenever this card is below the screen
-     * Delta is the number of pixels that this card is below the screen
+     * Called whenever the card moves in or out of the screen
      */
-    onBelowScreen?: (cardId: string, delta: number) => void;
+    onScreenPositionChanged?: (cardId: string, screenPosition: ScreenPosition) => void;
 }
 
 interface ICardEditorStateProps extends ICardEditorOwnProps {
@@ -64,7 +66,7 @@ enum TransitionState {
  * A card that is part of a cardlist
  */
 class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
-    private onScroll?: () => void;
+    private onScrollHandler?: () => void;
     private cardElement: HTMLElement | null = null;
 
     constructor(props: ICardEditorProps) {
@@ -73,6 +75,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
         const slideIn = props.slideIn === undefined || props.slideIn === true;
         this.state = {
             transitionState: slideIn ? TransitionState.SlideIn : TransitionState.PlaceholderLoad,
+            screenPosition: "unknown",
         };
     }
 
@@ -88,15 +91,13 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
     }
 
     public componentWillMount() {
-        if (this.props.onBelowScreen) {
-            // Add a scroll listener if the leave screen handler is bound
-            this.onScroll = this.onLeaveScreen.bind(this);
-            window.addEventListener("scroll", this.onScroll!);
-        }
+        // Add a scroll listener if the leave screen handler is bound
+        this.onScrollHandler = this.onScroll.bind(this);
+        window.addEventListener("scroll", this.onScrollHandler!);
     }
 
     public componentWillUnmount() {
-        window.removeEventListener("scroll", this.onScroll!);
+        window.removeEventListener("scroll", this.onScrollHandler!);
     }
 
     public render() {
@@ -228,14 +229,26 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
         this.props.onDeleted(this.props.cardId);
     }
 
-    private onLeaveScreen() {
-        if (this.cardElement !== null && this.props.onBelowScreen !== undefined) {
-            const scrollPos = window.scrollY;
-            const screenHeight = window.innerHeight;
-            const elementPos = this.cardElement.offsetTop;
+    private onScroll() {
+        if (this.cardElement !== null) {
+            const boundingRect = this.cardElement.getBoundingClientRect();
+            const elementTop = boundingRect.top;
+            const elementBottom = elementTop + this.cardElement.offsetHeight;
 
-            if (elementPos > scrollPos + screenHeight) {
-                this.props.onBelowScreen(this.props.cardId, elementPos - (scrollPos + screenHeight));
+            if (this.props.onScreenPositionChanged !== undefined) {
+                let newScreenPos: ScreenPosition = "unknown";
+                if (elementTop > window.innerHeight) {
+                    newScreenPos = "below"
+                } else if (elementBottom < 0) {
+                    newScreenPos = "above";
+                } else {
+                    newScreenPos = "onscreen";
+                }
+
+                if (this.state.screenPosition !== newScreenPos) {
+                    this.props.onScreenPositionChanged(this.props.cardId, newScreenPos);
+                    this.setState({screenPosition: newScreenPos});
+                }
             }
         }
     }
