@@ -129,9 +129,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                     { /* Show empty div instead of footer */ }
                     <div style={{height: "41px"}}></div>
                 </div>;
-            divider = <CardDivider
-                    isSubtle={true}
-                />;
+            divider = <CardDivider isSubtle={true} />;
         } else {
             const card = this.props.card.value!;
             editor = <div className={"card"}>
@@ -173,27 +171,6 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                         {divider}
                     </li>
                 </SlideTransition>;
-            case (TransitionState.None):
-                return <li className="listed-flashcard is-clearfix" ref={el => this.cardElement = el}>
-                    {editor}
-                    {divider}
-                </li>;
-            case (TransitionState.PlaceholderLoad):
-                // Placeholders just pop into place, while the real content animates
-                return <li className={"is-clearfix" + (isPlaceholder ? "" : " listed-flashcard")}>
-                    <ResizeTransition doTransition={! isPlaceholder}>
-                        <div style={{ background: "white" }} >
-                            { isPlaceholder
-                                ? editor
-                                : <FadeTransition from="hidden" to={"visible"}
-                                            onFadeComplete={this.introComplete.bind(this)}>
-                                    {editor}
-                                </FadeTransition>
-                            }
-                        </div>
-                    </ResizeTransition>
-                    {divider}
-                </li>;
             case (TransitionState.Collapsing):
                 return <SlideTransition targetState="collapsed" onSlideComplete={this.deleteFinal.bind(this)}>
                     <li className="listed-flashcard is-clearfix">
@@ -201,6 +178,12 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                         {divider}
                     </li>
                 </SlideTransition>;
+            case (TransitionState.None):
+            case (TransitionState.PlaceholderLoad):
+                return <li className={"is-clearfix" + (isPlaceholder ? "" : " listed-flashcard")} ref={el => this.cardElement = el}>
+                    {editor}
+                    {divider}
+                </li>;
         }
     }
 
