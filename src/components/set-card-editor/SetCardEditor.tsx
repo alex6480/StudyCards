@@ -202,6 +202,11 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                 if (card === undefined) {
                     continue;
                 }
+                if (displayData === undefined) {
+                    // There is a disconnection between display data and the cardorder
+                    // This will be fixed in a later render cycle, so just ignore it for now
+                    continue;
+                }
 
                 // Never show more than two cards loading at once
                 if (card.isFetching || card.value === undefined) {
@@ -302,6 +307,12 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
         let loadFrom: number = -1;
         for (let i = 0; i < cardOrder.length; i++) {
             const displayData = this.state.cardDisplayData[cardOrder[i]];
+            if (displayData === undefined) {
+                // There is a disconnection between display data and the cardorder
+                // This will be fixed in a later render cycle, so just ignore it for now
+                continue;
+            }
+
             let visible: boolean = true;
             if (displayData.screenPos === "below" || displayData.screenPos === "unknown") {
                 if (++cardsBelowScreen > this.showCardsBelowScreen) {
