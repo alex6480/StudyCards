@@ -2,6 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Route, Switch  } from "react-router";
 import Dashboard from "./dashboard/Dashboard";
+import Logo from "./logo";
 import SetCardEditor from "./set-card-editor/SetCardEditor";
 import SetImporter from "./set-importer/ImportPage";
 import SetExporter from "./SetExporter";
@@ -18,7 +19,12 @@ export default class StudyCardsApp extends React.Component {
     }
 
     public render() {
-        return <div>
+        return <>
+            <header className="header">
+                <nav>
+                    <Logo />
+                </nav>
+            </header>
             <Switch>
                 <Route exact path="/" render={({history}) => <Dashboard history={history} />}/>
                 <Route exact path="/import" component={SetImporter} />
@@ -26,6 +32,6 @@ export default class StudyCardsApp extends React.Component {
                 <Route path="/set/:setId/edit" component={SetCardEditor} />
                 <Route path="/set/:setId/export" component={SetExporter} />
             </Switch>
-        </div>;
+        </>;
     }
 }

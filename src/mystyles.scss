@@ -273,3 +273,11 @@ $transition-medium: 0.5s;
         background-size: 800px 104px;
     }
 }
+
+.header {
+    background-color: white;
+    padding: 1rem 1rem 0.5rem 1rem;
+    & svg {
+        height: 2.5rem;
+    }
+}
