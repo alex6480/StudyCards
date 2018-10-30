@@ -24,7 +24,7 @@ interface ISetHeaderProps extends ISetHeaderStateProps, ISetHeaderDispatchProps 
 
 class SetHeader extends React.Component<ISetHeaderProps> {
     public render() {
-        return <section className="hero is-primary">
+        return <header className="hero is-primary">
             <div className="hero-body">
                 <div className="container">
                     <h1 className="title is-1">
@@ -37,7 +37,7 @@ class SetHeader extends React.Component<ISetHeaderProps> {
                     </nav>
                 </div>
             </div>
-        </section>;
+        </header>;
     }
 
     private renderTitle() {

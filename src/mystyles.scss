@@ -51,6 +51,10 @@ $transition-medium: 0.5s;
 @import "../node_modules/bulma/sass/components/navbar.sass";
 @import "../node_modules/bulma/sass/components/tabs.sass";
 
+.title {
+    font-weight: normal;
+}
+
 // These should be moved to appropriate locations
 // Used by the RichFieldEditor
 .listed-flashcard {
@@ -274,10 +278,9 @@ $transition-medium: 0.5s;
     }
 }
 
-.header {
-    background-color: white;
-    padding: 1rem 1rem 0.5rem 1rem;
-    & svg {
-        height: 2.5rem;
+.hero + .navbar {
+    background-color: #343337;
+    .navbar-item {
+        color: white;
     }
 }
