@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export default function() {
     return <svg version="1.1" id="Side_by_side" x="0px" y="0px" viewBox="0 0 360.72 72.04">
         <g>
