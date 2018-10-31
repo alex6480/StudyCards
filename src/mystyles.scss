@@ -5,8 +5,8 @@
 
 // Set your brand colors
 $beige-lighter: #EFF0EB;
-$primary: #3D89C9;
-$info: #7843CE;
+$primary: #1B82C3;
+$info: #2e1f92;
 $link: #4F4CD1;
 $warning: #FFAF40;
 $danger: #E23600;
@@ -279,8 +279,11 @@ $transition-medium: 0.5s;
 }
 
 .hero + .navbar {
-    background-color: #343337;
+    background-color: $info;
     .navbar-item {
         color: white;
+        &:hover {
+            color: black;
+        }
     }
 }
