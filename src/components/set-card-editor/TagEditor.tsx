@@ -35,7 +35,7 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
     }
 
     private renderTag(tag: string) {
-        return <span className="tag is-info" key={tag}>
+        return <span className="tag is-primary" key={tag}>
             {tag}
             <button className="delete is-small" onClick={this.tagDeleteClicked.bind(this)}></button>
         </span>;

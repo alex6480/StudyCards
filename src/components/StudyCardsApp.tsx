@@ -21,32 +21,54 @@ export default class StudyCardsApp extends React.Component {
         return <section>
             <header className="header">
                 <nav className="navbar" role="navigation" aria-label="main navigation">
-                    <div className="navbar-brand">
-                        <a className="navbar-item" href="https://bulma.io">
-                            <img src="/assets/logo.png" width="150" height="28" />
-                        </a>
-
-                        <a role="button" className="navbar-burger burger" aria-label="menu"
-                            aria-expanded="false" data-target="navbarBasicExample">
-                            <span aria-hidden="true"></span>
-                            <span aria-hidden="true"></span>
-                            <span aria-hidden="true"></span>
-                        </a>
-                    </div>
-                    <div className="navbar-menu">
-                        <div className="navbar-start">
-                            <a className="navbar-item">
-                                Dashboard
+                    <div className="container">
+                        <div className="navbar-brand">
+                            <a className="navbar-item" href="https://bulma.io">
+                                <img src="/assets/logo.png" width="150" height="28" />
                             </a>
-                            <a className="navbar-item">
-                                Browse Sets
+
+                            <a role="button" className="navbar-burger burger" aria-label="menu"
+                                aria-expanded="false" data-target="navbarBasicExample">
+                                <span aria-hidden="true"></span>
+                                <span aria-hidden="true"></span>
+                                <span aria-hidden="true"></span>
                             </a>
                         </div>
+                        <div className="navbar-menu">
+                            <div className="navbar-start">
+                                <a className="navbar-item">
+                                    Browse
+                                </a>
+                                <a className="navbar-item">
+                                    Study Guide
+                                </a>
+                                <a className="navbar-item">
+                                    Blog
+                                </a>
+                            </div>
 
-                        <div className="navbar-end">
-                            <a className="navbar-item">
-                                Sign In
-                            </a>
+                            <div className="navbar-end">
+                                <a className="navbar-item">
+                                    My Sets
+                                </a>
+                                <div className="navbar-item has-dropdown is-hoverable">
+                                    <a className="navbar-link">
+                                        <span className="icon">
+                                            <i className="fas fa-user"></i>
+                                        </span>&nbsp;
+                                        Alexander
+                                    </a>
+                                    <div className="navbar-dropdown">
+                                        <a className="navbar-item">
+                                            Account
+                                        </a>
+                                        <hr className="navbar-divider" />
+                                        <a className="navbar-item">
+                                            Sign Out
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </nav>
