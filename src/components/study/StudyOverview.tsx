@@ -6,6 +6,7 @@ import { IStudyState } from "../../lib/flashcard/StudyState";
 import IRemote from "../../lib/remote";
 import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
+import { TagFilter } from "../set-card-editor/TagFilter";
 import { Slider } from "../Slider";
 import Tooltip from "../Tooltip";
 import FadeTransition from "../transition/FadeTransition";
@@ -81,6 +82,19 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps, 
                             </div>
                         </> : <>
                             { /* The set contains cards*/ }
+
+                            { /* Filter which cards will be in the set*/ }
+                            <div className="field">
+                                <label className="label">Only include cards with the following tags:</label>
+                                <div className="control">
+                                    <TagFilter tags={this.props.set.value!.availableTags}
+                                        activeTags={this.props.set.value!.filter.tags || { }}
+                                        toggleTag={() => { return; }}
+                                        offStyle="" />
+                                </div>
+                            </div>
+
+                            { /* Chose the number of cards*/ }
                             <div className="field">
                                 <label className="label">New Cards</label>
                                 <Slider currentPosition={this.state.countNewCards}
@@ -98,6 +112,8 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps, 
                                     { from: knownCardIds.length * 0.5, to: knownCardIds.length, color: "#2854bc"}]}>
                                 </Slider>
                             </div>
+
+                            {/* Summary of the study session */}
                             <p>
                                 This study session will include {this.state.countNewCards} new
                                 &#32;{p("card", newCardsInStudy)} and {this.state.countKnownCards}&#32;

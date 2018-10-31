@@ -4,6 +4,8 @@ import * as Utils from "../../lib/utils";
 interface ITagFilterProps {
     tags: { [tag: string]: number };
     activeTags: { [tag: string]: boolean };
+    onStyle?: string;
+    offStyle?: string;
     toggleTag: (tag: string) => void;
 }
 
@@ -13,17 +15,16 @@ export class TagFilter extends React.PureComponent<ITagFilterProps> {
     }
 
     public render() {
+        const onStyle = this.props.offStyle !== undefined ? this.props.offStyle : "is-primary";
+        const offStyle = this.props.offStyle !== undefined ? this.props.offStyle : "is-white";
         const tagElements = Object.keys(this.props.tags).map(tag =>
-            <span className={"tag" + (this.props.activeTags[tag] === true ? " is-primary" : " is-white")}
+            <span className={"tag " + (this.props.activeTags[tag] === true ? onStyle : offStyle)}
                 onClick={() => this.props.toggleTag(tag)}
                 key={tag}>
                 {tag} ({this.props.tags[tag]})
             </span>,
         );
 
-        return<div>
-            <p>Only show cards with the following tags:</p>
-            <div className="tags">{tagElements}</div>
-        </div>;
+        return <div className="tags">{tagElements}</div>;
     }
 }

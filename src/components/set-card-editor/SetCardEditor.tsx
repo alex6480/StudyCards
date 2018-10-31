@@ -136,6 +136,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                     : "Showing " + set.filteredCardOrder.value!.length + " cards out of "
                         + set.cardOrder.length }</h3>
 
+                <p>Only show cards with the following tags:</p>
                 <TagFilter tags={set.availableTags}
                     activeTags={set.filter.tags || { }}
                     toggleTag={this.toggleTag.bind(this)} />
