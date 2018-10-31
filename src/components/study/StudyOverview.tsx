@@ -6,6 +6,7 @@ import { IStudyState } from "../../lib/flashcard/StudyState";
 import IRemote from "../../lib/remote";
 import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
+import { Slider } from "../Slider";
 import Tooltip from "../Tooltip";
 import FadeTransition from "../transition/FadeTransition";
 import ResizeTransition from "../transition/ResizeTransition";
@@ -16,7 +17,20 @@ interface IStudyOverviewProps {
     startStudySession: () => void;
 }
 
-export default class StudyOverview extends React.Component<IStudyOverviewProps> {
+interface IStudyOverviewState {
+    countNewCards: number;
+    countKnownCards: number;
+}
+
+export default class StudyOverview extends React.Component<IStudyOverviewProps, IStudyOverviewState> {
+    public constructor(props: IStudyOverviewProps) {
+        super(props);
+        this.state = {
+            countNewCards: Study.MAX_NEW_CARDS,
+            countKnownCards: Study.MAX_TOTAL_CARDS - Study.MAX_NEW_CARDS,
+        };
+    }
+
     public render() {
         if (this.props.set.value === undefined || this.props.set.isFetching
             || this.props.studyState.value === undefined || this.props.studyState.isFetching) {
@@ -67,10 +81,27 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
                             </div>
                         </> : <>
                             { /* The set contains cards*/ }
-                            <p className="subtitle is-6">Last studied <time>never</time></p>
+                            <div className="field">
+                                <label className="label">New Cards</label>
+                                <Slider currentPosition={this.state.countNewCards}
+                                    showDirectInput={true}
+                                    onDrag={newPos => this.setState({countNewCards: Math.round(newPos)})}
+                                    sections={[{ from: 0, to: newCardIds.length, color: "#1B82C3"}]}>
+                                </Slider>
+                            </div>
+                            <div className="field">
+                                <label className="label">Known Cards</label>
+                                <Slider currentPosition={this.state.countKnownCards}
+                                    showDirectInput={true}
+                                    onDrag={newPos => this.setState({countKnownCards: Math.round(newPos)})}
+                                    sections={[{ from: 0, to: knownCardIds.length * 0.5, color: "#1B82C3"},
+                                    { from: knownCardIds.length * 0.5, to: knownCardIds.length, color: "#2854bc"}]}>
+                                </Slider>
+                            </div>
                             <p>
-                                This study section will include {newCardsInStudy} new {p("card", newCardsInStudy)}&#32;
-                                and {knownCardsInStudy} known {p("card", knownCardsInStudy)}.
+                                This study session will include {this.state.countNewCards} new
+                                &#32;{p("card", newCardsInStudy)} and {this.state.countKnownCards}&#32;
+                                known {p("card", knownCardsInStudy)}.
                             </p>
                             <a href="#" className="button is-primary" onClick={this.handleStartClick.bind(this)}>
                                 Study Now
@@ -86,6 +117,7 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps> 
                 {this.animateCardContent(false,
                     <div className="card-content">
                         <h2 className="title is-4">Current progress:</h2>
+                        <p>Last studied <time>never</time></p>
                         <p>{newCardIds.length} cards are&#32;
                             <Tooltip message="These cards have never been studied before">
                                 <span className="tag">new</span>
