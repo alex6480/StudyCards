@@ -5,8 +5,8 @@ import { IStudySessionCardData } from "./flashcard/StudyState";
 import * as Utils from "./utils";
 
 export interface IStudySessionOptions {
-    maxTotalCards: number;
-    maxNewCards: number;
+    countKnownCards: number;
+    countNewCards: number;
     filter?: IFlashCardFilter;
 }
 

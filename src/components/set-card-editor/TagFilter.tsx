@@ -15,7 +15,7 @@ export class TagFilter extends React.PureComponent<ITagFilterProps> {
     }
 
     public render() {
-        const onStyle = this.props.offStyle !== undefined ? this.props.offStyle : "is-primary";
+        const onStyle = this.props.onStyle !== undefined ? this.props.onStyle : "is-primary";
         const offStyle = this.props.offStyle !== undefined ? this.props.offStyle : "is-white";
         const tagElements = Object.keys(this.props.tags).map(tag =>
             <span className={"tag " + (this.props.activeTags[tag] === true ? onStyle : offStyle)}

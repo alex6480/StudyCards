@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { Dispatch } from "redux";
-import IFlashCardSet, { ExportFlashCardSet } from "../../lib/flashcard/FlashCardSet";
+import IFlashCardSet, { ExportFlashCardSet, IFlashCardFilter } from "../../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../../lib/flashcard/StudyData";
 import { IStudyState } from "../../lib/flashcard/StudyState";
 import IRemote, { EmptyRemote } from "../../lib/remote";
@@ -34,6 +34,7 @@ interface IStudySectionDispatchProps {
     loadStudyState: (setId: string) => void;
     beginStudy: (options: Study.IStudySessionOptions) => void;
     evaluateCard: (cardId: string, evaluation: Study.CardEvaluation) => void;
+    filterCards: (setId: string, filter: IFlashCardFilter) => void;
 }
 
 interface IStudySectionProps extends IStudySectionOwnProps, IStudySectionStateProps, IStudySectionDispatchProps { }
@@ -75,7 +76,8 @@ class StudySection extends React.Component<IStudySectionProps, {}> {
             return <div className="container">
                 <StudyOverview set={this.props.set}
                     studyState={this.props.studyState}
-                    startStudySession={this.startStudy.bind(this)}/>
+                    startStudySession={this.startStudy.bind(this)}
+                    filterCards={filter => this.props.filterCards(this.props.setId, filter)}/>
             </div>;
         } else {
             const currentSession = this.props.studyState.value.currentSession;
@@ -91,15 +93,12 @@ class StudySection extends React.Component<IStudySectionProps, {}> {
         }
     }
 
-    private startStudy() {
+    private startStudy(options: Study.IStudySessionOptions) {
         if (this.props.studyState.isFetching || this.props.studyState.value === undefined) {
             throw new Error("Study can only be started when an up to date study data is available");
         }
 
-        this.props.beginStudy({
-            maxNewCards: Study.MAX_NEW_CARDS,
-            maxTotalCards: Study.MAX_TOTAL_CARDS,
-        });
+        this.props.beginStudy(options);
     }
 
     private evaluateCard(evaluation: Study.CardEvaluation) {
@@ -137,6 +136,8 @@ function mapDispatchToProps(dispatch: Dispatch): IStudySectionDispatchProps {
         beginStudy: (options: Study.IStudySessionOptions) => dispatch<any>(Storage.beginStudySession(options)),
         evaluateCard: (cardId: string, evaluation: Study.CardEvaluation) =>
             dispatch<any>(Storage.evaluateCard(cardId, evaluation)),
+        filterCards: (setId: string, filter: IFlashCardFilter) =>
+            dispatch<any>(Storage.filterCards(setId, filter)),
     };
 }
 

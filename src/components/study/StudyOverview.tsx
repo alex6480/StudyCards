@@ -15,13 +15,13 @@ import ResizeTransition from "../transition/ResizeTransition";
 interface IStudyOverviewProps {
     set: IRemote<IFlashCardSet>;
     studyState: IRemote<IStudyState>;
-    startStudySession: () => void;
+    startStudySession: (options: Study.IStudySessionOptions) => void;
+    filterCards: (filter: IFlashCardFilter) => void;
 }
 
 interface IStudyOverviewState {
     countNewCards: number;
     countKnownCards: number;
-    filter?: IFlashCardFilter;
 }
 
 export default class StudyOverview extends React.Component<IStudyOverviewProps, IStudyOverviewState> {
@@ -89,8 +89,8 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps, 
                                 <label className="label">Only include cards with the following tags:</label>
                                 <div className="control">
                                     <TagFilter tags={this.props.set.value!.availableTags}
-                                        activeTags={this.props.set.value!.filter.tags || { }}
-                                        toggleTag={() => { return; }}
+                                        activeTags={this.props.set.value!.filter.tags}
+                                        toggleTag={this.toggleTag.bind(this)}
                                         offStyle="" />
                                 </div>
                             </div>
@@ -152,6 +152,23 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps, 
         </div>;
     }
 
+    private toggleTag(tag: string) {
+        const set = this.props.set!.value!;
+        let newTags: { [tag: string]: boolean };
+        if (set.filter.tags[tag] === true) {
+            // Create a new object where this tag is not present
+            const { [tag]: removedTagValue, ...tagsWithTagRemoved} = set.filter.tags;
+            newTags = tagsWithTagRemoved;
+        } else {
+            newTags = {...set.filter.tags, [tag]: true };
+        }
+
+        this.props.filterCards({
+            ...set.filter,
+            tags: newTags,
+        });
+    }
+
     private animateCardContent(isPlaceholder: boolean, content: JSX.Element) {
         // Placeholders just pop into place, while the real content animates
         return <ResizeTransition doTransition={! isPlaceholder}>
@@ -162,6 +179,10 @@ export default class StudyOverview extends React.Component<IStudyOverviewProps, 
     }
 
     private handleStartClick() {
-        this.props.startStudySession();
+        this.props.startStudySession({
+            countNewCards: this.state.countNewCards,
+            countKnownCards: this.state.countKnownCards,
+            filter: this.props.set.value!.filter,
+        });
     }
 }

@@ -266,15 +266,26 @@ export class LocalStorageProvider implements IStorageProvider {
             dispatch(fromActions.Action.filterCardsBegin(setId, filter));
 
             const setMeta = this.getSetMeta(setId)!;
-            const result = setMeta.cardOrder.filter(cardId => {
-                // Don't parse the card because rich text content is slow to parse
-                const card = this.getCardRaw(setId, cardId);
-                // Make a list of all the tags on the card that match the filter
-                const matchingTags = card.tags.filter(tag => filter.tags[tag] === true);
-                return matchingTags.length > 0;
-            });
+            const result = setMeta.cardOrder.filter(cardId => this.cardMatchesFilter(setId, cardId, filter));
 
-            this.result(() => dispatch(fromActions.Action.filterCardsComplete(setId, filter, result)));
+            // Also make sure to update the study state if the current set is being filtered
+            const studyState = getState().studyState.value;
+            if (studyState !== undefined && studyState.setId === setId) {
+                const setStudyData = this.getSetStudyData(setId)!;
+                const studyStateResult: IStudyState = {
+                    setId,
+                    newCardIds: Study.getNewCardIds(result, setStudyData),
+                    knownCardIds: Study.getKnownCardIds(result, setStudyData),
+                    currentSession: null,
+                };
+
+                this.result(() => {
+                    dispatch(fromActions.Action.setStudyStateComplete(studyStateResult));
+                    dispatch(fromActions.Action.filterCardsComplete(setId, filter, result));
+                });
+            } else {
+                this.result(() => dispatch(fromActions.Action.filterCardsComplete(setId, filter, result)));
+            }
         };
     }
 
@@ -311,9 +322,13 @@ export class LocalStorageProvider implements IStorageProvider {
                 throw new Error("Could not start a study session for set " + setId);
             }
 
-            const deck = Study.selectStudyDeck(studyData, options.maxNewCards,
-                options.maxTotalCards, setMeta.cardOrder);
-            const cardData = Utils.arrayToObject(setMeta.cardOrder, cardId => [cardId, {
+            const filteredCards = options.filter === undefined
+                ? setMeta.cardOrder
+                : setMeta.cardOrder.filter(c => this.cardMatchesFilter(setId, c, options.filter!));
+
+            const deck = Study.selectStudyDeck(studyData, options.countNewCards,
+                options.countKnownCards + options.countNewCards, filteredCards);
+            const cardData = Utils.arrayToObject(deck, cardId => [cardId, {
                 evaluations: [],
                 redrawTime: null,
             }]);
@@ -581,5 +596,17 @@ export class LocalStorageProvider implements IStorageProvider {
         } else {
             setTimeout(fn, this.virtualDelay);
         }
+    }
+
+    private cardMatchesFilter(setId: string, cardId: string, filter: IFlashCardFilter) {
+        // Don't parse the card because rich text content is slow to parse
+        const card = this.getCardRaw(setId, cardId);
+
+        // If no filter is applied, the card matches the filter
+        if (Object.keys(filter.tags).length === 0) { return true; }
+
+        // Make a list of all the tags on the card that match the filter
+        const matchingTags = card.tags.filter(tag => filter.tags[tag] === true);
+        return matchingTags.length > 0;
     }
 }
