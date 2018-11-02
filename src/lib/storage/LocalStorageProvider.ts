@@ -280,6 +280,7 @@ export class LocalStorageProvider implements IStorageProvider {
                 };
 
                 this.result(() => {
+                    console.log("Merge these into one action");
                     dispatch(fromActions.Action.setStudyStateComplete(studyStateResult));
                     dispatch(fromActions.Action.filterCardsComplete(setId, filter, result));
                 });
@@ -372,13 +373,14 @@ export class LocalStorageProvider implements IStorageProvider {
             }
             const studyState = getState().studyState.value!;
             const setId = studyState.setId;
-            const studyData = this.getSetStudyData(setId);
+            let studyData = this.getSetStudyData(setId);
             if (studyData === null) {
                 throw new Error("No study data exists for set " + setId);
             }
             if (studyState.currentSession === null) {
                 throw new Error("A session must have been started");
             }
+            const setMeta = this.getSetMeta(setId)!;
 
             const cardData: ICardStudyData = studyData.cardData[cardId];
             let redrawTime: Date | null;
@@ -387,12 +389,14 @@ export class LocalStorageProvider implements IStorageProvider {
                     // Redraw time doesn't matter anymore since the card will be removed fomr the deck
                     redrawTime = null;
                     // Update the due date for the card
-                    this.saveCardStudyData({
+                    const newCardStudyData = {
                         ...cardData,
                         understandingLevel: Study.getNewUnderstandingLevel(cardData,
                             studyState.currentSession.cardData[cardId].evaluations),
                         dueDate: Study.getDueTimeIncrease(cardData, evaluation),
-                    });
+                    };
+                    studyData.cardData = { ...studyData.cardData, [cardId]: newCardStudyData };
+                    this.saveCardStudyData(newCardStudyData);
                     break;
                 case Study.CardEvaluation.Decent:
                 case Study.CardEvaluation.Poor:
@@ -411,6 +415,13 @@ export class LocalStorageProvider implements IStorageProvider {
                 evaluation,
                 redrawTime,
                 nextCardId,
+                {
+                    setId,
+                    newCardIds: Study.getNewCardIds(setMeta.cardOrder, studyData!),
+                    knownCardIds: Study.getKnownCardIds(setMeta.cardOrder, studyData!),
+                    // Currentsession can be null as it is ignored
+                    currentSession: null,
+                },
             )));
         };
     }

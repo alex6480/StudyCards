@@ -111,14 +111,14 @@ export const Action = {
     filterCardsComplete: (setId: string, filter: IFlashCardFilter, result: string[]) =>
         createAction(SET_FILTER_CARDS_COMPLETE, { setId, filter, result }),
 
-    setStudyStateBegin: (state?: Partial<IStudyState>) => createAction(SET_STUDY_STATE_BEGIN, { state }),
-    setStudyStateComplete: (state: Partial<IStudyState>) => createAction(SET_STUDY_STATE_COMPLETE, { state }),
+    setStudyStateBegin: (studyState?: Partial<IStudyState>) => createAction(SET_STUDY_STATE_BEGIN, { studyState }),
+    setStudyStateComplete: (studyState: Partial<IStudyState>) => createAction(SET_STUDY_STATE_COMPLETE, { studyState }),
 
     evaluateCardBegin: (setId: string, cardId: string, evaluation: CardEvaluation) =>
         createAction(EVALUATE_CARD_BEGIN, { setId, cardId, evaluation }),
     evaluateCardComplete: (setId: string, cardId: string, evaluation: CardEvaluation,
-                           redrawTime: Date | null, nextCardId: string) =>
-        createAction(EVALUATE_CARD_COMPLETE, { setId, cardId, evaluation, redrawTime, nextCardId }),
+                           redrawTime: Date | null, nextCardId: string, studyState: IStudyState) =>
+        createAction(EVALUATE_CARD_COMPLETE, { setId, cardId, evaluation, redrawTime, nextCardId, studyState }),
 };
 
 export type Action = ActionsUnion<typeof Action>;

@@ -26,6 +26,7 @@ export function studyState(state: IRemote<IStudyState> = EmptyRemote(),
                 value: studyStateValue(state.value, action),
             };
         case fromActions.SET_STUDY_STATE_COMPLETE:
+        case fromActions.EVALUATE_CARD_COMPLETE:
             return {
                 ...state,
                 isFetching: false,
@@ -43,7 +44,8 @@ export function studyStateValue(state: IStudyState | undefined, action: fromActi
     switch (action.type) {
         case fromActions.SET_STUDY_STATE_BEGIN:
         case fromActions.SET_STUDY_STATE_COMPLETE:
-            if (action.payload.state === undefined) {
+        case fromActions.EVALUATE_CARD_COMPLETE:
+            if (action.payload.studyState === undefined) {
                 return undefined;
             }
             return {
@@ -66,7 +68,8 @@ function setId(state: string = initialState.setId, action: fromActions.Action): 
     switch (action.type) {
         case fromActions.SET_STUDY_STATE_BEGIN:
         case fromActions.SET_STUDY_STATE_COMPLETE:
-            const newSetId = action.payload.state!.setId;
+        case fromActions.EVALUATE_CARD_COMPLETE:
+            const newSetId = action.payload.studyState!.setId;
             if (newSetId !== undefined) {
                 return newSetId;
             }
@@ -80,7 +83,8 @@ function newCardIds(state: string[] = initialState.newCardIds, action: fromActio
     switch (action.type) {
         case fromActions.SET_STUDY_STATE_BEGIN:
         case fromActions.SET_STUDY_STATE_COMPLETE:
-            const newNewCardIds = action.payload.state!.newCardIds;
+        case fromActions.EVALUATE_CARD_COMPLETE:
+            const newNewCardIds = action.payload.studyState!.newCardIds;
             if (newNewCardIds !== undefined) {
                 return newNewCardIds;
             }
@@ -94,7 +98,8 @@ function knownCardIds(state: string[] = initialState.knownCardIds, action: fromA
     switch (action.type) {
         case fromActions.SET_STUDY_STATE_BEGIN:
         case fromActions.SET_STUDY_STATE_COMPLETE:
-            const newKnownCardIds = action.payload.state!.knownCardIds;
+        case fromActions.EVALUATE_CARD_COMPLETE:
+            const newKnownCardIds = action.payload.studyState!.knownCardIds;
             if (newKnownCardIds !== undefined) {
                 return newKnownCardIds;
             }
@@ -110,7 +115,7 @@ function currentSession(state: IStudySession | null = initialState.currentSessio
     switch (action.type) {
         case fromActions.SET_STUDY_STATE_BEGIN:
         case fromActions.SET_STUDY_STATE_COMPLETE:
-            const newSession = action.payload.state!.currentSession;
+            const newSession = action.payload.studyState!.currentSession;
             if (newSession !== undefined) {
                 return newSession;
             }
