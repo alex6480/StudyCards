@@ -66,9 +66,10 @@ export class Slider extends React.PureComponent<ISliderProps> {
         </div>;
     }
 
-    private beginDrag() {
+    private beginDrag(e: MouseEvent) {
         window.addEventListener("pointerup", this.mouseUpHandler);
         window.addEventListener("pointermove", this.mouseMoveHandler);
+        this.updatePosition(e);
     }
 
     private onMouseUp() {
