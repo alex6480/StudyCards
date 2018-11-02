@@ -1,5 +1,5 @@
 import IFlashCard from "../lib/flashcard/flashcard";
-import IFlashCardSet, { IFlashCardSetCardFilter } from "../lib/flashcard/FlashCardSet";
+import IFlashCardSet, { IFlashCardFilter } from "../lib/flashcard/FlashCardSet";
 import IRemote from "../lib/remote";
 import * as Utils from "../lib/utils";
 import * as fromActions from "./actions";
@@ -100,7 +100,7 @@ function cardOrder(state: string[] = initialState.cardOrder, action: fromActions
     }
 }
 
-function filter(state: IFlashCardSetCardFilter = initialState.filter, action: fromActions.Action) {
+function filter(state: IFlashCardFilter = initialState.filter, action: fromActions.Action) {
     switch (action.type) {
         case fromActions.SET_FILTER_CARDS_BEGIN:
             return action.payload.filter;
@@ -111,7 +111,7 @@ function filter(state: IFlashCardSetCardFilter = initialState.filter, action: fr
 
 function filteredCardOrder(filteredCards: IRemote<string[]> | undefined,
                            setCards: string[],
-                           currentFilter: IFlashCardSetCardFilter,
+                           currentFilter: IFlashCardFilter,
                            action: fromActions.Action): IRemote<string[]> {
     switch (action.type) {
         case fromActions.SET_FILTER_CARDS_BEGIN:
@@ -137,7 +137,7 @@ function filteredCardOrder(filteredCards: IRemote<string[]> | undefined,
 
 function filteredCardsValue(state: string[] | undefined,
                             setCards: string[],
-                            currentFilter: IFlashCardSetCardFilter,
+                            currentFilter: IFlashCardFilter,
                             action: fromActions.Action) {
     switch (action.type) {
         case fromActions.DELETE_CARD_BEGIN:

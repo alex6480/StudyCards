@@ -4,7 +4,7 @@ import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
 import IFlashCard, { IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace } from "../flashcard/FlashCardFace";
-import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../flashcard/FlashCardSet";
+import IFlashCardSet, { IFlashCardFilter, IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 import { ICardStudyData } from "../flashcard/StudyData";
 import { CardEvaluation, IStudySessionOptions } from "../study";
 import { LocalStorageProvider } from "./LocalStorageProvider";
@@ -78,7 +78,7 @@ export default interface IStorageProvider {
     /**
      * Updates the filtered cards for the specified set
      */
-    filterCards: (setId: string, filter: IFlashCardSetCardFilter) => ThunkAction<void, IAppState, void, Action>;
+    filterCards: (setId: string, filter: IFlashCardFilter) => ThunkAction<void, IAppState, void, Action>;
 
     /**
      * Begins a new study session a fetched a deck according to the specified options

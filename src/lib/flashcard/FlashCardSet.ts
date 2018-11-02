@@ -7,13 +7,13 @@ export interface IFlashCardSetMeta {
     name: string;
 
     cardOrder: string[];
-    filter: IFlashCardSetCardFilter;
+    filter: IFlashCardFilter;
     filteredCardOrder: IRemote<string[]>;
 
     availableTags: { [tag: string]: number };
 }
 
-export interface IFlashCardSetCardFilter {
+export interface IFlashCardFilter {
     tags: { [tag: string]: boolean };
 }
 

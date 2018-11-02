@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { Dispatch } from "redux";
 import IFlashCard from "../../lib/flashcard/flashcard";
-import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../../lib/flashcard/FlashCardSet";
+import IFlashCardSet, { IFlashCardFilter, IFlashCardSetMeta } from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
 import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import * as Utils from "../../lib/utils";
@@ -28,7 +28,7 @@ interface ISetCardEditorStateProps extends RouteComponentProps<ISetCardEditorOwn
 interface ISetCardEditorDispatchProps {
     addNewCard: (afterCard?: IFlashCard) => string;
     loadCards: (cardIds: string[]) => void;
-    filterCards: (filter: IFlashCardSetCardFilter) => void;
+    filterCards: (filter: IFlashCardFilter) => void;
     loadSetMetaAll: () => void;
 }
 
@@ -97,7 +97,8 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                 } } = { };
                 const cardsToLoad: string[] = [];
                 for (const cardId of newProps.set.value.filteredCardOrder.value!) {
-                    let loaded = this.state.cardDisplayData[cardId] !== undefined && this.state.cardDisplayData[cardId].loaded;
+                    const loaded = this.state.cardDisplayData[cardId] !== undefined
+                                    && this.state.cardDisplayData[cardId].loaded;
                     newDisplayData[cardId] = {
                         loaded,
                         screenPos: "unknown",
@@ -173,12 +174,6 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                 throw new Error("Filtered card order should never be undefined");
             }
         }
-
-        //window.addEventListener("scroll", this.scrollListener);
-    }
-
-    public componentWillUnmount() {
-        //window.removeEventListener("scroll", this.scrollListener);
     }
 
     private renderCards(set: IFlashCardSet) {
@@ -350,7 +345,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                         loaded: true,
                         screenPos: this.state.cardDisplayData[cardId].screenPos,
                     }]),
-                }
+                },
             }, () => this.props.loadCards(cardsToLoad));
         }
     }
@@ -379,8 +374,8 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
                 ...this.state.cardDisplayData[cardId],
                 screenPos,
             },
-        }
-        this.setState({ cardDisplayData: newCardDisplayData })
+        };
+        this.setState({ cardDisplayData: newCardDisplayData });
     }
 }
 
@@ -411,7 +406,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: RouteComponentProps<IS
             dispatch<any>(Storage.addCard(setId, afterCard)),
         loadCards: (cardIds: string[]) =>
             dispatch<any>(Storage.loadCards(setId, cardIds)),
-        filterCards: (filter: IFlashCardSetCardFilter) =>
+        filterCards: (filter: IFlashCardFilter) =>
             dispatch<any>(Storage.filterCards(setId, filter)),
         loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
     };

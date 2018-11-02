@@ -1,13 +1,13 @@
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 import IFlashCard from "./flashcard/flashcard";
-import { IFlashCardSetCardFilter } from "./flashcard/FlashCardSet";
+import { IFlashCardFilter } from "./flashcard/FlashCardSet";
 import { IStudySessionCardData } from "./flashcard/StudyState";
 import * as Utils from "./utils";
 
 export interface IStudySessionOptions {
     maxTotalCards: number;
     maxNewCards: number;
-    filter?: IFlashCardSetCardFilter;
+    filter?: IFlashCardFilter;
 }
 
 /**

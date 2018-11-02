@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
+import IFlashCardSet, { IFlashCardFilter } from "../../lib/flashcard/FlashCardSet";
 import { ISetStudyData } from "../../lib/flashcard/StudyData";
 import { IStudyState } from "../../lib/flashcard/StudyState";
 import IRemote from "../../lib/remote";
@@ -21,6 +21,7 @@ interface IStudyOverviewProps {
 interface IStudyOverviewState {
     countNewCards: number;
     countKnownCards: number;
+    filter?: IFlashCardFilter;
 }
 
 export default class StudyOverview extends React.Component<IStudyOverviewProps, IStudyOverviewState> {

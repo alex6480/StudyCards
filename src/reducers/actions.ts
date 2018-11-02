@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 import IFlashCard, { IFlashCardMeta } from "../lib/flashcard/flashcard";
 import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
-import IFlashCardSet, { IFlashCardSetCardFilter, IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
+import IFlashCardSet, { IFlashCardFilter, IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
 import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
 import { IStudyState } from "../lib/flashcard/StudyState";
 import { CardEvaluation } from "../lib/study";
@@ -106,9 +106,9 @@ export const Action = {
 
     swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),
 
-    filterCardsBegin: (setId: string, filter: IFlashCardSetCardFilter) =>
+    filterCardsBegin: (setId: string, filter: IFlashCardFilter) =>
         createAction(SET_FILTER_CARDS_BEGIN, { setId, filter} ),
-    filterCardsComplete: (setId: string, filter: IFlashCardSetCardFilter, result: string[]) =>
+    filterCardsComplete: (setId: string, filter: IFlashCardFilter, result: string[]) =>
         createAction(SET_FILTER_CARDS_COMPLETE, { setId, filter, result }),
 
     setStudyStateBegin: (state?: Partial<IStudyState>) => createAction(SET_STUDY_STATE_BEGIN, { state }),

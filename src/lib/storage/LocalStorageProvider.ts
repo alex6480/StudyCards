@@ -6,7 +6,7 @@ import { initialCard } from "../../reducers/card";
 import * as fromSet from "../../reducers/set";
 import IFlashCard, { ExportFlashCard, IFlashCardMeta } from "../flashcard/flashcard";
 import { IFlashCardFace, IRichTextFlashCardFace } from "../flashcard/FlashCardFace";
-import IFlashCardSet, { ExportFlashCardSet, IFlashCardSetCardFilter,
+import IFlashCardSet, { ExportFlashCardSet, IFlashCardFilter,
     IFlashCardSetMeta } from "../flashcard/FlashCardSet";
 import parseCard from "../flashcard/parsers/parseCard";
 import { ICardStudyData, ISetStudyData, ISetStudyDataMeta } from "../flashcard/StudyData";
@@ -260,7 +260,7 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public filterCards(setId: string, filter: IFlashCardSetCardFilter):
+    public filterCards(setId: string, filter: IFlashCardFilter):
         ThunkAction<void, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             dispatch(fromActions.Action.filterCardsBegin(setId, filter));
