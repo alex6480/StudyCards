@@ -10,7 +10,7 @@ import { LocalStorageProvider } from "./lib/storage/LocalStorageProvider";
 import { setStorageProvider } from "./lib/storage/StorageProvider";
 import reducer from "./reducers";
 
-import "./mystyles.scss";
+import "./styles/main.scss";
 
 setStorageProvider(new LocalStorageProvider(1000));
 const store = createStore(reducer, applyMiddleware(thunk));
