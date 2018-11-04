@@ -79,6 +79,8 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
 
 function name(state: string = initialState.name, setId: string, action: fromActions.Action): string {
     switch (action.type) {
+        case fromActions.ADD_NEW_SET_BEGIN:
+            return action.payload.set.name !== undefined ? action.payload.set.name : state;
         case fromActions.SAVE_SET_META_BEGIN:
             return action.payload.setMeta.name !== undefined ? action.payload.setMeta.name : state;
         default:

@@ -57,7 +57,7 @@ export default interface IStorageProvider {
      * Adds the specified set. A set with the same id cannot exist
      * Returns the id of the newly added set
      */
-    addSet: (set?: IFlashCardSet) => ThunkAction<string, IAppState, void, Action>;
+    addSet: (set?: Partial<IFlashCardSet>) => ThunkAction<string, IAppState, void, Action>;
 
     /**
      * Saves the card face on the remote host

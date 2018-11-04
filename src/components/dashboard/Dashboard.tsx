@@ -8,6 +8,7 @@ import IRemote from "../../lib/remote";
 import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
+import CreateSetModal from "./CreateSetModal";
 import SetTile from "./SetTile";
 
 interface IDashboardOwnProps {
@@ -19,17 +20,21 @@ interface IDashboardStateProps {
 }
 
 interface IDashboardDispatchProps {
-    addSet: (set?: IFlashCardSet) => string;
+    addSet: (set?: Partial<IFlashCardSet>) => string;
     loadSetMetaAll: () => void;
 }
 
 interface IDashboardProps extends IDashboardStateProps, IDashboardDispatchProps, IDashboardOwnProps { }
 
-export class Dashboard extends React.Component<IDashboardProps> {
+interface IDashboardState {
+    creatingSet: boolean;
+}
+
+export class Dashboard extends React.Component<IDashboardProps, IDashboardState> {
     constructor(props: IDashboardProps) {
         super(props);
         // Set initial state
-        this.state = { };
+        this.state = { creatingSet: false };
 
         props.loadSetMetaAll();
     }
@@ -51,7 +56,7 @@ export class Dashboard extends React.Component<IDashboardProps> {
             <nav className="navbar is-info" role="navigation" aria-label="main navigation">
                 <div className="navbar-menu container">
                     <div className="navbar-start">
-                    <a className="navbar-item" onClick={this.handleAddSet.bind(this)}>
+                    <a className="navbar-item" onClick={() => this.setState({ creatingSet: true })}>
                         Create new
                     </a>
                     <Link className="navbar-item" to="/import">
@@ -65,6 +70,9 @@ export class Dashboard extends React.Component<IDashboardProps> {
                     { this.renderContent() }
                 </div>
             </section>
+            { this.state.creatingSet &&
+                <CreateSetModal closeModal={() => this.setState({ creatingSet: false }) }
+                    createSet={ this.handleAddSet.bind(this)} /> }
         </div>;
     }
 
@@ -78,8 +86,8 @@ export class Dashboard extends React.Component<IDashboardProps> {
         }
     }
 
-    private handleAddSet() {
-        const newSetId = this.props.addSet();
+    private handleAddSet(set?: Partial<IFlashCardSet>) {
+        const newSetId = this.props.addSet(set);
         this.props.history.push("/set/" + newSetId + "/edit");
     }
 
@@ -106,7 +114,7 @@ function mapStateToProps(state: IAppState): IDashboardStateProps {
 
 function mapDispatchToProps(dispatch: Dispatch): IDashboardDispatchProps {
     return {
-        addSet: (set?: IFlashCardSet) => dispatch<any>(Storage.addSet(set)),
+        addSet: (set?: Partial<IFlashCardSet>) => dispatch<any>(Storage.addSet(set)),
         loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
     };
 }

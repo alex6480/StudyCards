@@ -107,17 +107,21 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public addSet(set?: IFlashCardSet): ThunkAction<string, IAppState, void, fromActions.Action> {
+    public addSet(set?: Partial<IFlashCardSet>): ThunkAction<string, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             if (set === undefined || set.id === undefined) {
                 set = {
-                    ...fromSet.initialState,
                     id: Utils.guid(),
+                    ...set,
                 };
             }
             const setId = set.id!;
 
-            this.saveSet(set, true);
+            const fullSet = {
+                ...fromSet.initialState,
+                ...set,
+            };
+            this.saveSet(fullSet, true);
             this.saveSetStudyData({
                 setId,
                 cardData: {},
@@ -373,7 +377,7 @@ export class LocalStorageProvider implements IStorageProvider {
             }
             const studyState = getState().studyState.value!;
             const setId = studyState.setId;
-            let studyData = this.getSetStudyData(setId);
+            const studyData = this.getSetStudyData(setId);
             if (studyData === null) {
                 throw new Error("No study data exists for set " + setId);
             }
