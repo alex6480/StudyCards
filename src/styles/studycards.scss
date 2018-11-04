@@ -223,16 +223,6 @@
     }
 }
 
-.hero + .navbar {
-    background-color: $info;
-    .navbar-item {
-        color: white;
-        &:hover {
-            color: black;
-        }
-    }
-}
-
 .slider-control {
     display: flex;
     height: 2.25em;
