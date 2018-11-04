@@ -1,13 +1,13 @@
 import { History } from "history";
 import * as React from "react";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 import { Dispatch } from "redux";
 import IFlashCardSet from "../../lib/flashcard/FlashCardSet";
 import IRemote from "../../lib/remote";
 import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
-import AddNewSetTile from "./AddNewSetTile";
 import SetTile from "./SetTile";
 
 interface IDashboardOwnProps {
@@ -48,6 +48,18 @@ export class Dashboard extends React.Component<IDashboardProps> {
                     </div>
                 </div>
             </section>
+            <nav className="navbar is-info" role="navigation" aria-label="main navigation">
+                <div className="navbar-menu container">
+                    <div className="navbar-start">
+                    <a className="navbar-item" onClick={this.handleAddSet.bind(this)}>
+                        Create new
+                    </a>
+                    <Link className="navbar-item" to="/import">
+                        Import
+                    </Link>
+                    </div>
+                </div>
+            </nav>
             <section className="section">
                 <div className="container">
                     { this.renderContent() }
@@ -60,7 +72,6 @@ export class Dashboard extends React.Component<IDashboardProps> {
         if (this.props.sets.value !== undefined) {
             return <div className="columns is-multiline">
                 { this.getSetTiles(this.props.sets.isFetching, this.props.sets.value) }
-                <AddNewSetTile addSet={this.handleAddSet.bind(this)} />
             </div>;
         } else {
             return <p>Loading sets</p>;

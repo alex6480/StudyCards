@@ -52,6 +52,18 @@ class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> 
                     </div>
                 </div>
             </section>
+            <nav className="navbar is-info" role="navigation" aria-label="main navigation">
+                <div className="navbar-menu container">
+                    <div className="navbar-start">
+                    <Link className="navbar-item" to="/">
+                        <span className="icon icon-small">
+                            <i className="fas fa-arrow-left"></i>
+                        </span>&nbsp;
+                        Back
+                    </Link>
+                    </div>
+                </div>
+            </nav>
             <section className="section">
                 <div className="container">
                     <h3 className="title is-3">Select file</h3>
