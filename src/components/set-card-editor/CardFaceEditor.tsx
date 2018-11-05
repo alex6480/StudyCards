@@ -1,4 +1,4 @@
-import { CompositeDecorator, ContentState, Editor, EditorState, RichUtils } from "draft-js";
+import { CompositeDecorator, ContentState, Editor, EditorState, getDefaultKeyBinding, RichUtils } from "draft-js";
 import * as React from "react";
 import "../../../node_modules/draft-js/dist/Draft.css";
 import { FlashCardFaceType, IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
@@ -80,6 +80,10 @@ export default class CardFaceEditor extends React.PureComponent<ICardFaceEditorP
                         editorState={this.state.editorState!}
                         onChange={this.onRichTextChange.bind(this)}
                         ref={editor => this.editor = editor}
+                        handleKeyCommand={this.handleKeyCommand.bind(this)}
+                        keyBindingFn={this.mapKeyToEditorCommand.bind(this)}
+                        onTab={e => this.onRichTextChange(RichUtils.onTab(e, this.state.editorState!, 4))}
+                        spellCheck={true}
                         onBlur={this.onBlur.bind(this)}
                         placeholder={this.props.face.id === "front" ? "Front" : "Back"}
                     />
@@ -126,6 +130,29 @@ export default class CardFaceEditor extends React.PureComponent<ICardFaceEditorP
 
     private onBlur() {
         this.updateGlobalState();
+    }
+
+    private handleKeyCommand(command: string, editorState: EditorState) {
+        const newState = RichUtils.handleKeyCommand(editorState, command);
+        if (newState) {
+            this.onRichTextChange(newState);
+            return true;
+        }
+        return false;
+    }
+
+    private mapKeyToEditorCommand(e: React.KeyboardEvent<{}>) {
+        if (e.keyCode === 9 /* TAB */) {
+            const newEditorState = RichUtils.onTab(e,
+                this.state.editorState!,
+                4, /* maxDepth */
+                );
+            if (newEditorState !== this.state.editorState) {
+                this.onRichTextChange(newEditorState);
+            }
+            return "";
+        }
+        return getDefaultKeyBinding(e);
     }
 
     private updateGlobalState() {
