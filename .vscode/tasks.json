@@ -33,7 +33,8 @@
                 "--display-modules",
                 "--progress",
                 "-p"
-            ]
+            ],
+            "problemMatcher": []
         },
         {
             "label": "Lint",
