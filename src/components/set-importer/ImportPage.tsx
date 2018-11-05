@@ -52,7 +52,7 @@ class SetImporter extends React.Component<ISetImporterProps, ISetImporterState> 
                     </div>
                 </div>
             </section>
-            <nav className="navbar is-info" role="navigation" aria-label="main navigation">
+            <nav className="navbar is-primary" role="navigation" aria-label="main navigation">
                 <div className="navbar-menu container">
                     <div className="navbar-start">
                     <Link className="navbar-item" to="/">

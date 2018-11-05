@@ -20,12 +20,12 @@ export default class StudyCardsApp extends React.Component {
 
     public render() {
         return <section>
-            <header className="header">
-                <nav className="navbar" role="navigation" aria-label="main navigation">
+            <header className="header site-header">
+                <nav className="navbar is-white" role="navigation" aria-label="main navigation">
                     <div className="container">
                         <div className="navbar-brand">
                             <a className="navbar-item" href="https://bulma.io">
-                                <img src="/assets/logo.png" width="150" height="28" />
+                                <img src="/assets/logo.svg" width="150" height="28" />
                             </a>
 
                             <a role="button" className="navbar-burger burger" aria-label="menu"

@@ -53,7 +53,7 @@ export class Dashboard extends React.Component<IDashboardProps, IDashboardState>
                     </div>
                 </div>
             </section>
-            <nav className="navbar is-info" role="navigation" aria-label="main navigation">
+            <nav className="navbar is-primary" role="navigation" aria-label="main navigation">
                 <div className="navbar-menu container">
                     <div className="navbar-start">
                     <a className="navbar-item" onClick={() => this.setState({ creatingSet: true })}>

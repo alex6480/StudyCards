@@ -7,7 +7,7 @@ interface ISetNavProps {
 }
 
 export default function SetNav(props: ISetNavProps) {
-    return <nav className="navbar is-info" role="navigation" aria-label="main navigation">
+    return <nav className="navbar is-primary" role="navigation" aria-label="main navigation">
         <div className="navbar-menu container">
             <div className="navbar-start">
                 <Link className="navbar-item" to="/">
