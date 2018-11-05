@@ -5,6 +5,7 @@ import Dashboard from "./dashboard/Dashboard";
 import SetCardEditor from "./set-card-editor/SetCardEditor";
 import SetImporter from "./set-importer/ImportPage";
 import SetExporter from "./SetExporter";
+import SetProperties from "./SetProperties";
 import StudySection from "./study/StudySection";
 
 export default class StudyCardsApp extends React.Component {
@@ -79,6 +80,7 @@ export default class StudyCardsApp extends React.Component {
                 <Route path="/set/:setId/study" component={StudySection} />
                 <Route path="/set/:setId/edit" component={SetCardEditor} />
                 <Route path="/set/:setId/export" component={SetExporter} />
+                <Route path="/set/:setId/properties" component={SetProperties} />
             </Switch>
         </section>;
     }
