@@ -2,6 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Route, Switch  } from "react-router";
 import Dashboard from "./dashboard/Dashboard";
+import LoginPage from "./LoginPage";
 import SetCardEditor from "./set-card-editor/SetCardEditor";
 import SetImporter from "./set-importer/ImportPage";
 import SetExporter from "./SetExporter";
@@ -24,7 +25,7 @@ export default class StudyCardsApp extends React.Component {
                 <nav className="navbar is-white" role="navigation" aria-label="main navigation">
                     <div className="container">
                         <div className="navbar-brand">
-                            <a className="navbar-item" href="https://bulma.io">
+                            <a className="navbar-item" href="/">
                                 <img src="/assets/logo.svg" width="150" height="28" />
                             </a>
 
@@ -76,6 +77,7 @@ export default class StudyCardsApp extends React.Component {
             </header>
             <Switch>
                 <Route exact path="/" render={({history}) => <Dashboard history={history} />}/>
+                <Route exact path="/login" component={LoginPage} />
                 <Route exact path="/import" component={SetImporter} />
                 <Route path="/set/:setId/study" component={StudySection} />
                 <Route path="/set/:setId/edit" component={SetCardEditor} />
