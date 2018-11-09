@@ -1,4 +1,4 @@
-import * as fromActions from "../actions";
+import * as fromActions from "../actions/.";
 import * as fromCard from "../card";
 import * as fromSet from "../set";
 

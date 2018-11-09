@@ -10,7 +10,6 @@ import { Storage } from "../../lib/storage/StorageProvider";
 import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
 import { IAppState } from "../../reducers";
-import { Action } from "../../reducers/actions";
 import SetHeader from "../SetHeader";
 import SetLoader from "../SetLoader";
 import SetNav from "../SetNav";

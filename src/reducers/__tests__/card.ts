@@ -1,5 +1,5 @@
 import { FlashCardFaceType } from "../../lib/flashcard/FlashCardFace";
-import * as fromActions from "../actions";
+import * as fromActions from "../actions/.";
 import card from "../card";
 
 test("added card has correct set and card id", () => {

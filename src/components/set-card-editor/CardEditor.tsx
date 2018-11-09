@@ -6,7 +6,7 @@ import { FlashCardFaceId, IFlashCardFace } from "../../lib/flashcard/FlashCardFa
 import IRemote from "../../lib/remote";
 import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
-import { Action } from "../../reducers/actions";
+import { Action } from "../../reducers/actions/.";
 import FadeTransition from "../transition/FadeTransition";
 import ResizeTransition from "../transition/ResizeTransition";
 import SlideTransition from "../transition/SlideTransition";

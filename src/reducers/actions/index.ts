@@ -1,10 +1,13 @@
 import { Dispatch } from "redux";
-import IFlashCard, { IFlashCardMeta } from "../lib/flashcard/flashcard";
-import { IFlashCardFace } from "../lib/flashcard/FlashCardFace";
-import IFlashCardSet, { IFlashCardFilter, IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
-import { ICardStudyData, ISetStudyData } from "../lib/flashcard/StudyData";
-import { IStudyState } from "../lib/flashcard/StudyState";
-import { CardEvaluation } from "../lib/study";
+import { ThunkAction } from "redux-thunk";
+import { IAppState } from "..";
+import IFlashCard, { IFlashCardMeta } from "../../lib/flashcard/flashcard";
+import { IFlashCardFace } from "../../lib/flashcard/FlashCardFace";
+import IFlashCardSet, { IFlashCardFilter, IFlashCardSetMeta } from "../../lib/flashcard/FlashCardSet";
+import { ICardStudyData, ISetStudyData } from "../../lib/flashcard/StudyData";
+import { IStudyState } from "../../lib/flashcard/StudyState";
+import { CardEvaluation } from "../../lib/study";
+import { userActions } from "./user.actions";
 
 /*
     Boilerplate stuff used to get typesafety within Redux
@@ -28,6 +31,7 @@ interface IActionsCreatorMapObject {
 }
 
 export type ActionsUnion<A extends IActionsCreatorMapObject> = ReturnType<A[keyof A]>;
+export type TAction<R, E> = ThunkAction<R, IAppState, E, Action>;
 
 export const SWAP_CARD_FACES = "swap card faces";
 
@@ -68,6 +72,8 @@ export const EVALUATE_CARD_BEGIN = "evaluate card begin";
 export const EVALUATE_CARD_COMPLETE = "evaluate card complete";
 
 export const Action = {
+    ...userActions,
+
     loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
     loadSetMetaAllComplete: (setMeta: {[id: string]: IFlashCardSetMeta}) =>
         createAction(LOAD_SET_META_ALL_COMPLETE, setMeta),

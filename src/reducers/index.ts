@@ -4,17 +4,20 @@ import { IStudyState } from "../lib/flashcard/StudyState";
 import IRemote, { EmptyRemote } from "../lib/remote";
 import { LocalStorageProvider } from "../lib/storage/LocalStorageProvider";
 import IStorageProvider from "../lib/storage/StorageProvider";
+import { IUser } from "../lib/User";
 import * as Utils from "../lib/utils";
 import * as fromActions from "./actions";
 import sets, * as fromSet from "./set";
 import { studyState } from "./studyState";
 
 export interface IAppState {
+    user: IUser | null;
     sets: IRemote<{ [id: string]: IRemote<IFlashCardSet> }>;
     studyState: IRemote<IStudyState>;
 }
 
 const initialState: IAppState = {
+    user: null,
     sets: EmptyRemote(),
     studyState: EmptyRemote(),
 };

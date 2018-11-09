@@ -1,5 +1,5 @@
 import { ContentState } from "draft-js";
-import * as fromAction from "../../../../reducers/actions";
+import * as fromAction from "../../../../reducers/actions/.";
 import card, * as fromCard from "../../../../reducers/card";
 import * as Utils from "../../../utils";
 import { ExportFlashCard } from "../../flashcard";
