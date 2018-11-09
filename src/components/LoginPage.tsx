@@ -50,7 +50,8 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
     public render() {
         return <section>
             <div className="container">
-                <div className="box login-box">
+                <form className="box login-box"
+                    onSubmit={this.props.logIn.bind(this)}>
                     <h1 className="title is-3">Log In</h1>
 
                     { /* Email field */ }
@@ -108,16 +109,15 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
 
                     { /* Sign in button */ }
                     { ! this.state.isLoggingIn
-                         ? <button
+                         ? <input type="submit"
                             className="button is-primary is-fullwidth"
-                            onClick={this.login.bind(this)}>
-                            Log In
-                        </button>
+                            onClick={this.login.bind(this)}
+                            value="Log In" />
                         : <button
                             className="button is-primary is-fullwidth is-loading">
                             Log In
                         </button> }
-                </div>
+                </form>
 
                 <p className="sign-up">Don't have an account? <a>Sign Up</a></p>
             </div>
@@ -125,7 +125,7 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
     }
 
     private login() {
-        if (this.props.user != null) {
+        if (this.props.user != null || this.state.isLoggingIn) {
             // Prevent double logins
             return;
         }
