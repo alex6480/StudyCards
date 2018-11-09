@@ -1,15 +1,17 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import { IUser } from "../../lib/User";
 
 interface IUserHeaderProps {
     user: IUser;
+    logOut: () => void;
 }
 
 const UserHeader: React.SFC<IUserHeaderProps> = (props) => {
     return <>
-        <a className="navbar-item">
+        <Link to="/dashboard" className="navbar-item">
             My Sets
-        </a>
+        </Link>
         <div className="navbar-item has-dropdown is-hoverable">
             <a className="navbar-link">
                 <span className="icon">
@@ -22,8 +24,8 @@ const UserHeader: React.SFC<IUserHeaderProps> = (props) => {
                     Account
                 </a>
                 <hr className="navbar-divider" />
-                <a className="navbar-item">
-                    Sign Out
+                <a className="navbar-item" onClick={props.logOut}>
+                    Log Out
                 </a>
             </div>
         </div>

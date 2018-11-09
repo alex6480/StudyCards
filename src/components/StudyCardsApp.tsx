@@ -24,8 +24,8 @@ export default class StudyCardsApp extends React.Component {
         return <section>
             <SiteHeader />
             <Switch>
-                <Route exact path="/" render={({history}) => <Dashboard history={history} />}/>
-                <Route exact path="/login" component={LoginPage} />
+                <Route exact path="/dashboard" render={({history}) => <Dashboard history={history} />} />
+                <Route exact path="/login" render={({history}) => <LoginPage history={history} />} />
                 <Route exact path="/import" component={SetImporter} />
                 <Route path="/set/:setId/study" component={StudySection} />
                 <Route path="/set/:setId/edit" component={SetCardEditor} />

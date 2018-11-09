@@ -10,7 +10,7 @@ export default function SetNav(props: ISetNavProps) {
     return <nav className="navbar is-primary" role="navigation" aria-label="main navigation">
         <div className="navbar-menu container">
             <div className="navbar-start">
-                <Link className="navbar-item" to="/">
+                <Link className="navbar-item" to="/dashboard">
                     <span className="icon icon-small">
                         <i className="fas fa-arrow-left"></i>
                     </span>&nbsp;
