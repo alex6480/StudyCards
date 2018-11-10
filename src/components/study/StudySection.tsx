@@ -10,6 +10,7 @@ import { Storage } from "../../lib/storage/StorageProvider";
 import * as Study from "../../lib/study";
 import * as Utils from "../../lib/utils";
 import { IAppState } from "../../reducers";
+import { SetService } from "../../services/set.service";
 import SetHeader from "../SetHeader";
 import SetLoader from "../SetLoader";
 import SetNav from "../SetNav";
@@ -130,7 +131,7 @@ function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<IStudyS
 function mapDispatchToProps(dispatch: Dispatch): IStudySectionDispatchProps {
     return {
         loadCards: (setId: number, cardIds: string[]) => dispatch<any>(Storage.loadCards(setId, cardIds)),
-        loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
+        loadSetMetaAll: () => dispatch<any>(SetService.list()),
         loadStudyState: (setId: number) => dispatch<any>(Storage.loadStudyState(setId)),
         beginStudy: (options: Study.IStudySessionOptions) => dispatch<any>(Storage.beginStudySession(options)),
         evaluateCard: (cardId: string, evaluation: Study.CardEvaluation) =>

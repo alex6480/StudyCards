@@ -4,7 +4,7 @@ import IFlashCard, { ExportFlashCard } from "./flashcard";
 
 export interface IFlashCardSetMeta {
     id: number;
-    name: string;
+    setName: string;
 
     cardOrder: string[];
     filter: IFlashCardFilter;
@@ -34,7 +34,7 @@ export class ExportFlashCardSet {
             }
             return new ExportFlashCard(v.value);
         });
-        this.name = set.name;
+        this.name = set.setName;
         this.id = set.id;
     }
 }

@@ -17,7 +17,7 @@ interface ISetImporterOwnProps {
 
 interface ISetImporterDispatchProps {
     addSet: (set: IFlashCardSet) => void;
-    setExists: (setId: string, callback: (exists: boolean) => void) => void;
+    setExists: (setId: number, callback: (exists: boolean) => void) => void;
 }
 
 interface ISetImporterProps extends ISetImporterOwnProps, ISetImporterDispatchProps { }
@@ -138,7 +138,7 @@ function mapStateToProps(state: IAppState): { } {
 function mapDispatchToProps(dispatch: Dispatch): ISetImporterDispatchProps {
     return {
         addSet: (set: IFlashCardSet) => dispatch<any>(Storage.addSet(set)),
-        setExists: (setId: string, callback: (exists: boolean) => void) => Storage.setExists(setId, callback),
+        setExists: (setId: number, callback: (exists: boolean) => void) => Storage.setExists(setId, callback),
     };
 }
 

@@ -18,7 +18,7 @@ export default interface IStorageProvider {
     /**
      * Used to get meta data for all sets
      */
-    loadSetMetaAll: () => ThunkAction<void, IAppState, void, Action>;
+    // loadSetMetaAll: () => ThunkAction<void, IAppState, void, Action>;
 
     /**
      * Saves the metadata for the specified set on the remote source

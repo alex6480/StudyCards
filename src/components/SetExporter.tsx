@@ -6,6 +6,7 @@ import IFlashCardSet, { ExportFlashCardSet } from "../lib/flashcard/FlashCardSet
 import IRemote from "../lib/remote";
 import { Storage } from "../lib/storage/StorageProvider";
 import { IAppState } from "../reducers";
+import { SetService } from "../services/set.service";
 import SetHeader from "./SetHeader";
 import SetLoader from "./SetLoader";
 import SetNav from "./SetNav";
@@ -56,7 +57,7 @@ class SetExporter extends React.Component<ISetExplorerProps, ISetExporterState> 
             const set = this.props.set.value;
             content =  <div className="container">
                 <h3 className="title is-3">Export Set</h3>
-                <p className="subtitle is-4">Exports the set '{set.name}' into
+                <p className="subtitle is-4">Exports the set '{set.setName}' into
                     a study cards set file (*.scset).</p>
                 <div className="box">
                     <div className="field">
@@ -124,7 +125,7 @@ function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<ISetExp
 
 function mapDispatchToProps(dispatch: Dispatch): ISetExplorerDispatchProps {
     return {
-        loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
+        loadSetMetaAll: () => dispatch<any>(SetService.list()),
     };
 }
 

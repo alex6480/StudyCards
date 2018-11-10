@@ -5,7 +5,7 @@ import * as Study from "../lib/study";
 import * as fromActions from "./actions";
 
 const initialState: IStudyState = {
-    setId: "",
+    setId: 0,
     newCardIds: [],
     knownCardIds: [],
     currentSession: null,
@@ -64,7 +64,7 @@ export function studyStateValue(state: IStudyState | undefined, action: fromActi
     }
 }
 
-function setId(state: string = initialState.setId, action: fromActions.Action): string {
+function setId(state: number = initialState.setId, action: fromActions.Action): number {
     switch (action.type) {
         case fromActions.SET_STUDY_STATE_BEGIN:
         case fromActions.SET_STUDY_STATE_COMPLETE:

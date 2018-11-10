@@ -56,13 +56,13 @@ class SetHeader extends React.Component<ISetHeaderProps> {
                 </span>
                 <EditableText maxLength={30}
                     readOnly={true}
-                    value={this.props.set.value.name} />
+                    value={this.props.set.value.setName} />
             </>;
         } else {
             // Show a normal editable text
             return <EditableText maxLength={30}
                 readOnly={false}
-                value={this.props.set.value.name}
+                value={this.props.set.value.setName}
                 onBlur={this.updateSetName.bind(this)}/>;
         }
     }
@@ -76,15 +76,15 @@ class SetHeader extends React.Component<ISetHeaderProps> {
             return <>
                 <li><Link to="/">My Sets</Link></li>
                 <li className="is-active"><a href="#" aria-current="page">
-                    {this.props.set.value.name}
+                    {this.props.set.value.setName}
                 </a></li>
             </>;
         }
     }
 
     private updateSetName(newName: string) {
-        if (newName !== this.props.set!.value!.name) {
-            this.props.saveSetMeta({ id: this.props.setId, name: newName });
+        if (newName !== this.props.set!.value!.setName) {
+            this.props.saveSetMeta({ id: this.props.setId, setName: newName });
         }
     }
 }

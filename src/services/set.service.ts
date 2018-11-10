@@ -5,6 +5,7 @@ import { IFlashCardSetMeta } from "../lib/flashcard/FlashCardSet";
 import { IUser } from "../lib/User";
 import * as Utils from "../lib/utils";
 import { Action, TAction } from "../reducers/actions";
+import { UserService } from "./user.service";
 
 const URL_LIST = "/set/";
 
@@ -17,13 +18,15 @@ function list(): TAction<Promise<{ [id: string]: IFlashCardSetMeta }>, void> {
         return new Promise((resolve, reject) => {
             const request = new XMLHttpRequest();
             request.open("GET", conf.remote_url + URL_LIST);
+            UserService.setAuth(request);
             request.send();
 
             request.onload = ev => {
-                if (request.status === 200) {
+                    debugger;
+                    if (request.status === 200) {
                     const response = request.responseText;
                     const setMeta = Utils.arrayToObject(JSON.parse(response) as IFlashCardSetMeta[],
-                                                        meta => [meta.id.toString(), meta]);
+                                                        meta => [meta.id.toString(), {...meta }]);
                     resolve(setMeta);
                     dispatch(Action.loadSetMetaAllComplete(setMeta));
                 } else {
@@ -33,6 +36,7 @@ function list(): TAction<Promise<{ [id: string]: IFlashCardSetMeta }>, void> {
             };
 
             request.onerror = ev => {
+                debugger;
                 // Some kind of error occured
                 reject();
                 dispatch(Action.loadSetMetaAllError());

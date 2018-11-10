@@ -7,6 +7,7 @@ import IFlashCardSet, { IFlashCardFilter, IFlashCardSetMeta } from "../../lib/fl
 import { ICardStudyData, ISetStudyData } from "../../lib/flashcard/StudyData";
 import { IStudyState } from "../../lib/flashcard/StudyState";
 import { CardEvaluation } from "../../lib/study";
+import { setActions } from "./set.actions";
 import { userActions } from "./user.actions";
 
 /*
@@ -49,10 +50,6 @@ export const ADD_NEW_CARD_BEGIN = "add new card begin";
 export const ADD_NEW_CARD_COMPLETE = "add new card complete";
 export const ADD_NEW_CARD_ERROR = "add new card error";
 
-export const LOAD_SET_META_ALL_BEGIN = "load meta data for all sets begin";
-export const LOAD_SET_META_ALL_COMPLETE = "load meta data for all sets complete";
-export const LOAD_SET_META_ALL_ERROR = "load meta data for all sets error";
-
 export const LOAD_CARDS_BEGIN = "load cards begin";
 export const LOAD_CARDS_COMPLETE = "load cards complete";
 
@@ -73,11 +70,7 @@ export const EVALUATE_CARD_COMPLETE = "evaluate card complete";
 
 export const Action = {
     ...userActions,
-
-    loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
-    loadSetMetaAllComplete: (setMeta: {[id: string]: IFlashCardSetMeta}) =>
-        createAction(LOAD_SET_META_ALL_COMPLETE, setMeta),
-    loadSetMetaAllError: () => createAction(LOAD_SET_META_ALL_ERROR, { }),
+    ...setActions,
 
     loadCardsBegin: (setId: number, cardIds: string[]) => createAction(LOAD_CARDS_BEGIN, { setId, cardIds }),
     loadCardsComplete: (setId: number, cards: {[id: string]: IFlashCard }) =>

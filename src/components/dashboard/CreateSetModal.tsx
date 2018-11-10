@@ -50,6 +50,6 @@ export default class CreateSetModal extends React.Component<ICreateSetModalProps
     }
 
     private createSet() {
-        this.props.createSet({ name: this.state.name });
+        this.props.createSet({ setName: this.state.name });
     }
 }

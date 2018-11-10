@@ -6,14 +6,14 @@ import { ExportFlashCard } from "../../flashcard";
 import * as fromCardParse from "../parseCard";
 
 test("export and import", () => {
-    const setId = "setId123";
+    const setId = 0;
     const cardId = "cardId123";
     let state: any = fromCard.cardValue({
         tags: ["tag1", "tag2"],
     }, cardId, fromAction.Action.addNewCardBegin(cardId, setId));
     state = fromCard.cardValue(state, cardId, fromAction.Action.saveCardFaceBegin(
-        cardId,
         setId,
+        cardId,
         {
             ...state.faces.front,
             richTextContent: ContentState.createFromText("This is a test"),

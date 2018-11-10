@@ -6,6 +6,7 @@ import IFlashCardSet, { ExportFlashCardSet, IFlashCardSetMeta } from "../lib/fla
 import IRemote from "../lib/remote";
 import { Storage } from "../lib/storage/StorageProvider";
 import { IAppState } from "../reducers";
+import { SetService } from "../services/set.service";
 import SetHeader from "./SetHeader";
 import SetLoader from "./SetLoader";
 import SetNav from "./SetNav";
@@ -37,7 +38,7 @@ class SetExporter extends React.Component<ISetPropertiesProps, ISetExporterState
         super(props);
 
         this.state = {
-            setName: props.set !== undefined ? (props.set.value !== undefined ? props.set.value.name : "") : "",
+            setName: props.set !== undefined ? (props.set.value !== undefined ? props.set.value.setName : "") : "",
             isDeleting: false,
         };
     }
@@ -46,7 +47,7 @@ class SetExporter extends React.Component<ISetPropertiesProps, ISetExporterState
         // When we get set data, set the name of the set
         if ((this.props.set === undefined || this.props.set.value === undefined)
             && newProps.set !== undefined && newProps.set.value !== undefined) {
-            this.setState({ setName: newProps.set.value.name });
+            this.setState({ setName: newProps.set.value.setName });
         }
     }
 
@@ -130,8 +131,8 @@ class SetExporter extends React.Component<ISetPropertiesProps, ISetExporterState
     }
 
     private updateSetName() {
-        if (this.state.setName !== this.props.set!.value!.name) {
-            this.props.saveSetMeta({ id: this.props.setId, name: this.state.setName });
+        if (this.state.setName !== this.props.set!.value!.setName) {
+            this.props.saveSetMeta({ id: this.props.setId, setName: this.state.setName });
         }
     }
 }
@@ -159,7 +160,7 @@ function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<ISetPro
 
 function mapDispatchToProps(dispatch: Dispatch): ISetPropertiesDispatchProps {
     return {
-        loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
+        loadSetMetaAll: () => dispatch<any>(SetService.list()),
         saveSetMeta: (setMeta: Partial<IFlashCardSetMeta>) => dispatch<any>(Storage.saveSetMeta(setMeta)),
     };
 }

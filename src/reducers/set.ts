@@ -3,11 +3,12 @@ import IFlashCardSet, { IFlashCardFilter } from "../lib/flashcard/FlashCardSet";
 import IRemote from "../lib/remote";
 import * as Utils from "../lib/utils";
 import * as fromActions from "./actions";
+import * as SetActions from "./actions/set.actions";
 import card, * as fromCard from "./card";
 
 export const initialState: IFlashCardSet = {
     cards: {},
-    name: "New Set",
+    setName: "New Set",
     cardOrder: [],
     id: 0,
     availableTags: {},
@@ -23,7 +24,7 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
                setId: number,
                action: fromActions.Action): { [id: string]: IRemote<IFlashCard>; } {
     switch (action.type) {
-        case fromActions.LOAD_SET_META_ALL_COMPLETE:
+        case SetActions.LIST_SETS_COMPLETE:
             return Utils.arrayToObject(action.payload[setId].cardOrder, v => {
                 return state[v] !== undefined ? [v, state[v]] : [v, { isFetching: false, value: undefined }];
             });
@@ -73,12 +74,12 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
     }
 }
 
-function name(state: string = initialState.name, setId: number, action: fromActions.Action): string {
+function name(state: string = initialState.setName, setId: number, action: fromActions.Action): string {
     switch (action.type) {
         case fromActions.ADD_NEW_SET_BEGIN:
-            return action.payload.set.name !== undefined ? action.payload.set.name : state;
+            return action.payload.set.setName !== undefined ? action.payload.set.setName : state;
         case fromActions.SAVE_SET_META_BEGIN:
-            return action.payload.setMeta.name !== undefined ? action.payload.setMeta.name : state;
+            return action.payload.setMeta.setName !== undefined ? action.payload.setMeta.setName : state;
         default:
             return state;
     }
@@ -188,7 +189,7 @@ export function setValue(state: Partial<IFlashCardSet> = initialState, action: f
             return {
                 id: stateId,
                 cardOrder: newCardOrder,
-                name: name(state.name, stateId, action),
+                setName: name(state.setName, stateId, action),
                 availableTags: availableTags(state.availableTags, state.cards, action),
                 cards: cards(state.cards, stateId, action),
                 filter: newFilter,
@@ -200,7 +201,7 @@ export function setValue(state: Partial<IFlashCardSet> = initialState, action: f
 export function set(state: IRemote<Partial<IFlashCardSet>> = { isFetching: true, value: initialState },
                     action: fromActions.Action): IRemote<IFlashCardSet> {
     switch (action.type) {
-        case fromActions.LOAD_SET_META_ALL_COMPLETE:
+        case SetActions.LIST_SETS_COMPLETE:
         case fromActions.SAVE_SET_META_COMPLETE:
         case fromActions.ADD_NEW_SET_COMPLETE:
             return {
@@ -226,16 +227,16 @@ export function set(state: IRemote<Partial<IFlashCardSet>> = { isFetching: true,
 export default function sets(state: IRemote<{ [id: string]: IRemote<IFlashCardSet> }>,
                              action: fromActions.Action): IRemote<{ [id: string]: IRemote<IFlashCardSet> }> {
     switch (action.type) {
-        case fromActions.LOAD_SET_META_ALL_BEGIN:
+        case SetActions.LIST_SETS_BEGIN:
             return { ...state, isFetching: true };
-        case fromActions.LOAD_SET_META_ALL_COMPLETE:
+        case SetActions.LIST_SETS_COMPLETE:
             return {
                 ...state,
                 isFetching: false,
                 value: Utils.objectMapString(action.payload, (k, remoteSet) =>
                     set({ isFetching: false, value: remoteSet }, action)),
             };
-        case fromActions.LOAD_SET_META_ALL_ERROR:
+        case SetActions.LIST_SETS_ERROR:
             return {
                 ...state,
                 error: "ERROR",

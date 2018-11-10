@@ -40,7 +40,7 @@ export default class SetTile extends React.Component<ISetTileProps> {
             isPlaceholder = false;
             content = <>
                 <div className="card-content">
-                    <p className="title is-4">{this.props.set.value.name}</p>
+                    <p className="title is-4">{this.props.set.value.setName}</p>
                     <p className="subtitle is-6">{cardCount} {cardCount === 1 ? "card" : "cards"} (26 due today)</p>
                     <p>Last studied <time>September 5th 2018</time></p>
                 </div>

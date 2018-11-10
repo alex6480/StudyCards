@@ -8,6 +8,7 @@ import IRemote from "../../lib/remote";
 import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import * as Utils from "../../lib/utils";
 import { IAppState } from "../../reducers";
+import { SetService } from "../../services/set.service";
 import SetHeader from "../SetHeader";
 import SetLoader from "../SetLoader";
 import SetNav from "../SetNav";
@@ -22,7 +23,7 @@ interface ISetCardEditorOwnProps {
 
 interface ISetCardEditorStateProps extends RouteComponentProps<ISetCardEditorOwnProps> {
     set?: IRemote<IFlashCardSet>;
-    setId: string;
+    setId: number;
 }
 
 interface ISetCardEditorDispatchProps {
@@ -131,7 +132,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
             const set = this.props.set.value!;
             content = <div className="container card-editor">
                 { /* Set name */ }
-                <h2 className="title is-4">Edit cards in {set.name}</h2>
+                <h2 className="title is-4">Edit cards in {set.setName}</h2>
                 <h3 className="subtitle is-6">{set.cardOrder.length === 0
                     ? "This set contains no cards."
                     : "Showing " + set.filteredCardOrder.value!.length + " cards out of "
@@ -381,7 +382,7 @@ class SetCardEditor extends React.Component<ISetCardEditorProps, ISetCardEditorS
 
 function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<ISetCardEditorOwnProps>):
     ISetCardEditorStateProps {
-    const setId = ownProps.match.params.setId;
+    const setId = Number(ownProps.match.params.setId);
     let set: IRemote<IFlashCardSet> | undefined;
     if (state.sets.isFetching === false && state.sets.value === undefined) {
         // Return an undefined set, so the component will attempt to fetch it
@@ -400,7 +401,7 @@ function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<ISetCar
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: RouteComponentProps<ISetCardEditorOwnProps>):
     ISetCardEditorDispatchProps {
-    const setId = ownProps.match.params.setId;
+    const setId = Number(ownProps.match.params.setId);
     return {
         addNewCard: (afterCard?: IFlashCard) =>
             dispatch<any>(Storage.addCard(setId, afterCard)),
@@ -408,7 +409,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: RouteComponentProps<IS
             dispatch<any>(Storage.loadCards(setId, cardIds)),
         filterCards: (filter: IFlashCardFilter) =>
             dispatch<any>(Storage.filterCards(setId, filter)),
-        loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
+        loadSetMetaAll: () => dispatch<any>(SetService.list()),
     };
 }
 

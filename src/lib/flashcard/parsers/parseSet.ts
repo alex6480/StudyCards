@@ -35,7 +35,7 @@ function parseSet(set: ExportFlashCardSet, onError: onErrorHandler): IFlashCardS
 
     const result: IFlashCardSet = {
         id,
-        name: parseName(set, onError),
+        setName: parseName(set, onError),
         cards: Utils.objectMapString(cards, (k, v) => ({ isFetching: false, value: v, lastUpdated: Date.now() })),
         cardOrder: parseCardOrder(set, cards, onError),
         availableTags: Utils.countTags(cards),

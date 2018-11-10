@@ -8,6 +8,7 @@ import IRemote from "../../lib/remote";
 import IStorageProvider, { Storage } from "../../lib/storage/StorageProvider";
 import { IAppState } from "../../reducers";
 import { Action } from "../../reducers/actions";
+import { SetService } from "../../services/set.service";
 import CreateSetModal from "./CreateSetModal";
 import SetTile from "./SetTile";
 
@@ -115,7 +116,7 @@ function mapStateToProps(state: IAppState): IDashboardStateProps {
 function mapDispatchToProps(dispatch: Dispatch): IDashboardDispatchProps {
     return {
         addSet: (set?: Partial<IFlashCardSet>) => dispatch<any>(Storage.addSet(set)),
-        loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
+        loadSetMetaAll: () => dispatch<any>(SetService.list()),
     };
 }
 

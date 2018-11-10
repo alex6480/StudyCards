@@ -9,6 +9,7 @@ const URL_AUTH = "/user/authenticate";
 export const UserService = {
     logIn,
     logOut,
+    setAuth,
 };
 
 function logIn(email: string, password: string): TAction<Promise<IUser>, void> {
@@ -29,6 +30,8 @@ function logIn(email: string, password: string): TAction<Promise<IUser>, void> {
                 } else {
                     const response = request.responseText;
                     const user = JSON.parse(response) as IUser;
+
+                    localStorage.setItem("user-token", user.token);
                     resolve(user);
                     dispatch(Action.authenticate(user));
                 }
@@ -49,4 +52,8 @@ function logOut(): TAction<void, void> {
 
         dispatch(Action.logOut());
     };
+}
+
+function setAuth(request: XMLHttpRequest) {
+    request.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("user-token"));
 }

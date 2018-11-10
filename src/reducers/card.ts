@@ -7,20 +7,20 @@ import * as fromActions from "./actions";
 
 export const initialCard: IFlashCard = {
     id: "",
-    setId: "",
+    setId: 0,
     tags: [],
     faces: {
         front: {
             id: "front",
             cardId: "",
-            setId: "",
+            setId: 0,
             type: FlashCardFaceType.RichText,
             richTextContent: ContentState.createFromText(""),
         },
         back: {
             id: "back",
             cardId: "",
-            setId: "",
+            setId: 0,
             type: FlashCardFaceType.RichText,
             richTextContent: ContentState.createFromText(""),
         },
