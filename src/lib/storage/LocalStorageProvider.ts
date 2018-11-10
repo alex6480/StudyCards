@@ -47,7 +47,7 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public addCard(setId: string, afterCard?: IFlashCard): ThunkAction<string, IAppState, void, fromActions.Action> {
+    public addCard(setId: number, afterCard?: IFlashCard): ThunkAction<string, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             const cardId = Utils.guid();
             dispatch(fromActions.Action.addNewCardBegin(cardId, setId, afterCard));
@@ -84,7 +84,7 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public deleteCard(setId: string, cardId: string): ThunkAction<void, IAppState, void, fromActions.Action> {
+    public deleteCard(setId: number, cardId: string): ThunkAction<void, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             dispatch(fromActions.Action.deleteCardBegin(setId, cardId));
 
@@ -107,11 +107,11 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public addSet(set?: Partial<IFlashCardSet>): ThunkAction<string, IAppState, void, fromActions.Action> {
+    public addSet(set?: Partial<IFlashCardSet>): ThunkAction<number, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             if (set === undefined || set.id === undefined) {
                 set = {
-                    id: Utils.guid(),
+                    id: 0,
                     ...set,
                 };
             }
@@ -122,10 +122,10 @@ export class LocalStorageProvider implements IStorageProvider {
                 ...set,
             };
             this.saveSet(fullSet, true);
-            this.saveSetStudyData({
+            /* this.saveSetStudyData({
                 setId,
                 cardData: {},
-            }, []);
+            }, []); */
 
             dispatch(fromActions.Action.addSetBegin(setId, set));
             this.result(() => dispatch(fromActions.Action.addSetComplete(setId)));
@@ -133,11 +133,11 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public setExists(setId: string, callback: (setExists: boolean) => void) {
+    public setExists(setId: number, callback: (setExists: boolean) => void) {
         callback(this.getSetIds().indexOf(setId) !== -1);
     }
 
-    public loadCards(setId: string, cardIds: string[]): ThunkAction<void, IAppState, void, fromActions.Action> {
+    public loadCards(setId: number, cardIds: string[]): ThunkAction<void, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             dispatch(fromActions.Action.loadCardsBegin(setId, cardIds));
 
@@ -155,7 +155,7 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public loadStudyState(setId: string): ThunkAction<void, IAppState, void, fromActions.Action> {
+    public loadStudyState(setId: number): ThunkAction<void, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             const setStudyData = this.getSetStudyData(setId);
             if (setStudyData === null) {
@@ -174,7 +174,7 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public saveCardFace(setId: string, cardId: string, face: IFlashCardFace):
+    public saveCardFace(setId: number, cardId: string, face: IFlashCardFace):
             ThunkAction<void, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             dispatch(fromActions.Action.saveCardFaceBegin(setId, cardId, face));
@@ -196,7 +196,7 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public saveCardMeta(setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>):
+    public saveCardMeta(setId: number, cardId: string, cardMeta: Partial<IFlashCardMeta>):
         ThunkAction<void, IAppState, void, fromActions.Action>  {
         return (dispatch, getState) => {
             const previousAvailableTags = getState().sets.value![setId].value!.availableTags;
@@ -264,7 +264,7 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public filterCards(setId: string, filter: IFlashCardFilter):
+    public filterCards(setId: number, filter: IFlashCardFilter):
         ThunkAction<void, IAppState, void, fromActions.Action> {
         return (dispatch, getState) => {
             dispatch(fromActions.Action.filterCardsBegin(setId, filter));
@@ -294,7 +294,7 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    public getExportUri(setId: string) {
+    public getExportUri(setId: number) {
         // Load the appropriate data
         const setMeta = this.getSetMeta(setId);
         if (setMeta === null) {
@@ -430,14 +430,14 @@ export class LocalStorageProvider implements IStorageProvider {
         };
     }
 
-    private getCard(setId: string, cardId: string): IFlashCard {
+    private getCard(setId: number, cardId: string): IFlashCard {
         const exportCard = this.getCardRaw(setId, cardId);
         const card = parseCard(exportCard, setId);
 
         return card as IFlashCard;
     }
 
-    private getCardRaw(setId: string, cardId: string): ExportFlashCard {
+    private getCardRaw(setId: number, cardId: string): ExportFlashCard {
         const data = localStorage.getItem(this.cardKey(setId, cardId));
         if (data === null) {
             throw new Error("Card does not exist");
@@ -449,7 +449,7 @@ export class LocalStorageProvider implements IStorageProvider {
      * Attemps to retrieve metadata for the specified set. Returns null if none is available
      * @param setId The id of the set for which to fetch metadata
      */
-    private getSetMeta(setId: string): IFlashCardSetMeta | null {
+    private getSetMeta(setId: number): IFlashCardSetMeta | null {
         const data = localStorage.getItem(this.setKey(setId));
         if (data === null) {
             return null;
@@ -519,7 +519,7 @@ export class LocalStorageProvider implements IStorageProvider {
         }
     }
 
-    private getSetStudyData(setId: string): ISetStudyData | null {
+    private getSetStudyData(setId: number): ISetStudyData | null {
         const setMeta: IFlashCardSetMeta | null = this.getSetMeta(setId);
         if (setMeta === null) {
             return null;
@@ -546,7 +546,7 @@ export class LocalStorageProvider implements IStorageProvider {
         localStorage.setItem(this.cardStudyDataKey(card.setId, card.cardId), JSON.stringify(card));
     }
 
-    private getCardStudyData(setId: string, cardId: string): ICardStudyData {
+    private getCardStudyData(setId: number, cardId: string): ICardStudyData {
         const data = localStorage.getItem(this.cardStudyDataKey(setId, cardId));
         if (data === null) {
             // If no study data is present, just generate a default study data
@@ -570,7 +570,7 @@ export class LocalStorageProvider implements IStorageProvider {
         localStorage.setItem(this.cardKey(card.setId, card.id), JSON.stringify(new ExportFlashCard(card)));
     }
 
-    private removeCard(setId: string, cardId: string) {
+    private removeCard(setId: number, cardId: string) {
         localStorage.removeItem(this.cardKey(setId, cardId));
     }
 
@@ -579,29 +579,29 @@ export class LocalStorageProvider implements IStorageProvider {
      */
     private getSetIds() {
         const setIdData = localStorage.getItem("sets");
-        const setIds = setIdData === null ? [] : setIdData.split(this.idDelimiter);
+        const setIds = setIdData === null ? [] : setIdData.split(this.idDelimiter).map(id => Number(id));
         return setIds;
     }
 
     /**
      * Return the localstorage key for a set with the specified id
      */
-    private setKey(setId: string) {
+    private setKey(setId: string | number) {
         return "sets" + this.idDelimiter + setId;
     }
 
     /**
      * Return the localstorage key for a card with the specified id
      */
-    private cardKey(setId: string, cardId: string) {
+    private cardKey(setId: string |number, cardId: string | number) {
         return "cards" + this.idDelimiter + setId + this.idDelimiter + cardId;
     }
 
-    private setStudyDataKey(setId: string) {
+    private setStudyDataKey(setId: string | number) {
         return "setStudyData" + this.idDelimiter + setId;
     }
 
-    private cardStudyDataKey(setId: string, cardId: string) {
+    private cardStudyDataKey(setId: string | number, cardId: string | number) {
         return "cardStudyData" + this.idDelimiter + setId + this.idDelimiter + cardId;
     }
 
@@ -613,7 +613,7 @@ export class LocalStorageProvider implements IStorageProvider {
         }
     }
 
-    private cardMatchesFilter(setId: string, cardId: string, filter: IFlashCardFilter) {
+    private cardMatchesFilter(setId: number, cardId: string, filter: IFlashCardFilter) {
         // Don't parse the card because rich text content is slow to parse
         const card = this.getCardRaw(setId, cardId);
 

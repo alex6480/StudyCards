@@ -1,7 +1,7 @@
 import { CardEvaluation } from "../study";
 
 export interface IStudyState {
-    setId: string;
+    setId: number;
     newCardIds: string[];
     knownCardIds: string[];
     currentSession: IStudySession | null;

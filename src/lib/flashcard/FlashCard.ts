@@ -12,7 +12,7 @@ export default interface IFlashCard extends IFlashCardMeta {
 
 export interface IFlashCardMeta {
     id: string;
-    setId: string;
+    setId: number;
     tags: string[];
 }
 

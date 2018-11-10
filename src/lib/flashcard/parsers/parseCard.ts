@@ -6,7 +6,7 @@ import { ExportFlashCardFace, ExportRichTextFlashCardFace, FlashCardFaceId,
 import { onErrorHandler, ParseError } from "./parseSet";
 // import remarkableRevealPlugin from "./remarkableRevealPlugin";
 
-export default function parse(card: ExportFlashCard, setId: string): IFlashCard | ParseError[] {
+export default function parse(card: ExportFlashCard, setId: number): IFlashCard | ParseError[] {
     const errors: ParseError[] = [];
     const err = (error: ParseError) => { errors.push(error); };
 
@@ -18,7 +18,7 @@ export default function parse(card: ExportFlashCard, setId: string): IFlashCard 
     }
 }
 
-export function parseCard(card: ExportFlashCard, setId: string, onError: onErrorHandler): IFlashCard {
+export function parseCard(card: ExportFlashCard, setId: number, onError: onErrorHandler): IFlashCard {
     const id = parseId(card, onError);
     const result: IFlashCard = {
         id,
@@ -38,7 +38,7 @@ function parseId(card: ExportFlashCard, onError: onErrorHandler) {
 }
 
 function parseFaces(card: ExportFlashCard, cardId: string,
-                    setId: string, onError: onErrorHandler): { [id in FlashCardFaceId]: IFlashCardFace } {
+                    setId: number, onError: onErrorHandler): { [id in FlashCardFaceId]: IFlashCardFace } {
     const faces: { [id: string]: IFlashCardFace } = {};
 
     for (const faceId of Object.keys(card.faces)) {
@@ -67,7 +67,7 @@ function parseFaces(card: ExportFlashCard, cardId: string,
 }
 
 function parseFace(face: ExportFlashCardFace, faceId: FlashCardFaceId,
-                   cardId: string, setId: string, onError: onErrorHandler): IFlashCardFace {
+                   cardId: string, setId: number, onError: onErrorHandler): IFlashCardFace {
     const cardFaceType = parseFaceType(face, onError);
     switch (cardFaceType) {
         case FlashCardFaceType.RichText:

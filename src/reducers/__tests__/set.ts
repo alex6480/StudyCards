@@ -3,7 +3,7 @@ import * as fromCard from "../card";
 import * as fromSet from "../set";
 
 test("added card is added in the correct position", () => {
-    const setId = "setId123";
+    const setId = 0;
     let state = fromSet.setValue({ id: setId }, fromActions.Action.addSetComplete(setId));
     expect(state.cardOrder).toStrictEqual([]);
     expect(state.filteredCardOrder.value).toStrictEqual([]);
@@ -28,7 +28,7 @@ test("added card is added in the correct position", () => {
 });
 
 describe("available tags", () => {
-    const setId = "setId123";
+    const setId = 0;
     let state = fromSet.setValue({ id: setId }, fromActions.Action.addSetComplete(setId));
     state = fromSet.setValue(state, fromActions.Action.addNewCardBegin("cardId1", setId));
     state = fromSet.setValue(state, fromActions.Action.addNewCardBegin("cardId2", setId));

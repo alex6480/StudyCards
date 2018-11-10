@@ -4,7 +4,7 @@ import card from "../card";
 
 test("added card has correct set and card id", () => {
     const cardId = "cardId123";
-    const setId = "setId123";
+    const setId = 0;
 
     const action = fromActions.Action.addNewCardBegin(cardId, setId);
     const result = card({
@@ -22,7 +22,7 @@ test("added card has correct set and card id", () => {
 
 test("updated card has correct set and card id", () => {
     const cardId = "cardId123";
-    const setId = "setId123";
+    const setId = 0;
     const tags = ["tag1", "tag2", "tag3"];
     const state = card(undefined, cardId, fromActions.Action.addNewCardBegin(cardId, setId));
     const updatedState = card(state, cardId,
@@ -35,7 +35,7 @@ test("updated card has correct set and card id", () => {
 
 test("updated card face has correct set and card id", () => {
     const cardId = "cardId123";
-    const setId = "setId123";
+    const setId = 0;
     const state = card(undefined, cardId, fromActions.Action.addNewCardBegin(cardId, setId));
     const result = card(state, cardId,
         fromActions.Action.saveCardFaceBegin(setId, cardId, {

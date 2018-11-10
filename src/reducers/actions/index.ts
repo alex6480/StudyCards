@@ -77,52 +77,52 @@ export const Action = {
     loadSetMetaAllBegin: () => createAction(LOAD_SET_META_ALL_BEGIN),
     loadSetMetaAllComplete: (setMeta: {[id: string]: IFlashCardSetMeta}) =>
         createAction(LOAD_SET_META_ALL_COMPLETE, setMeta),
-    loadSetMetaAllError: (message: string) => createAction(LOAD_SET_META_ALL_ERROR, { message }),
+    loadSetMetaAllError: () => createAction(LOAD_SET_META_ALL_ERROR, { }),
 
-    loadCardsBegin: (setId: string, cardIds: string[]) => createAction(LOAD_CARDS_BEGIN, { setId, cardIds }),
-    loadCardsComplete: (setId: string, cards: {[id: string]: IFlashCard }) =>
+    loadCardsBegin: (setId: number, cardIds: string[]) => createAction(LOAD_CARDS_BEGIN, { setId, cardIds }),
+    loadCardsComplete: (setId: number, cards: {[id: string]: IFlashCard }) =>
         createAction(LOAD_CARDS_COMPLETE, { setId, cards }),
 
-    addNewCardBegin: (cardId: string, setId: string, afterCard?: IFlashCard) =>
+    addNewCardBegin: (cardId: string, setId: number, afterCard?: IFlashCard) =>
         createAction(ADD_NEW_CARD_BEGIN, { cardId, setId, afterCard }),
-    addNewCardComplete: (setId: string, cardId: string) =>
+    addNewCardComplete: (setId: number, cardId: string) =>
         createAction(ADD_NEW_CARD_COMPLETE, { setId, cardId }),
 
-    addSetBegin: (setId: string, set: Partial<IFlashCardSet>) =>
+    addSetBegin: (setId: number, set: Partial<IFlashCardSet>) =>
         createAction(ADD_NEW_SET_BEGIN, { setId, set }),
-    addSetComplete: (setId: string) => createAction(ADD_NEW_SET_COMPLETE, { setId }),
+    addSetComplete: (setId: number) => createAction(ADD_NEW_SET_COMPLETE, { setId }),
 
-    saveCardFaceBegin: (setId: string, cardId: string, face: IFlashCardFace) =>
+    saveCardFaceBegin: (setId: number, cardId: string, face: IFlashCardFace) =>
         createAction(SAVE_CARD_FACE_BEGIN, { setId, cardId, face }),
-    saveCardFaceComplete: (setId: string, cardId: string) =>
+    saveCardFaceComplete: (setId: number, cardId: string) =>
         createAction(SAVE_CARD_FACE_COMPLETE, { setId, cardId }),
 
-    saveCardMetaBegin: (setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) =>
+    saveCardMetaBegin: (setId: number, cardId: string, cardMeta: Partial<IFlashCardMeta>) =>
         createAction(SAVE_CARD_META_BEGIN, { setId, cardId, cardMeta }),
-    saveCardMetaComplete: (setId: string, cardId: string, cardMeta: IFlashCardMeta) =>
+    saveCardMetaComplete: (setId: number, cardId: string, cardMeta: IFlashCardMeta) =>
         createAction(SAVE_CARD_META_COMPLETE, { setId, cardId, cardMeta }),
 
     saveSetMetaBegin: (setMeta: Partial<IFlashCardSetMeta>) =>
         createAction(SAVE_SET_META_BEGIN, { setId: setMeta.id, setMeta }),
-    saveSetMetaComplete: (setId: string) =>
+    saveSetMetaComplete: (setId: number) =>
         createAction(SAVE_SET_META_COMPLETE, { setId }),
 
-    deleteCardBegin: (setId: string, cardId: string) => createAction(DELETE_CARD_BEGIN, { cardId, setId }),
-    deleteCardComplete: (setId: string, cardId: string) => createAction(DELETE_CARD_COMPLETE, { cardId, setId }),
+    deleteCardBegin: (setId: number, cardId: string) => createAction(DELETE_CARD_BEGIN, { cardId, setId }),
+    deleteCardComplete: (setId: number, cardId: string) => createAction(DELETE_CARD_COMPLETE, { cardId, setId }),
 
-    swapCardFaces: (setId: string, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),
+    swapCardFaces: (setId: number, cardId: string) => createAction(SWAP_CARD_FACES, { cardId, setId }),
 
-    filterCardsBegin: (setId: string, filter: IFlashCardFilter) =>
+    filterCardsBegin: (setId: number, filter: IFlashCardFilter) =>
         createAction(SET_FILTER_CARDS_BEGIN, { setId, filter} ),
-    filterCardsComplete: (setId: string, filter: IFlashCardFilter, result: string[]) =>
+    filterCardsComplete: (setId: number, filter: IFlashCardFilter, result: string[]) =>
         createAction(SET_FILTER_CARDS_COMPLETE, { setId, filter, result }),
 
     setStudyStateBegin: (studyState?: Partial<IStudyState>) => createAction(SET_STUDY_STATE_BEGIN, { studyState }),
     setStudyStateComplete: (studyState: Partial<IStudyState>) => createAction(SET_STUDY_STATE_COMPLETE, { studyState }),
 
-    evaluateCardBegin: (setId: string, cardId: string, evaluation: CardEvaluation) =>
+    evaluateCardBegin: (setId: number, cardId: string, evaluation: CardEvaluation) =>
         createAction(EVALUATE_CARD_BEGIN, { setId, cardId, evaluation }),
-    evaluateCardComplete: (setId: string, cardId: string, evaluation: CardEvaluation,
+    evaluateCardComplete: (setId: number, cardId: string, evaluation: CardEvaluation,
                            redrawTime: Date | null, nextCardId: string, studyState: IStudyState) =>
         createAction(EVALUATE_CARD_COMPLETE, { setId, cardId, evaluation, redrawTime, nextCardId, studyState }),
 };

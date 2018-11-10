@@ -9,7 +9,7 @@ import { IAppState } from "../reducers";
 import EditableText from "./rich-text-editor/EditableText";
 
 interface ISetHeaderOwnProps {
-    setId: string;
+    setId: number;
 }
 
 interface ISetHeaderStateProps extends ISetHeaderOwnProps {

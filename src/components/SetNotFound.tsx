@@ -1,7 +1,7 @@
 import * as React from "react";
 
 interface ISetNotFoundProps {
-    setId: string;
+    setId: number;
 }
 
 const SetNotFound: React.SFC<ISetNotFoundProps> = (props) => {

@@ -10,7 +10,7 @@ export enum FlashCardFaceType {
 
 export interface IFlashCardFace {
     id: FlashCardFaceId;
-    setId: string;
+    setId: number;
     cardId: string;
     type: FlashCardFaceType;
     richTextContent: ContentState;

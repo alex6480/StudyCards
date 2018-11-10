@@ -16,7 +16,7 @@ interface ISetExplorerOwnProps {
 }
 
 interface ISetExplorerStateProps extends RouteComponentProps<ISetExplorerOwnProps> {
-    setId: string;
+    setId: number;
     set?: IRemote<IFlashCardSet>;
 }
 
@@ -104,7 +104,7 @@ class SetExporter extends React.Component<ISetExplorerProps, ISetExporterState> 
 function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<ISetExplorerOwnProps>):
     ISetExplorerStateProps {
 
-    const setId = ownProps.match.params.setId;
+    const setId = Number(ownProps.match.params.setId);
     let set: IRemote<IFlashCardSet> | undefined;
     if (state.sets.isFetching === false && state.sets.value === undefined) {
         // Return an undefined set, so the component will attempt to fetch it

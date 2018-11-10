@@ -46,9 +46,9 @@ function parseSet(set: ExportFlashCardSet, onError: onErrorHandler): IFlashCardS
     return result;
 }
 
-function parseId(set: ExportFlashCardSet, onError: onErrorHandler): string {
-    if (set.id === undefined || set.id == null || set.id.trim() === "") {
-        return Utils.guid();
+function parseId(set: ExportFlashCardSet, onError: onErrorHandler): number {
+    if (set.id === undefined || set.id == null) {
+        return 0;
     } else {
         return set.id;
     }
@@ -67,7 +67,7 @@ function parseCardOrder(set: ExportFlashCardSet,
     return Object.keys(cards).sort();
 }
 
-function parseCards(set: ExportFlashCardSet, setId: string, onError: onErrorHandler): { [id: string]: IFlashCard } {
+function parseCards(set: ExportFlashCardSet, setId: number, onError: onErrorHandler): { [id: string]: IFlashCard } {
     const cards: { [id: string]: IFlashCard } = {};
 
     for (const cardId of Object.keys(set.cards)) {

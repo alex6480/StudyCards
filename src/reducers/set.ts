@@ -9,22 +9,18 @@ export const initialState: IFlashCardSet = {
     cards: {},
     name: "New Set",
     cardOrder: [],
-    id: "",
+    id: 0,
     availableTags: {},
     filter: { tags: { } },
     filteredCardOrder: { isFetching: false, value: [] },
 };
 
-export function id(state: string = initialState.id, action: fromActions.Action) {
-    if (state === undefined || state === initialState.id) {
-        return Utils.guid();
-    } else {
-        return state;
-    }
+export function id(state: number = initialState.id, action: fromActions.Action) {
+    return state;
 }
 
 function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.cards,
-               setId: string,
+               setId: number,
                action: fromActions.Action): { [id: string]: IRemote<IFlashCard>; } {
     switch (action.type) {
         case fromActions.LOAD_SET_META_ALL_COMPLETE:
@@ -77,7 +73,7 @@ function cards(state: { [id: string]: IRemote<IFlashCard>; } = initialState.card
     }
 }
 
-function name(state: string = initialState.name, setId: string, action: fromActions.Action): string {
+function name(state: string = initialState.name, setId: number, action: fromActions.Action): string {
     switch (action.type) {
         case fromActions.ADD_NEW_SET_BEGIN:
             return action.payload.set.name !== undefined ? action.payload.set.name : state;
@@ -242,7 +238,7 @@ export default function sets(state: IRemote<{ [id: string]: IRemote<IFlashCardSe
         case fromActions.LOAD_SET_META_ALL_ERROR:
             return {
                 ...state,
-                error: action.payload.message,
+                error: "ERROR",
             };
         case fromActions.SAVE_SET_META_BEGIN:
         case fromActions.SAVE_SET_META_COMPLETE:

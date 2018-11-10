@@ -22,21 +22,21 @@ interface IStudySectionOwnProps {
 }
 
 interface IStudySectionStateProps extends RouteComponentProps<IStudySectionOwnProps> {
-    setId: string;
+    setId: number;
     set?: IRemote<IFlashCardSet>;
     studyState: IRemote<IStudyState>;
 }
 
 interface IStudySectionDispatchProps {
-    loadCards: (setId: string, cardIds: string[]) => void;
+    loadCards: (setId: number, cardIds: string[]) => void;
     loadSetMetaAll: () => void;
-    loadStudyState: (setId: string) => void;
+    loadStudyState: (setId: number) => void;
     beginStudy: (options: Study.IStudySessionOptions) => void;
     evaluateCard: (cardId: string, evaluation: Study.CardEvaluation) => void;
-    filterCards: (setId: string, filter: IFlashCardFilter) => void;
+    filterCards: (setId: number, filter: IFlashCardFilter) => void;
 }
 
-interface IStudySectionProps extends IStudySectionOwnProps, IStudySectionStateProps, IStudySectionDispatchProps { }
+interface IStudySectionProps extends IStudySectionStateProps, IStudySectionDispatchProps { }
 
 class StudySection extends React.Component<IStudySectionProps, {}> {
     constructor(props: IStudySectionProps) {
@@ -108,7 +108,7 @@ class StudySection extends React.Component<IStudySectionProps, {}> {
 function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<IStudySectionOwnProps>):
     IStudySectionStateProps {
 
-    const setId = ownProps.match.params.setId;
+    const setId = Number(ownProps.match.params.setId);
     let set: IRemote<IFlashCardSet> | undefined;
     if (state.sets.isFetching === false && state.sets.value === undefined) {
         // Return an undefined set, so the component will attempt to fetch it
@@ -129,13 +129,13 @@ function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<IStudyS
 
 function mapDispatchToProps(dispatch: Dispatch): IStudySectionDispatchProps {
     return {
-        loadCards: (setId: string, cardIds: string[]) => dispatch<any>(Storage.loadCards(setId, cardIds)),
+        loadCards: (setId: number, cardIds: string[]) => dispatch<any>(Storage.loadCards(setId, cardIds)),
         loadSetMetaAll: () => dispatch<any>(Storage.loadSetMetaAll()),
-        loadStudyState: (setId: string) => dispatch<any>(Storage.loadStudyState(setId)),
+        loadStudyState: (setId: number) => dispatch<any>(Storage.loadStudyState(setId)),
         beginStudy: (options: Study.IStudySessionOptions) => dispatch<any>(Storage.beginStudySession(options)),
         evaluateCard: (cardId: string, evaluation: Study.CardEvaluation) =>
             dispatch<any>(Storage.evaluateCard(cardId, evaluation)),
-        filterCards: (setId: string, filter: IFlashCardFilter) =>
+        filterCards: (setId: number, filter: IFlashCardFilter) =>
             dispatch<any>(Storage.filterCards(setId, filter)),
     };
 }

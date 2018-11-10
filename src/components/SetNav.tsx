@@ -2,7 +2,7 @@ import * as React from "react";
 import { Link } from "react-router-dom";
 
 interface ISetNavProps {
-    setId: string;
+    setId: number;
     activePage: "study" | "edit" | "properties" | "export";
 }
 

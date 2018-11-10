@@ -24,7 +24,7 @@ interface ICardEditorState {
 }
 
 interface ICardEditorOwnProps {
-    setId: string;
+    setId: number;
     cardId: string;
 
     /**
@@ -46,11 +46,11 @@ interface ICardEditorStateProps extends ICardEditorOwnProps {
 }
 
 interface ICardEditorDispatchProps {
-    deleteCard: (setId: string, cardId: string) => void;
-    saveCardFace: (setId: string, cardId: string, face: IFlashCardFace) => void;
-    swapCardFaces: (setId: string, cardId: string) => void;
-    loadCards: (setId: string, cardIds: string[]) => void;
-    saveCardMeta: (setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) => void;
+    deleteCard: (setId: number, cardId: string) => void;
+    saveCardFace: (setId: number, cardId: string, face: IFlashCardFace) => void;
+    swapCardFaces: (setId: number, cardId: string) => void;
+    loadCards: (setId: number, cardIds: string[]) => void;
+    saveCardMeta: (setId: number, cardId: string, cardMeta: Partial<IFlashCardMeta>) => void;
 }
 
 interface ICardEditorProps extends ICardEditorStateProps, ICardEditorDispatchProps { }
@@ -180,7 +180,8 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
                 </SlideTransition>;
             case (TransitionState.None):
             case (TransitionState.PlaceholderLoad):
-                return <li className={"is-clearfix" + (isPlaceholder ? "" : " listed-flashcard")} ref={el => this.cardElement = el}>
+                return <li className={"is-clearfix" + (isPlaceholder ? "" : " listed-flashcard")}
+                            ref={el => this.cardElement = el}>
                     {editor}
                     {divider}
                 </li>;
@@ -221,7 +222,7 @@ class CardEditor extends React.Component<ICardEditorProps, ICardEditorState> {
             if (this.props.onScreenPositionChanged !== undefined) {
                 let newScreenPos: ScreenPosition = "unknown";
                 if (elementTop > window.innerHeight) {
-                    newScreenPos = "below"
+                    newScreenPos = "below";
                 } else if (elementBottom < 0) {
                     newScreenPos = "above";
                 } else {
@@ -250,14 +251,14 @@ function mapStateToProps(state: IAppState, ownProps: ICardEditorOwnProps): ICard
 
 function mapDispatchToProps(dispatch: Dispatch): ICardEditorDispatchProps {
     return {
-        deleteCard: (setId: string, cardId: string) =>
+        deleteCard: (setId: number, cardId: string) =>
             dispatch<any>(Storage.deleteCard(setId, cardId)),
-        saveCardFace: (setId: string, cardId: string, face: IFlashCardFace) =>
+        saveCardFace: (setId: number, cardId: string, face: IFlashCardFace) =>
             dispatch<any>(Storage.saveCardFace(setId, cardId, face)),
-        swapCardFaces: (setId: string, cardId: string) => dispatch(Action.swapCardFaces(setId, cardId)),
-        loadCards: (setId: string, cardIds: string[]) =>
+        swapCardFaces: (setId: number, cardId: string) => dispatch(Action.swapCardFaces(setId, cardId)),
+        loadCards: (setId: number, cardIds: string[]) =>
             dispatch<any>(Storage.loadCards(setId, cardIds)),
-        saveCardMeta: (setId: string, cardId: string, cardMeta: Partial<IFlashCardMeta>) =>
+        saveCardMeta: (setId: number, cardId: string, cardMeta: Partial<IFlashCardMeta>) =>
             dispatch<any>(Storage.saveCardMeta(setId, cardId, cardMeta)),
     };
 }

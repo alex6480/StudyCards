@@ -1,7 +1,7 @@
 import IFlashCard from "./flashcard";
 
 export interface ICardStudyData {
-    setId: string;
+    setId: number;
     cardId: string;
     dueDate: Date;
 

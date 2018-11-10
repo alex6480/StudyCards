@@ -16,7 +16,7 @@ interface ISetPropertiesOwnProps {
 }
 
 interface ISetPropertiesStateProps extends RouteComponentProps<ISetPropertiesOwnProps> {
-    setId: string;
+    setId: number;
     set?: IRemote<IFlashCardSet>;
 }
 
@@ -152,7 +152,7 @@ function mapStateToProps(state: IAppState, ownProps: RouteComponentProps<ISetPro
 
     return {
         ...ownProps,
-        setId,
+        setId: Number(setId),
         set,
     };
 }

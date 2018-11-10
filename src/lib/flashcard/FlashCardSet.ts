@@ -3,7 +3,7 @@ import { objectMapString } from "../utils";
 import IFlashCard, { ExportFlashCard } from "./flashcard";
 
 export interface IFlashCardSetMeta {
-    id: string;
+    id: number;
     name: string;
 
     cardOrder: string[];
@@ -24,7 +24,7 @@ export default interface IFlashCardSet extends IFlashCardSetMeta {
 export class ExportFlashCardSet {
     public readonly cards: { [id: string]: ExportFlashCard; };
     public readonly name: string;
-    public readonly id: string;
+    public readonly id: number;
     public readonly exportVersion: string = "1";
 
     constructor(set: IFlashCardSet) {
